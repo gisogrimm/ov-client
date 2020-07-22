@@ -2,6 +2,8 @@ all: build binaries
 
 BINARIES = ov-client
 
+EXTERNALS = jack libxml++-2.6 liblo sndfile
+
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 
 
@@ -16,6 +18,10 @@ CPPFLAGS = -std=c++11
 PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
+
+LDLIBS += `pkg-config --libs $(EXTERNALS)`
+CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
+LDLIBS += -ldl -ltascar
 
 build: build/.directory
 
