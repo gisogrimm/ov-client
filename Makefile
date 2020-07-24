@@ -1,7 +1,7 @@
 all: build binaries
 
 BINARIES = ov-client
-OBJ = ov_types errmsg ov_client_orlandoviols ov_render_tascar
+OBJ = ov_types errmsg ov_client_orlandoviols ov_render_tascar mactools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl
 

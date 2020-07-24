@@ -149,11 +149,13 @@ void ov_client_orlandoviols_t::service()
 {
   std::string hash;
   double gracetime(8.0);
-  uint64_t gracetime_milli(1000.0 * gracetime);
   while(runservice) {
     std::string stagecfg(get_device_init(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
       RSJresource my_json(stagecfg);
+      std::cout << "-----------------------------------------------"
+                << std::endl;
+      std::cout << stagecfg << std::endl;
       // jacksettings_t jacks;
       // jacks.device = my_json["jackdevice"].as<std::string>("hw:1");
       // jacks.rate = my_json["jackrate"].as<int>(48000);
@@ -161,7 +163,11 @@ void ov_client_orlandoviols_t::service()
       // jacks.buffers = my_json["jackbuffers"].as<int>(2);
       // return jacks;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(gracetime_milli));
+    double t(0);
+    while((t < gracetime) && runservice) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      t += 0.001;
+    }
   }
 }
 

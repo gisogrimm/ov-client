@@ -1,44 +1,30 @@
+#include "mactools.h"
+#include "ov_client_orlandoviols.h"
+#include "ov_render_tascar.h"
 #include <stdint.h>
 #include <string>
 
-#include "ov_types.h"
+static bool quit_app(false);
 
-void ov_render_base_t::configure_audio_backend(
-    const audio_device_t& audiodevice_)
+static void sighandler(int sig)
 {
-  if(audiodevice != audiodevice_) {
-    audiodevice = audiodevice_;
-    if(audio_active) {
-      bool session_was_active(session_active);
-      if(session_active)
-        end_session();
-      stop_audiobackend();
-      start_audiobackend();
-      if(session_was_active)
-        start_session();
-    }
-  }
-}
-
-void ov_render_base_t::add_stage_device(const stage_device_t& stagedevice)
-{
-  stage.stage[stagedevice.id] = stagedevice;
-}
-
-void ov_render_base_t::rm_stage_device(stage_device_id_t stagedeviceid)
-{
-  stage.stage.erase(stagedeviceid);
-}
-
-void ov_render_base_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
-                                             double gain)
-{
-  if(stage.stage.find(stagedeviceid) != stage.stage.end())
-    stage.stage[stagedeviceid].gain = gain;
+  quit_app = true;
 }
 
 int main(int argc, char** argv)
 {
+  signal(SIGABRT, &sighandler);
+  signal(SIGTERM, &sighandler);
+  signal(SIGINT, &sighandler);
+  std::string deviceid(getmacaddr());
+  // std::string lobby("http://box.orlandoviols.com/");
+  std::string lobby("http://localhost:8083/");
+  ov_render_tascar_t render(deviceid);
+  ov_client_orlandoviols_t ovclient(render, lobby);
+  ovclient.start_service();
+  while(!quit_app)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  ovclient.stop_service();
   return 0;
 }
 
