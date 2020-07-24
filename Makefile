@@ -19,6 +19,8 @@ PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
 
+LDLIBS += -ltascar
+
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl -ltascar
@@ -32,4 +34,4 @@ build: build/.directory
 binaries: $(BUILD_BINARIES)
 
 build/%: src/%.cc
-	$(CXX) $(CXXFLAGS) $(LDLIBS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDLIBS) -o $@
