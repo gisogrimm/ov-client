@@ -1,6 +1,18 @@
 #include "ov_render_tascar.h"
 #include <unistd.h>
 
+std::string to_string(const TASCAR::pos_t& x)
+{
+  return TASCAR::to_string(x.x) + " " + TASCAR::to_string(x.y) + " " +
+         TASCAR::to_string(x.z);
+}
+
+std::string to_string(const TASCAR::zyx_euler_t& x)
+{
+  return TASCAR::to_string(x.z) + " " + TASCAR::to_string(x.y) + " " +
+         TASCAR::to_string(x.x);
+}
+
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid)
     : ov_render_base_t(deviceid), h_pipe_jack(NULL), tascar(NULL)
 {
@@ -26,18 +38,23 @@ void ov_render_tascar_t::start_session()
   e_session->set_attribute("name", stage.thisdeviceid);
   e_session->set_attribute("license", "CC0");
   e_session->set_attribute("levelmeter_tc", "0.5");
-  if(!stage.rawmode) {
+  if(!stage.rendersettings.rawmode) {
     xmlpp::Element* e_scene(e_session->add_child("scene"));
     e_scene->set_attribute("name", stage.thisdeviceid);
     xmlpp::Element* e_rec = e_scene->add_child("receiver");
-    e_rec->set_attribute("type", stage.rectype);
-    if(stage.rectype == "ortf") {
+    e_rec->set_attribute("type", stage.rendersettings.rectype);
+    if(stage.rendersettings.rectype == "ortf") {
       e_rec->set_attribute("angle", "140");
       e_rec->set_attribute("f6db", "12000");
       e_rec->set_attribute("fmin", "3000");
     }
     e_rec->set_attribute("name", "master");
     e_rec->set_attribute("delaycomp", "0.05");
+    e_rec->set_attribute(
+        "dlocation", to_string(stage.stage[stage.rendersettings.id].position));
+    e_rec->set_attribute(
+        "dorientation",
+        to_string(stage.stage[stage.rendersettings.id].orientation));
     if(!stage.stage.empty()) {
       // the stage is not empty, which means we are on a stage.
 
@@ -57,15 +74,33 @@ void ov_render_tascar_t::start_session()
       double radius(1.2);
       for(auto stagemember : stage.stage) {
         az += daz;
-
         xmlpp::Element* e_src(e_scene->add_child("source"));
-        e_src->set_attribute("name", "true");
-        xmlpp::Element* e_snd(e_src->add_child("sound"));
+        if(stagemember.second.id == stage.thisstagedeviceid)
+          e_src->set_attribute("name", "ego");
+        else
+          e_src->set_attribute("name", stagemember.second.label);
+        if(b_sender) {
+          e_src->set_attribute("dlocation",
+                               to_string(stagemember.second.position));
+          e_src->set_attribute("dorientation",
+                               to_string(stagemember.second.orientation));
+        }
+        for(auto ch : stagemember.second.channels) {
+          xmlpp::Element* e_snd(e_src->add_child("sound"));
+          if(stagemember.second.id == stage.thisstagedeviceid)
+            e_snd->set_attribute("connect", ch.sourceport);
+          e_snd->set_attribute("gain",
+                               TASCAR::to_string(20.0 * log10(ch.gain)));
+          e_snd->set_attribute("x", TASCAR::to_string(ch.position.x));
+          e_snd->set_attribute("y", TASCAR::to_string(ch.position.y));
+          e_snd->set_attribute("z", TASCAR::to_string(ch.position.z));
+        }
       }
     } else {
       // the stage is empty, which means we play an announcement only.
     }
   }
+  tascar->doc->write_to_file_formatted("debugsession.tsc");
   tascar->start();
 }
 
@@ -130,6 +165,18 @@ void ov_render_tascar_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
   if(is_session_active()) {
     end_session();
     start_session();
+  }
+}
+
+void ov_render_tascar_t::set_render_settings(
+    const render_settings_t& rendersettings)
+{
+  if(rendersettings != stage.rendersettings) {
+    ov_render_base_t::set_render_settings(rendersettings);
+    if(is_session_active()) {
+      end_session();
+      start_session();
+    }
   }
 }
 

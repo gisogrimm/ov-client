@@ -57,13 +57,8 @@ bool operator!=(const std::vector<device_channel_t>& a,
 
 bool operator!=(const stage_device_t& a, const stage_device_t& b);
 
-struct stage_t {
-  /// Device identifier of this stage device (typically its mac address):
-  std::string thisdeviceid;
-  /// Numeric identifier of this device within the stage:
-  stage_device_id_t thisstagedeviceid;
-  /// Devices on the stage:
-  std::map<stage_device_id_t, stage_device_t> stage;
+struct render_settings_t {
+  stage_device_id_t id;
   /// room dimensions:
   TASCAR::pos_t roomsize;
   ///
@@ -73,12 +68,26 @@ struct stage_t {
   bool rawmode;
   /// Receiver type, either ortf or hrtf:
   std::string rectype;
+  /// self monitor gain:
+  double egogain;
+};
+
+bool operator!=(const render_settings_t& a, const render_settings_t& b);
+
+struct stage_t {
+  render_settings_t rendersettings;
+  /// Device identifier of this stage device (typically its mac address):
+  std::string thisdeviceid;
+  /// Numeric identifier of this device within the stage:
+  stage_device_id_t thisstagedeviceid;
+  /// Devices on the stage:
+  std::map<stage_device_id_t, stage_device_t> stage;
 };
 
 class ov_render_base_t {
 public:
   ov_render_base_t(const std::string& deviceid)
-      : audiodevice({"", "", 48000, 96, 2}), stage({deviceid, 0}),
+      : audiodevice({"", "", 48000, 96, 2}), stage({{}, deviceid, 0}),
         session_active(false), audio_active(false){};
   virtual ~ov_render_base_t(){};
   virtual void start_session() { session_active = true; };
@@ -86,8 +95,10 @@ public:
   virtual void configure_audio_backend(const audio_device_t&);
   virtual void add_stage_device(const stage_device_t& stagedevice);
   virtual void rm_stage_device(stage_device_id_t stagedeviceid);
+  virtual void clear_stage();
   virtual void set_stage_device_gain(stage_device_id_t stagedeviceid,
                                      double gain);
+  virtual void set_render_settings(const render_settings_t& rendersettings);
   virtual void start_audiobackend() { audio_active = true; };
   virtual void stop_audiobackend() { audio_active = false; };
   const bool is_session_active() const { return session_active; };

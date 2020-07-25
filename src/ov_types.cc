@@ -41,6 +41,14 @@ bool operator!=(const stage_device_t& a, const stage_device_t& b)
          (a.gain != b.gain) || (a.mute != b.mute);
 }
 
+bool operator!=(const render_settings_t& a, const render_settings_t& b)
+{
+  return (a.roomsize != b.roomsize) || (a.absorption != b.absorption) ||
+         (a.damping != b.damping) || (a.renderreverb != b.renderreverb) ||
+         (a.rawmode != b.rawmode) || (a.rectype != b.rectype) ||
+         (a.egogain != b.egogain);
+}
+
 void ov_render_base_t::configure_audio_backend(
     const audio_device_t& audiodevice_)
 {
@@ -63,6 +71,11 @@ void ov_render_base_t::add_stage_device(const stage_device_t& stagedevice)
   stage.stage[stagedevice.id] = stagedevice;
 }
 
+void ov_render_base_t::clear_stage()
+{
+  stage.stage.clear();
+}
+
 void ov_render_base_t::rm_stage_device(stage_device_id_t stagedeviceid)
 {
   stage.stage.erase(stagedeviceid);
@@ -74,3 +87,15 @@ void ov_render_base_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
   if(stage.stage.find(stagedeviceid) != stage.stage.end())
     stage.stage[stagedeviceid].gain = gain;
 }
+
+void ov_render_base_t::set_render_settings(
+    const render_settings_t& rendersettings)
+{
+  stage.rendersettings = rendersettings;
+}
+
+/*
+ * Local Variables:
+ * compile-command: "make -C .."
+ * End:
+ */

@@ -15,6 +15,7 @@ public:
   void add_stage_device(const stage_device_t& stagedevice);
   void rm_stage_device(stage_device_id_t stagedeviceid);
   void set_stage_device_gain(stage_device_id_t stagedeviceid, double gain);
+  void set_render_settings(const render_settings_t& rendersettings);
 
 private:
   FILE* h_pipe_jack;

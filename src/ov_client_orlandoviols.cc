@@ -115,32 +115,17 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
-
   url += "?ovclient=" + device + "&hash=" + hash;
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
-  /* send all data to this function  */
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
-  /* we pass our 'chunk' struct to the callback function */
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
-
-  /* some servers don't like requests that are made without a user-agent
-     field, so we provide one */
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-  /* some servers don't like requests that are made without a user-agent
-     field, so we provide one */
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsdevs.c_str());
-
-  /* get it! */
   res = curl_easy_perform(curl);
-
-  /* check for errors */
-  if(res == CURLE_OK) {
+  if(res == CURLE_OK)
     retv.insert(0, chunk.memory, chunk.size);
-    // printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
-  }
   free(chunk.memory);
   std::stringstream ss(retv);
   std::string to;
@@ -156,6 +141,35 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
   if(retv.size())
     retv.erase(retv.size() - 1);
   return retv;
+}
+
+stage_device_t get_stage_dev(RSJresource& dev)
+{
+  stage_device_t stagedev;
+  stagedev.id = dev["id"].as<int>(-1);
+  stagedev.label = dev["label"].as<std::string>("");
+  for(auto ch : dev["channels"].as_array()) {
+    device_channel_t devchannel;
+    devchannel.sourceport = ch["sourceport"].as<std::string>("");
+    devchannel.gain = ch["gain"].as<double>(1.0);
+    devchannel.position.x = ch["position"]["x"].as<double>(0);
+    devchannel.position.y = ch["position"]["y"].as<double>(0);
+    devchannel.position.z = ch["position"]["z"].as<double>(0);
+    stagedev.channels.push_back(devchannel);
+  }
+  /// Position of the stage device in the virtual space:
+  stagedev.position.x = dev["position"]["x"].as<double>(0);
+  stagedev.position.y = dev["position"]["y"].as<double>(0);
+  stagedev.position.z = dev["position"]["z"].as<double>(0);
+  /// Orientation of the stage device in the virtual space, ZYX Euler angles:
+  stagedev.orientation.z = dev["orientation"]["z"].as<double>(0);
+  stagedev.orientation.y = dev["orientation"]["y"].as<double>(0);
+  stagedev.orientation.x = dev["orientation"]["x"].as<double>(0);
+  /// Linear gain of the stage device:
+  stagedev.gain = dev["gain"].as<double>(0);
+  /// Mute flag:
+  stagedev.mute = dev["mute"].as<bool>(false);
+  return stagedev;
 }
 
 void ov_client_orlandoviols_t::service()
@@ -177,6 +191,36 @@ void ov_client_orlandoviols_t::service()
       audio.periodsize = js_audio["periodsize"].as<int>(96);
       audio.numperiods = js_audio["numperiods"].as<int>(2);
       backend.configure_audio_backend(audio);
+
+      RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
+      RSJresource js_stage(js_stagecfg["room"]);
+      RSJresource js_roomsize(js_stage["size"]);
+      RSJresource js_reverb(js_stage["reverb"]);
+      render_settings_t rendersettings;
+      rendersettings.id = js_rendersettings["id"].as<int>(-1);
+      rendersettings.roomsize.x = js_roomsize["x"].as<double>(0);
+      rendersettings.roomsize.y = js_roomsize["y"].as<double>(0);
+      rendersettings.roomsize.z = js_roomsize["z"].as<double>(0);
+      rendersettings.absorption = js_reverb["absorption"].as<double>(0.6);
+      rendersettings.damping = js_reverb["damping"].as<double>(0.7);
+      rendersettings.renderreverb =
+          js_rendersettings["renderreverb"].as<bool>(true);
+      rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
+      rendersettings.rectype =
+          js_rendersettings["rectype"].as<std::string>("ortf");
+      rendersettings.egogain =
+          pow(10.0, 0.05 * js_rendersettings["egogain"].as<double>(0.0));
+      backend.set_render_settings(rendersettings);
+
+      RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
+      backend.clear_stage();
+      for(auto dev : js_stagedevs)
+        backend.add_stage_device(get_stage_dev(dev));
+
+      if(!backend.is_audio_active())
+        backend.start_audiobackend();
+      if(!backend.is_session_active())
+        backend.start_session();
     }
     double t(0);
     while((t < gracetime) && runservice) {
