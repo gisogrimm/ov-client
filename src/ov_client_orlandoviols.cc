@@ -108,7 +108,7 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
   if(jsdevs.size())
     jsdevs.erase(jsdevs.end() - 1);
   jsdevs += "}";
-  std::cout << jsdevs << std::endl;
+  // std::cout << jsdevs << std::endl;
   CURLcode res;
   std::string retv;
   struct webCURL::MemoryStruct chunk;
@@ -116,7 +116,7 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
 
-  url += "?ovclient=" + device;
+  url += "?ovclient=" + device + "&hash=" + hash;
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
   /* send all data to this function  */
@@ -142,6 +142,19 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
     // printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
   }
   free(chunk.memory);
+  std::stringstream ss(retv);
+  std::string to;
+  bool first(true);
+  retv = "";
+  while(std::getline(ss, to, '\n')) {
+    if(first)
+      hash = to;
+    else
+      retv += to + '\n';
+    first = false;
+  }
+  if(retv.size())
+    retv.erase(retv.size() - 1);
   return retv;
 }
 
@@ -152,16 +165,18 @@ void ov_client_orlandoviols_t::service()
   while(runservice) {
     std::string stagecfg(get_device_init(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
-      RSJresource my_json(stagecfg);
+      RSJresource js_stagecfg(stagecfg);
       std::cout << "-----------------------------------------------"
                 << std::endl;
       std::cout << stagecfg << std::endl;
-      // jacksettings_t jacks;
-      // jacks.device = my_json["jackdevice"].as<std::string>("hw:1");
-      // jacks.rate = my_json["jackrate"].as<int>(48000);
-      // jacks.period = my_json["jackperiod"].as<int>(96);
-      // jacks.buffers = my_json["jackbuffers"].as<int>(2);
-      // return jacks;
+      RSJresource js_audio(js_stagecfg["audiocfg"]);
+      audio_device_t audio;
+      audio.drivername = js_audio["driver"].as<std::string>("jack");
+      audio.devicename = js_audio["device"].as<std::string>("hw:1");
+      audio.srate = js_audio["srate"].as<double>(48000);
+      audio.periodsize = js_audio["periodsize"].as<int>(96);
+      audio.numperiods = js_audio["numperiods"].as<int>(2);
+      backend.configure_audio_backend(audio);
     }
     double t(0);
     while((t < gracetime) && runservice) {
