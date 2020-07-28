@@ -8,7 +8,7 @@ class ov_render_tascar_t : public ov_render_base_t {
 public:
   ov_render_tascar_t(const std::string& deviceid);
   ~ov_render_tascar_t();
-  void start_session();
+  void start_session(const std::string& host, port_t port);
   void end_session();
   void start_audiobackend();
   void stop_audiobackend();

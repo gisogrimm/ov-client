@@ -61,7 +61,7 @@ void ov_render_base_t::configure_audio_backend(
       stop_audiobackend();
       start_audiobackend();
       if(session_was_active)
-        start_session();
+        start_session(stage.host,stage.port);
     }
   }
 }

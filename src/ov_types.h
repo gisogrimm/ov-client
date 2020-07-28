@@ -8,6 +8,7 @@ bool operator!=(const TASCAR::pos_t& a, const TASCAR::pos_t& b);
 bool operator!=(const TASCAR::zyx_euler_t& a, const TASCAR::zyx_euler_t& b);
 
 typedef uint8_t stage_device_id_t;
+typedef uint16_t port_t;
 
 struct audio_device_t {
   /// driver name, e.g. jack, ALSA, ASIO
@@ -75,6 +76,11 @@ struct render_settings_t {
 bool operator!=(const render_settings_t& a, const render_settings_t& b);
 
 struct stage_t {
+  /// relay server host name:
+  std::string host;
+  /// relay server port:
+  port_t port;
+  /// rendering settings:
   render_settings_t rendersettings;
   /// Device identifier of this stage device (typically its mac address):
   std::string thisdeviceid;
@@ -87,11 +93,21 @@ struct stage_t {
 class ov_render_base_t {
 public:
   ov_render_base_t(const std::string& deviceid)
-      : audiodevice({"", "", 48000, 96, 2}), stage({{}, deviceid, 0}),
+      : audiodevice({"", "", 48000, 96, 2}), stage({"", 0, {}, deviceid, 0}),
         session_active(false), audio_active(false){};
   virtual ~ov_render_base_t(){};
-  virtual void start_session() { session_active = true; };
-  virtual void end_session() { session_active = false; };
+  virtual void start_session(const std::string& host, port_t port)
+  {
+    stage.host = host;
+    stage.port = port;
+    session_active = true;
+  };
+  virtual void end_session()
+  {
+    stage.host = "";
+    stage.port = 0;
+    session_active = false;
+  };
   virtual void configure_audio_backend(const audio_device_t&);
   virtual void add_stage_device(const stage_device_t& stagedevice);
   virtual void rm_stage_device(stage_device_id_t stagedeviceid);
