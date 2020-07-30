@@ -1,20 +1,9 @@
 #include "ov_render_tascar.h"
 #include <unistd.h>
 
-// std::string to_string(const TASCAR::pos_t& x)
-//{
-//  return TASCAR::to_string(x.x) + " " + TASCAR::to_string(x.y) + " " +
-//         TASCAR::to_string(x.z);
-//}
-//
-// std::string to_string(const TASCAR::zyx_euler_t& x)
-//{
-//  return TASCAR::to_string(x.z) + " " + TASCAR::to_string(x.y) + " " +
-//         TASCAR::to_string(x.x);
-//}
-
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid)
-    : ov_render_base_t(deviceid), h_pipe_jack(NULL), tascar(NULL)
+    : ov_render_base_t(deviceid), h_pipe_jack(NULL), tascar(NULL),
+      ovboxclient(NULL)
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
 }
@@ -27,14 +16,15 @@ ov_render_tascar_t::~ov_render_tascar_t()
     stop_audiobackend();
 }
 
-void ov_render_tascar_t::start_session(const std::string& host, port_t port)
+void ov_render_tascar_t::start_session()
 {
-  ov_render_base_t::start_session(host, port);
-  tascar = new TASCAR::session_t(
-      "<?xml version=\"1.0\"?><session srv_port=\"none\"/>",
-      TASCAR::session_t::LOAD_STRING, "");
+  ov_render_base_t::start_session();
   try {
-    xmlpp::Element* e_session(tascar->doc->get_root_node());
+    TASCAR::xml_doc_t tsc;
+    tsc.doc->create_root_node("session");
+    std::vector<std::string> waitports;
+    xmlpp::Element* e_session(tsc.doc->get_root_node());
+    e_session->set_attribute("srv_port", "none");
     e_session->set_attribute("duration", "36000");
     e_session->set_attribute("name", stage.thisdeviceid);
     e_session->set_attribute("license", "CC0");
@@ -57,16 +47,12 @@ void ov_render_tascar_t::start_session(const std::string& host, port_t port)
       e_rec->set_attribute(
           "dorientation",
           TASCAR::to_string(stage.stage[stage.rendersettings.id].orientation));
-      DEBUG(stage.host);
-      DEBUG(stage.port);
-      if(!stage.stage.empty()) {
-        DEBUG(stage.stage.size());
+      if(!stage.host.empty()) {
         // the stage is not empty, which means we are on a stage.
         // b_sender is true if this device is sending audio. If this
         // device is not sending audio, then the stage layout will
         // differ.
         bool b_sender(!stage.stage[stage.thisstagedeviceid].channels.empty());
-        DEBUG(b_sender);
         // width of stage in degree:
         double stagewidth(160);
         double az(-0.5 * stagewidth);
@@ -78,8 +64,6 @@ void ov_render_tascar_t::start_session(const std::string& host, port_t port)
         az = az * (M_PI / 180.0) - 0.5 * daz;
         double radius(1.2);
         for(auto stagemember : stage.stage) {
-          DEBUG((int)(stagemember.first));
-          DEBUG(stagemember.second.label);
           az += daz;
           TASCAR::pos_t pos(stagemember.second.position);
           TASCAR::zyx_euler_t rot(stagemember.second.orientation);
@@ -98,7 +82,9 @@ void ov_render_tascar_t::start_session(const std::string& host, port_t port)
             ego_delta.x = 0.2;
             ego_delta.z = -0.3;
           } else {
-            e_src->set_attribute("name", stagemember.second.label);
+            e_src->set_attribute("name",
+                                 stagemember.second.label + "_" +
+                                     TASCAR::to_string(stagemember.second.id));
           }
           if(b_sender) {
             e_src->set_attribute("dlocation", to_string(pos));
@@ -115,11 +101,106 @@ void ov_render_tascar_t::start_session(const std::string& host, port_t port)
             e_snd->set_attribute("z", TASCAR::to_string(ch.position.z));
           }
         }
+        if(stage.rendersettings.renderreverb) {
+          xmlpp::Element* e_rvb(e_scene->add_child("reverb"));
+          e_rvb->set_attribute("type", "simplefdn");
+          e_rvb->set_attribute(
+              "volumetric", TASCAR::to_string(stage.rendersettings.roomsize));
+          e_rvb->set_attribute("image", "false");
+          e_rvb->set_attribute("fdnorder", "5");
+          e_rvb->set_attribute("dw", "60");
+          e_rvb->set_attribute(
+              "absorption", TASCAR::to_string(stage.rendersettings.absorption));
+          e_rvb->set_attribute("damping",
+                               TASCAR::to_string(stage.rendersettings.damping));
+          e_rvb->set_attribute(
+              "gain", TASCAR::to_string(stage.rendersettings.reverbgain));
+        }
       } else {
         // the stage is empty, which means we play an announcement only.
       }
     }
-    tascar->doc->write_to_file_formatted("debugsession.tsc");
+    // configure extra modules:
+    xmlpp::Element* e_mods(e_session->add_child("modules"));
+    for(auto stagemember : stage.stage) {
+      if(stage.thisstagedeviceid != stagemember.second.id) {
+        std::string clientname(stagemember.second.label + "_" +
+                               TASCAR::to_string(stagemember.second.id));
+        xmlpp::Element* e_sys = e_mods->add_child("system");
+        double buff(stage.stage[stage.thisstagedeviceid].receiverjitter +
+                    stagemember.second.senderjitter);
+        e_sys->set_attribute(
+            "command",
+            "zita-n2j --chan " +
+                TASCAR::to_string(stagemember.second.channels.size()) +
+                " --jname " + clientname + " --buf " + TASCAR::to_string(buff) +
+                " 0.0.0.0 " +
+                TASCAR::to_string(4464 + 2 * stagemember.second.id));
+        e_sys->set_attribute("onunload", "killall zita-n2j");
+        for(size_t c = 0; c < stagemember.second.channels.size(); ++c) {
+          std::string srcport(clientname + ":out_" + std::to_string(c + 1));
+          std::string destport("render." + stage.thisdeviceid + ":" +
+                               clientname + "." + std::to_string(c) + ".0");
+          waitports.push_back(srcport);
+          xmlpp::Element* e_port = e_session->add_child("connect");
+          e_port->set_attribute("src", srcport);
+          e_port->set_attribute("dest", destport);
+        }
+        // if( stage.rendersettings.secrec )
+        //    if( $localdevprop['secrec'] > 0 ){
+        //      $mod =
+        //      $modules->appendChild($doc->createElement('system'));
+        //      $port = 'n2j_'.$chair.'_sec';
+        //      $mod->setAttribute('command','zita-n2j
+        //      --chan '.$chan.'
+        //      --jname
+        //      '.$port.' --buf ' .
+        //      ($buff+$localdevprop['secrec']) . '
+        //      0.0.0.0 ' . ($iport+100)); $waitports =
+        //      $waitports . ' ' . $port.':out_1'; if(
+        //      $numsource > 1 )
+        //        $waitports = $waitports . ' ' .
+        //        $port.':out_2';
+        //      $mod =
+        //      $modules->appendChild($doc->createElement('route'));
+        //      $mod->setAttribute('name',$devuser .
+        //      '_'.$chair.'_sec');
+        //      $mod->setAttribute('channels',$numsource);
+        //      $mod->setAttribute('gain',$devprop['playbackgain']);
+        //      $mod->setAttribute('connect',$port.':out_[12]');
+        //    }
+      }
+    }
+    if(stage.stage[stage.thisstagedeviceid].channels.size() > 0) {
+      xmlpp::Element* e_sys = e_mods->add_child("system");
+      e_sys->set_attribute(
+          "command",
+          "zita-j2n --chan " +
+              std::to_string(
+                  stage.stage[stage.thisstagedeviceid].channels.size()) +
+              " --jname sender --16bit 127.0.0.1 " +
+              std::to_string(4464 + 2 * stage.thisstagedeviceid));
+      e_sys->set_attribute("onunload", "killall zita-j2n");
+      int chn(0);
+      for(auto ch : stage.stage[stage.thisstagedeviceid].channels) {
+        ++chn;
+        xmlpp::Element* e_port = e_session->add_child("connect");
+        e_port->set_attribute("src", ch.sourceport);
+        e_port->set_attribute("dest", "sender:in_" + std::to_string(chn));
+      }
+    }
+    xmlpp::Element* e_wait = e_mods->add_child("waitforjackport");
+    for(auto port : waitports) {
+      xmlpp::Element* e_p = e_wait->add_child("port");
+      e_p->add_child_text(port);
+    }
+    ovboxclient = new ovboxclient_t(
+        stage.host, stage.port, 4464 + 2 * stage.thisstagedeviceid, 0, 30,
+        stage.pin, stage.thisstagedeviceid, stage.rendersettings.peer2peer,
+        false, false);
+    tsc.doc->write_to_file_formatted("debugsession.tsc");
+    tascar = new TASCAR::session_t(tsc.doc->write_to_string(),
+                                   TASCAR::session_t::LOAD_STRING, "");
     tascar->start();
   }
   catch(...) {
@@ -136,6 +217,11 @@ void ov_render_tascar_t::end_session()
   if(tascar) {
     tascar->stop();
     delete tascar;
+    tascar = NULL;
+  }
+  if(ovboxclient) {
+    delete ovboxclient;
+    ovboxclient = NULL;
   }
 }
 
@@ -172,7 +258,7 @@ void ov_render_tascar_t::add_stage_device(const stage_device_t& stagedevice)
   ov_render_base_t::add_stage_device(stagedevice);
   if(is_session_active()) {
     end_session();
-    start_session(stage.host, stage.port);
+    start_session();
   }
 }
 
@@ -181,7 +267,7 @@ void ov_render_tascar_t::rm_stage_device(stage_device_id_t stagedeviceid)
   ov_render_base_t::rm_stage_device(stagedeviceid);
   if(is_session_active()) {
     end_session();
-    start_session(stage.host, stage.port);
+    start_session();
   }
 }
 
@@ -192,7 +278,7 @@ void ov_render_tascar_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
   // this is really brute force, will be replaced soon:
   if(is_session_active()) {
     end_session();
-    start_session(stage.host, stage.port);
+    start_session();
   }
 }
 
@@ -203,7 +289,7 @@ void ov_render_tascar_t::set_render_settings(
     ov_render_base_t::set_render_settings(rendersettings);
     if(is_session_active()) {
       end_session();
-      start_session(stage.host, stage.port);
+      start_session();
     }
   }
 }

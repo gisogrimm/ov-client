@@ -61,7 +61,7 @@ void ov_render_base_t::configure_audio_backend(
       stop_audiobackend();
       start_audiobackend();
       if(session_was_active)
-        start_session(stage.host,stage.port);
+        start_session();
     }
   }
 }
@@ -92,6 +92,22 @@ void ov_render_base_t::set_render_settings(
     const render_settings_t& rendersettings)
 {
   stage.rendersettings = rendersettings;
+}
+
+void ov_render_base_t::set_relay_server(const std::string& host, port_t port,
+                                        secret_t pin)
+{
+  bool restart(false);
+  if(is_session_active() &&
+     ((stage.host != host) || (stage.port != port) || (stage.pin != pin)))
+    restart = true;
+  stage.host = host;
+  stage.port = port;
+  stage.pin = pin;
+  if(restart) {
+    end_session();
+    start_session();
+  }
 }
 
 /*

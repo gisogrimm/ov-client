@@ -2,13 +2,14 @@
 #define OV_RENDER_TASCAR
 
 #include "ov_types.h"
+#include "ovboxclient.h"
 #include <tascar/session.h>
 
 class ov_render_tascar_t : public ov_render_base_t {
 public:
   ov_render_tascar_t(const std::string& deviceid);
   ~ov_render_tascar_t();
-  void start_session(const std::string& host, port_t port);
+  void start_session();
   void end_session();
   void start_audiobackend();
   void stop_audiobackend();
@@ -20,6 +21,7 @@ public:
 private:
   FILE* h_pipe_jack;
   TASCAR::session_t* tascar;
+  ovboxclient_t* ovboxclient;
 };
 
 #endif

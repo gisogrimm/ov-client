@@ -190,11 +190,14 @@ stage_device_t get_stage_dev(RSJresource& dev)
   stagedev.gain = dev["gain"].as<double>(0);
   /// Mute flag:
   stagedev.mute = dev["mute"].as<bool>(false);
+  stagedev.receiverjitter = dev["jitter"]["receive"].as<double>(5);
+  stagedev.senderjitter = dev["jitter"]["send"].as<double>(5);
   return stagedev;
 }
 
 void ov_client_orlandoviols_t::service()
 {
+  report_error(lobby, backend.get_deviceid(), "");
   std::string hash;
   double gracetime(8.0);
   while(runservice) {
@@ -216,6 +219,10 @@ void ov_client_orlandoviols_t::service()
 
         RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
         RSJresource js_stage(js_stagecfg["room"]);
+        std::string stagehost(js_stage["host"].as<std::string>(""));
+        port_t stageport(js_stage["port"].as<int>(0));
+        secret_t stagepin(js_stage["pin"].as<secret_t>(0));
+        backend.set_relay_server(stagehost, stageport, stagepin);
         RSJresource js_roomsize(js_stage["size"]);
         RSJresource js_reverb(js_stage["reverb"]);
         render_settings_t rendersettings;
@@ -225,6 +232,7 @@ void ov_client_orlandoviols_t::service()
         rendersettings.roomsize.z = js_roomsize["z"].as<double>(0);
         rendersettings.absorption = js_reverb["absorption"].as<double>(0.6);
         rendersettings.damping = js_reverb["damping"].as<double>(0.7);
+        rendersettings.reverbgain = js_reverb["gain"].as<double>(-8);
         rendersettings.renderreverb =
             js_rendersettings["renderreverb"].as<bool>(true);
         rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
@@ -232,8 +240,9 @@ void ov_client_orlandoviols_t::service()
             js_rendersettings["rectype"].as<std::string>("ortf");
         rendersettings.egogain =
             pow(10.0, 0.05 * js_rendersettings["egogain"].as<double>(0.0));
+        rendersettings.peer2peer =
+            js_rendersettings["peer2peer"].as<bool>(true);
         backend.set_render_settings(rendersettings);
-
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
         backend.clear_stage();
         for(auto dev : js_stagedevs)
@@ -242,8 +251,7 @@ void ov_client_orlandoviols_t::service()
         if(!backend.is_audio_active())
           backend.start_audiobackend();
         if(!backend.is_session_active())
-          backend.start_session(js_stage["host"].as<std::string>(""),
-                                js_stage["port"].as<int>(0));
+          backend.start_session();
       }
       catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
