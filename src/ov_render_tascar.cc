@@ -105,16 +105,16 @@ void ov_render_tascar_t::start_session()
           }
           for(auto ch : stagemember.second.channels) {
             xmlpp::Element* e_snd(e_src->add_child("sound"));
-						e_snd->set_attribute("maxdist", "50");
-						e_snd->set_attribute("gainmodel", "1");
+            e_snd->set_attribute("maxdist", "50");
+            e_snd->set_attribute("gainmodel", "1");
             double gain(ch.gain * stagemember.second.gain);
             if(stagemember.second.id == stage.thisstagedeviceid) {
               e_snd->set_attribute("connect", ch.sourceport);
               gain *= stage.rendersettings.egogain;
-            }else{
-							// if not self-monitor then decrease gain:
-							gain *= 0.6;
-						}
+            } else {
+              // if not self-monitor then decrease gain:
+              gain *= 0.6;
+            }
             e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
             TASCAR::pos_t chpos(ch.position);
             chpos += ego_delta;
@@ -144,8 +144,8 @@ void ov_render_tascar_t::start_session()
         xmlpp::Element* e_src(e_scene->add_child("source"));
         e_src->set_attribute("name", "announce");
         xmlpp::Element* e_snd(e_src->add_child("sound"));
-				e_snd->set_attribute("maxdist", "50");
-				e_snd->set_attribute("gainmodel", "1");
+        e_snd->set_attribute("maxdist", "50");
+        e_snd->set_attribute("gainmodel", "1");
         e_snd->set_attribute("x", "4");
         //$egosound = xml_add_sound($source, $doc, array('x'=>4) );
         xmlpp::Element* e_plugs(e_snd->add_child("plugins"));

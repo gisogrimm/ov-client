@@ -108,6 +108,7 @@ void ov_client_orlandoviols_t::report_error(std::string url,
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
   url += "?ovclientmsg=" + device;
+  curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
@@ -128,6 +129,7 @@ bool ov_client_orlandoviols_t::download_file(const std::string& url,
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
+  curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
@@ -161,6 +163,7 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
   url += "?ovclient=" + device + "&hash=" + hash;
+  curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
@@ -222,7 +225,8 @@ stage_device_t get_stage_dev(RSJresource& dev)
 void ov_client_orlandoviols_t::service()
 {
   report_error(lobby, backend.get_deviceid(), "");
-  download_file(lobby + "/announce.flac", "announce.flac");
+  DEBUG(lobby);
+  DEBUG(download_file(lobby + "/announce.flac", "announce.flac"));
   std::string hash;
   double gracetime(8.0);
   while(runservice) {
@@ -268,8 +272,7 @@ void ov_client_orlandoviols_t::service()
         rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
         rendersettings.rectype =
             js_rendersettings["rectype"].as<std::string>("ortf");
-        rendersettings.egogain =
-					js_rendersettings["egogain"].as<double>(1.0);
+        rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
         backend.set_render_settings(rendersettings);

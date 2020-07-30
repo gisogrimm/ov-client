@@ -51,6 +51,46 @@ bool operator!=(const render_settings_t& a, const render_settings_t& b)
          (a.outputport1 != b.outputport1) || (a.outputport2 != b.outputport2);
 }
 
+ov_render_base_t::ov_render_base_t(const std::string& deviceid)
+    : audiodevice({"", "", 48000, 96, 2}), stage({"", 0, 0, {}, deviceid, 0}),
+      session_active(false), audio_active(false)
+{
+}
+
+void ov_render_base_t::start_session()
+{
+  session_active = true;
+}
+
+void ov_render_base_t::end_session()
+{
+  session_active = false;
+}
+
+void ov_render_base_t::start_audiobackend()
+{
+  audio_active = true;
+}
+void ov_render_base_t::stop_audiobackend()
+{
+  audio_active = false;
+}
+
+const bool ov_render_base_t::is_session_active() const
+{
+  return session_active;
+}
+
+const bool ov_render_base_t::is_audio_active() const
+{
+  return audio_active;
+}
+
+const std::string& ov_render_base_t::get_deviceid() const
+{
+  return stage.thisdeviceid;
+}
+
 void ov_render_base_t::configure_audio_backend(
     const audio_device_t& audiodevice_)
 {

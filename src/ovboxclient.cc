@@ -7,7 +7,7 @@
 
 ovboxclient_t::ovboxclient_t(const std::string& desthost, port_t destport,
                              port_t recport, port_t portoffset, int prio,
-                             secret_t secret, callerid_t callerid,
+                             secret_t secret, stage_device_id_t callerid,
                              bool peer2peer_, bool donotsend_,
                              bool downmixonly_)
     : prio(prio), secret(secret), remote_server(secret), toport(destport),
@@ -40,7 +40,8 @@ void ovboxclient_t::add_destination(port_t dest)
   xdest.push_back(dest);
 }
 
-void ovboxclient_t::announce_new_connection(callerid_t cid, const ep_desc_t& ep)
+void ovboxclient_t::announce_new_connection(stage_device_id_t cid,
+                                            const ep_desc_t& ep)
 {
   log(recport,
       "new connection for " + std::to_string(cid) + " from " + ep2str(ep.ep) +
@@ -49,14 +50,14 @@ void ovboxclient_t::announce_new_connection(callerid_t cid, const ep_desc_t& ep)
           ((ep.mode & B_DONOTSEND) ? " donotsend" : "") + " v" + ep.version);
 }
 
-void ovboxclient_t::announce_connection_lost(callerid_t cid)
+void ovboxclient_t::announce_connection_lost(stage_device_id_t cid)
 {
   log(recport, "connection for " + std::to_string(cid) + " lost.");
 }
 
-void ovboxclient_t::announce_latency(callerid_t cid, double lmin, double lmean,
-                                     double lmax, uint32_t received,
-                                     uint32_t lost)
+void ovboxclient_t::announce_latency(stage_device_id_t cid, double lmin,
+                                     double lmean, double lmax,
+                                     uint32_t received, uint32_t lost)
 {
   char ctmp[1024];
   if(lmean > 0) {
@@ -80,7 +81,7 @@ void ovboxclient_t::announce_latency(callerid_t cid, double lmin, double lmean,
   remote_server.send(buffer, n, toport);
 }
 
-void ovboxclient_t::handle_endpoint_list_update(callerid_t cid,
+void ovboxclient_t::handle_endpoint_list_update(stage_device_id_t cid,
                                                 const endpoint_t& ep)
 {
 }
@@ -108,7 +109,7 @@ void ovboxclient_t::sendsrv()
     set_thread_prio(prio);
     char buffer[BUFSIZE];
     endpoint_t sender_endpoint;
-    callerid_t rcallerid;
+    stage_device_id_t rcallerid;
     port_t destport;
     while(runsession) {
       size_t n(BUFSIZE);

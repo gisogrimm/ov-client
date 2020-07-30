@@ -1,17 +1,21 @@
 #ifndef OV_TYPES
 #define OV_TYPES
 
+/// this file defines types for cartesian coordinates (pos_t) and for
+/// Euler angles (zyx_euler_t):
 #include <tascar/coordinates.h>
 
 bool operator!=(const TASCAR::pos_t& a, const TASCAR::pos_t& b);
 
 bool operator!=(const TASCAR::zyx_euler_t& a, const TASCAR::zyx_euler_t& b);
 
+/// packet sequence type:
 typedef int16_t sequence_t;
+/// port number type:
 typedef uint16_t port_t;
+/// pin code type:
 typedef uint32_t secret_t;
-typedef uint8_t callerid_t;
-typedef uint8_t epmode_t;
+/// stage device id type:
 typedef uint8_t stage_device_id_t;
 
 struct audio_device_t {
@@ -70,11 +74,15 @@ struct render_settings_t {
   stage_device_id_t id;
   /// room dimensions:
   TASCAR::pos_t roomsize;
-  ///
+  /// average wall absorption coefficient:
   double absorption;
+  /// damping coefficient, defines frequency tilt of T60:
   double damping;
+  /// linear gain of reverberation:
   double reverbgain;
+  /// flag wether rendering of reverb is required or not:
   bool renderreverb;
+  /// flag wether rendering of virtual acoustics is required:
   bool rawmode;
   /// Receiver type, either ortf or hrtf:
   std::string rectype;
@@ -82,7 +90,7 @@ struct render_settings_t {
   double egogain;
   /// peer-to-peer mode:
   bool peer2peer;
-  /// output ports:
+  /// output ports of device master:
   std::string outputport1;
   std::string outputport2;
 };
@@ -108,14 +116,12 @@ struct stage_t {
 
 class ov_render_base_t {
 public:
-  ov_render_base_t(const std::string& deviceid)
-      : audiodevice({"", "", 48000, 96, 2}), stage({"", 0, 0, {}, deviceid, 0}),
-        session_active(false), audio_active(false){};
+  ov_render_base_t(const std::string& deviceid);
   virtual ~ov_render_base_t(){};
   virtual void set_relay_server(const std::string& host, port_t port,
                                 secret_t pin);
-  virtual void start_session() { session_active = true; };
-  virtual void end_session() { session_active = false; };
+  virtual void start_session();
+  virtual void end_session();
   virtual void configure_audio_backend(const audio_device_t&);
   virtual void add_stage_device(const stage_device_t& stagedevice);
   virtual void rm_stage_device(stage_device_id_t stagedeviceid);
@@ -123,11 +129,11 @@ public:
   virtual void set_stage_device_gain(stage_device_id_t stagedeviceid,
                                      double gain);
   virtual void set_render_settings(const render_settings_t& rendersettings);
-  virtual void start_audiobackend() { audio_active = true; };
-  virtual void stop_audiobackend() { audio_active = false; };
-  const bool is_session_active() const { return session_active; };
-  const bool is_audio_active() const { return audio_active; };
-  const std::string& get_deviceid() const { return stage.thisdeviceid; };
+  virtual void start_audiobackend();
+  virtual void stop_audiobackend();
+  const bool is_session_active() const;
+  const bool is_audio_active() const;
+  const std::string& get_deviceid() const;
 
 protected:
   audio_device_t audiodevice;
