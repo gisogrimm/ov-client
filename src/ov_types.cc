@@ -43,10 +43,12 @@ bool operator!=(const stage_device_t& a, const stage_device_t& b)
 
 bool operator!=(const render_settings_t& a, const render_settings_t& b)
 {
-  return (a.roomsize != b.roomsize) || (a.absorption != b.absorption) ||
-         (a.damping != b.damping) || (a.renderreverb != b.renderreverb) ||
+  return (a.id != b.id) || (a.roomsize != b.roomsize) ||
+         (a.absorption != b.absorption) || (a.damping != b.damping) ||
+         (a.reverbgain != b.reverbgain) || (a.renderreverb != b.renderreverb) ||
          (a.rawmode != b.rawmode) || (a.rectype != b.rectype) ||
-         (a.egogain != b.egogain);
+         (a.egogain != b.egogain) || (a.peer2peer != b.peer2peer) ||
+         (a.outputport1 != b.outputport1) || (a.outputport2 != b.outputport2);
 }
 
 void ov_render_base_t::configure_audio_backend(

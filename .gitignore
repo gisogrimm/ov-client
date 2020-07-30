@@ -36,3 +36,7 @@ build
 
 # Backup files:
 *~
+
+# auto-downloaded:
+announce.flac
+debugsession.tsc

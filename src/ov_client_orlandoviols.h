@@ -9,6 +9,7 @@ public:
   ov_client_orlandoviols_t(ov_render_base_t& backend, const std::string& lobby);
   void start_service();
   void stop_service();
+  bool download_file(const std::string& url, const std::string& dest);
 
 private:
   void service();

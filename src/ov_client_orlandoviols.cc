@@ -3,6 +3,7 @@
 #include "errmsg.h"
 #include <alsa/asoundlib.h>
 #include <curl/curl.h>
+#include <fstream>
 
 CURL* curl;
 
@@ -118,6 +119,29 @@ void ov_client_orlandoviols_t::report_error(std::string url,
   free(chunk.memory);
 }
 
+bool ov_client_orlandoviols_t::download_file(const std::string& url,
+                                             const std::string& dest)
+{
+  CURLcode res;
+  std::string retv;
+  struct webCURL::MemoryStruct chunk;
+  chunk.memory =
+      (char*)malloc(1); /* will be grown as needed by the realloc above */
+  chunk.size = 0;       /* no data at this point */
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+  res = curl_easy_perform(curl);
+  if(res == CURLE_OK) {
+    std::ofstream ofh(dest);
+    ofh.write(chunk.memory, chunk.size);
+    return true;
+  }
+  return false;
+}
+
 std::string ov_client_orlandoviols_t::get_device_init(std::string url,
                                                       const std::string& device,
                                                       std::string& hash)
@@ -187,7 +211,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
   stagedev.orientation.y = dev["orientation"]["y"].as<double>(0);
   stagedev.orientation.x = dev["orientation"]["x"].as<double>(0);
   /// Linear gain of the stage device:
-  stagedev.gain = dev["gain"].as<double>(0);
+  stagedev.gain = dev["gain"].as<double>(1.0);
   /// Mute flag:
   stagedev.mute = dev["mute"].as<bool>(false);
   stagedev.receiverjitter = dev["jitter"]["receive"].as<double>(5);
@@ -198,6 +222,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
 void ov_client_orlandoviols_t::service()
 {
   report_error(lobby, backend.get_deviceid(), "");
+  download_file(lobby + "/announce.flac", "announce.flac");
   std::string hash;
   double gracetime(8.0);
   while(runservice) {
@@ -232,14 +257,19 @@ void ov_client_orlandoviols_t::service()
         rendersettings.roomsize.z = js_roomsize["z"].as<double>(0);
         rendersettings.absorption = js_reverb["absorption"].as<double>(0.6);
         rendersettings.damping = js_reverb["damping"].as<double>(0.7);
-        rendersettings.reverbgain = js_reverb["gain"].as<double>(-8);
+        rendersettings.reverbgain = js_reverb["gain"].as<double>(0.4);
         rendersettings.renderreverb =
             js_rendersettings["renderreverb"].as<bool>(true);
+
+        rendersettings.outputport1 =
+            js_rendersettings["outputport1"].as<std::string>("");
+        rendersettings.outputport2 =
+            js_rendersettings["outputport2"].as<std::string>("");
         rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
         rendersettings.rectype =
             js_rendersettings["rectype"].as<std::string>("ortf");
         rendersettings.egogain =
-            pow(10.0, 0.05 * js_rendersettings["egogain"].as<double>(0.0));
+					js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
         backend.set_render_settings(rendersettings);
@@ -252,6 +282,7 @@ void ov_client_orlandoviols_t::service()
           backend.start_audiobackend();
         if(!backend.is_session_active())
           backend.start_session();
+        report_error(lobby, backend.get_deviceid(), "");
       }
       catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

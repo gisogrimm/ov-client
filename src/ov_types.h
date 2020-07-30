@@ -82,6 +82,9 @@ struct render_settings_t {
   double egogain;
   /// peer-to-peer mode:
   bool peer2peer;
+  /// output ports:
+  std::string outputport1;
+  std::string outputport2;
 };
 
 bool operator!=(const render_settings_t& a, const render_settings_t& b);

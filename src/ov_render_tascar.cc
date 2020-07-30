@@ -41,13 +41,26 @@ void ov_render_tascar_t::start_session()
       }
       e_rec->set_attribute("name", "master");
       e_rec->set_attribute("delaycomp", "0.05");
-      e_rec->set_attribute(
-          "dlocation",
-          TASCAR::to_string(stage.stage[stage.rendersettings.id].position));
-      e_rec->set_attribute(
-          "dorientation",
-          TASCAR::to_string(stage.stage[stage.rendersettings.id].orientation));
+      if(!stage.rendersettings.outputport1.empty()) {
+        xmlpp::Element* e_con(e_session->add_child("connect"));
+        e_con->set_attribute("src",
+                             "render." + stage.thisdeviceid + ":master_l");
+        e_con->set_attribute("dest", stage.rendersettings.outputport1);
+      }
+      if(!stage.rendersettings.outputport2.empty()) {
+        xmlpp::Element* e_con(e_session->add_child("connect"));
+        e_con->set_attribute("src",
+                             "render." + stage.thisdeviceid + ":master_r");
+        e_con->set_attribute("dest", stage.rendersettings.outputport2);
+      }
       if(!stage.host.empty()) {
+        e_rec->set_attribute(
+            "dlocation",
+            TASCAR::to_string(stage.stage[stage.rendersettings.id].position));
+        e_rec->set_attribute(
+            "dorientation",
+            TASCAR::to_string(
+                stage.stage[stage.rendersettings.id].orientation));
         // the stage is not empty, which means we are on a stage.
         // b_sender is true if this device is sending audio. If this
         // device is not sending audio, then the stage layout will
@@ -92,13 +105,22 @@ void ov_render_tascar_t::start_session()
           }
           for(auto ch : stagemember.second.channels) {
             xmlpp::Element* e_snd(e_src->add_child("sound"));
-            if(stagemember.second.id == stage.thisstagedeviceid)
+						e_snd->set_attribute("maxdist", "50");
+						e_snd->set_attribute("gainmodel", "1");
+            double gain(ch.gain * stagemember.second.gain);
+            if(stagemember.second.id == stage.thisstagedeviceid) {
               e_snd->set_attribute("connect", ch.sourceport);
-            e_snd->set_attribute("gain",
-                                 TASCAR::to_string(20.0 * log10(ch.gain)));
-            e_snd->set_attribute("x", TASCAR::to_string(ch.position.x));
-            e_snd->set_attribute("y", TASCAR::to_string(ch.position.y));
-            e_snd->set_attribute("z", TASCAR::to_string(ch.position.z));
+              gain *= stage.rendersettings.egogain;
+            }else{
+							// if not self-monitor then decrease gain:
+							gain *= 0.6;
+						}
+            e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
+            TASCAR::pos_t chpos(ch.position);
+            chpos += ego_delta;
+            e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
+            e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
+            e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
           }
         }
         if(stage.rendersettings.renderreverb) {
@@ -114,10 +136,24 @@ void ov_render_tascar_t::start_session()
           e_rvb->set_attribute("damping",
                                TASCAR::to_string(stage.rendersettings.damping));
           e_rvb->set_attribute(
-              "gain", TASCAR::to_string(stage.rendersettings.reverbgain));
+              "gain",
+              TASCAR::to_string(20 * log10(stage.rendersettings.reverbgain)));
         }
       } else {
         // the stage is empty, which means we play an announcement only.
+        xmlpp::Element* e_src(e_scene->add_child("source"));
+        e_src->set_attribute("name", "announce");
+        xmlpp::Element* e_snd(e_src->add_child("sound"));
+				e_snd->set_attribute("maxdist", "50");
+				e_snd->set_attribute("gainmodel", "1");
+        e_snd->set_attribute("x", "4");
+        //$egosound = xml_add_sound($source, $doc, array('x'=>4) );
+        xmlpp::Element* e_plugs(e_snd->add_child("plugins"));
+        xmlpp::Element* e_sndfile(e_plugs->add_child("sndfile"));
+        e_sndfile->set_attribute("name", "announce.flac");
+        e_sndfile->set_attribute("level", "57");
+        e_sndfile->set_attribute("transport", "false");
+        e_sndfile->set_attribute("loop", "0");
       }
     }
     // configure extra modules:
@@ -194,10 +230,12 @@ void ov_render_tascar_t::start_session()
       xmlpp::Element* e_p = e_wait->add_child("port");
       e_p->add_child_text(port);
     }
-    ovboxclient = new ovboxclient_t(
-        stage.host, stage.port, 4464 + 2 * stage.thisstagedeviceid, 0, 30,
-        stage.pin, stage.thisstagedeviceid, stage.rendersettings.peer2peer,
-        false, false);
+    if(!stage.host.empty()) {
+      ovboxclient = new ovboxclient_t(
+          stage.host, stage.port, 4464 + 2 * stage.thisstagedeviceid, 0, 30,
+          stage.pin, stage.thisstagedeviceid, stage.rendersettings.peer2peer,
+          false, false);
+    }
     tsc.doc->write_to_file_formatted("debugsession.tsc");
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),
                                    TASCAR::session_t::LOAD_STRING, "");
