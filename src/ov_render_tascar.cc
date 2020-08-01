@@ -96,8 +96,7 @@ void ov_render_tascar_t::start_session()
             ego_delta.z = -0.3;
           } else {
             e_src->set_attribute("name",
-                                 stagemember.second.label + "_" +
-                                     TASCAR::to_string(stagemember.second.id));
+                                 get_stagedev_name(stagemember.second.id));
           }
           if(b_sender) {
             e_src->set_attribute("dlocation", to_string(pos));
@@ -160,8 +159,7 @@ void ov_render_tascar_t::start_session()
     xmlpp::Element* e_mods(e_session->add_child("modules"));
     for(auto stagemember : stage.stage) {
       if(stage.thisstagedeviceid != stagemember.second.id) {
-        std::string clientname(stagemember.second.label + "_" +
-                               TASCAR::to_string(stagemember.second.id));
+        std::string clientname(get_stagedev_name(stagemember.second.id));
         xmlpp::Element* e_sys = e_mods->add_child("system");
         double buff(stage.stage[stage.thisstagedeviceid].receiverjitter +
                     stagemember.second.senderjitter);
@@ -312,11 +310,31 @@ void ov_render_tascar_t::rm_stage_device(stage_device_id_t stagedeviceid)
 void ov_render_tascar_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
                                                double gain)
 {
+  DEBUG(gain);
   ov_render_base_t::set_stage_device_gain(stagedeviceid, gain);
-  // this is really brute force, will be replaced soon:
-  if(is_session_active()) {
-    end_session();
-    start_session();
+  if(is_session_active() && tascar) {
+    uint32_t k = 0;
+    for(auto ch : stage.stage[stagedeviceid].channels) {
+      DEBUG(k);
+      gain = ch.gain * stage.stage[stagedeviceid].gain;
+      if(stagedeviceid == stage.thisstagedeviceid) {
+        gain *= stage.rendersettings.egogain;
+      } else {
+        // if not self-monitor then decrease gain:
+        gain *= 0.6;
+      }
+      DEBUG(gain);
+      std::string pattern("/" + stage.thisdeviceid + "/" +
+                          get_stagedev_name(stagedeviceid) + "/" +
+                          TASCAR::to_string(k));
+			DEBUG(pattern);
+      std::vector<TASCAR::Scene::audio_port_t*> port(
+          tascar->find_audio_ports(std::vector<std::string>(1, pattern)));
+			DEBUG(port.size());
+      if(port.size())
+        port[0]->set_gain_lin(gain);
+      ++k;
+    }
   }
 }
 
@@ -330,6 +348,14 @@ void ov_render_tascar_t::set_render_settings(
       start_session();
     }
   }
+}
+
+std::string ov_render_tascar_t::get_stagedev_name(stage_device_id_t id) const
+{
+  auto stagedev(stage.stage.find(id));
+  if(stagedev == stage.stage.end())
+    return "";
+  return stagedev->second.label + "_" + TASCAR::to_string(id);
 }
 
 /*

@@ -225,8 +225,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
 void ov_client_orlandoviols_t::service()
 {
   report_error(lobby, backend.get_deviceid(), "");
-  DEBUG(lobby);
-  DEBUG(download_file(lobby + "/announce.flac", "announce.flac"));
+  download_file(lobby + "/announce.flac", "announce.flac");
   std::string hash;
   double gracetime(8.0);
   while(runservice) {
