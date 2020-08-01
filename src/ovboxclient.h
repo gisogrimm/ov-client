@@ -16,7 +16,7 @@ public:
   void announce_connection_lost(stage_device_id_t cid);
   void announce_latency(stage_device_id_t cid, double lmin, double lmean,
                         double lmax, uint32_t received, uint32_t lost);
-  void add_destination(port_t dest);
+  void add_extraport(port_t dest);
 
 private:
   void sendsrv();

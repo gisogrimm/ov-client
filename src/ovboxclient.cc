@@ -35,7 +35,7 @@ ovboxclient_t::~ovboxclient_t()
   pingthread.join();
 }
 
-void ovboxclient_t::add_destination(port_t dest)
+void ovboxclient_t::add_extraport(port_t dest)
 {
   xdest.push_back(dest);
 }

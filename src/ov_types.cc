@@ -52,7 +52,14 @@ bool operator!=(const render_settings_t& a, const render_settings_t& b)
 }
 
 ov_render_base_t::ov_render_base_t(const std::string& deviceid)
-    : audiodevice({"", "", 48000, 96, 2}), stage({"", 0, 0, {}, deviceid, 0}),
+    : audiodevice({"", "", 48000, 96, 2}),
+      stage({"",
+             0,
+             0,
+             {0, TASCAR::pos_t(), 0.6, 0.7, -8, true, false, "ortf", 1, true,
+              "", "", 0},
+             deviceid,
+             0}),
       session_active(false), audio_active(false)
 {
 }

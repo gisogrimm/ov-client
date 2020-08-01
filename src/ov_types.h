@@ -93,6 +93,9 @@ struct render_settings_t {
   /// output ports of device master:
   std::string outputport1;
   std::string outputport2;
+  /// jitterbuffersize for second data receiver (e.g., for recording or
+  /// broadcasting):
+  double secrec;
 };
 
 bool operator!=(const render_settings_t& a, const render_settings_t& b);

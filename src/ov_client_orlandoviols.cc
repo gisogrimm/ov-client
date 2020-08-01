@@ -271,14 +271,17 @@ void ov_client_orlandoviols_t::service()
         rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
         rendersettings.rectype =
             js_rendersettings["rectype"].as<std::string>("ortf");
+        rendersettings.secrec = js_rendersettings["secrec"].as<double>(0);
         rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
         backend.set_render_settings(rendersettings);
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
         backend.clear_stage();
-        for(auto dev : js_stagedevs)
+        for(auto dev : js_stagedevs) {
+          DEBUG(dev.as<std::string>(""));
           backend.add_stage_device(get_stage_dev(dev));
+        }
 
         if(!backend.is_audio_active())
           backend.start_audiobackend();
