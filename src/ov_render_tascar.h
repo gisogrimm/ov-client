@@ -11,6 +11,7 @@ public:
   ~ov_render_tascar_t();
   void start_session();
   void end_session();
+  void clear_stage();
   void start_audiobackend();
   void stop_audiobackend();
   void add_stage_device(const stage_device_t& stagedevice);
@@ -20,6 +21,8 @@ public:
   std::string get_stagedev_name(stage_device_id_t stagedeviceid) const;
 
 private:
+  void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
+                                xmlpp::Element* e_scene);
   FILE* h_pipe_jack;
   TASCAR::session_t* tascar;
   ovboxclient_t* ovboxclient;

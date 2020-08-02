@@ -48,7 +48,8 @@ bool operator!=(const render_settings_t& a, const render_settings_t& b)
          (a.reverbgain != b.reverbgain) || (a.renderreverb != b.renderreverb) ||
          (a.rawmode != b.rawmode) || (a.rectype != b.rectype) ||
          (a.egogain != b.egogain) || (a.peer2peer != b.peer2peer) ||
-         (a.outputport1 != b.outputport1) || (a.outputport2 != b.outputport2);
+         (a.outputport1 != b.outputport1) || (a.outputport2 != b.outputport2) ||
+         (a.secrec != b.secrec);
 }
 
 ov_render_base_t::ov_render_base_t(const std::string& deviceid)

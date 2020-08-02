@@ -238,13 +238,13 @@ void ov_client_orlandoviols_t::service()
         std::cout << stagecfg << std::endl;
         RSJresource js_audio(js_stagecfg["audiocfg"]);
         audio_device_t audio;
+        backend.clear_stage();
         audio.drivername = js_audio["driver"].as<std::string>("jack");
         audio.devicename = js_audio["device"].as<std::string>("hw:1");
         audio.srate = js_audio["srate"].as<double>(48000);
         audio.periodsize = js_audio["periodsize"].as<int>(96);
         audio.numperiods = js_audio["numperiods"].as<int>(2);
         backend.configure_audio_backend(audio);
-
         RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
         RSJresource js_stage(js_stagecfg["room"]);
         std::string stagehost(js_stage["host"].as<std::string>(""));
@@ -263,7 +263,6 @@ void ov_client_orlandoviols_t::service()
         rendersettings.reverbgain = js_reverb["gain"].as<double>(0.4);
         rendersettings.renderreverb =
             js_rendersettings["renderreverb"].as<bool>(true);
-
         rendersettings.outputport1 =
             js_rendersettings["outputport1"].as<std::string>("");
         rendersettings.outputport2 =
@@ -277,12 +276,9 @@ void ov_client_orlandoviols_t::service()
             js_rendersettings["peer2peer"].as<bool>(true);
         backend.set_render_settings(rendersettings);
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
-        backend.clear_stage();
         for(auto dev : js_stagedevs) {
-          DEBUG(dev.as<std::string>(""));
           backend.add_stage_device(get_stage_dev(dev));
         }
-
         if(!backend.is_audio_active())
           backend.start_audiobackend();
         if(!backend.is_session_active())
