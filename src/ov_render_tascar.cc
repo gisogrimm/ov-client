@@ -116,6 +116,13 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   }
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  if(!stage.rendersettings.rawmode) {
+    // add web mixer tools (node-js server and touchosc interface):
+    xmlpp::Element* e_node(e_mods->add_child("system"));
+    e_node->set_attribute("command", "node webmixer.js");
+    e_mods->add_child("touchosc");
+  }
+  //
   for(auto stagemember : stage.stage) {
     std::string chanlist;
     for(uint32_t k = 0; k < stagemember.second.channels.size(); ++k) {

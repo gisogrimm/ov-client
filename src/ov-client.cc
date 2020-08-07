@@ -17,8 +17,8 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
   std::string deviceid(getmacaddr());
-	std::string lobby("http://box.orlandoviols.com/");
-  //std::string lobby("http://localhost:8083/");
+  std::string lobby("http://box.orlandoviols.com/");
+  // std::string lobby("http://localhost:8083/");
   const char* options = "s:hqv";
   struct option long_options[] = {{"server", 1, 0, 's'},
                                   {"help", 0, 0, 'h'},
