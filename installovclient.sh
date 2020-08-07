@@ -21,7 +21,7 @@
 
     # get autorun file:
     rm -f autorun
-    wget https://github.com/gisogrimm/ovbox/raw/master/tools/pi/autorun
+    wget https://github.com/gisogrimm/ov-client/raw/master/tools/pi/autorun
     chmod a+x autorun
 
     # update real-time priority priviledges:
@@ -39,8 +39,8 @@
     sudo sed -i "s/127.0.1.1.*raspberry/127.0.1.1\tovbox/g" /etc/hosts
 
     # clone ovbox repo if not yet available:
-    sudo su -l ov -c "test -e ovbox || git clone http://github.com/gisogrimm/ovbox"
-    sudo su -l ov -c "make -C ovbox"
+    sudo su -l ov -c "test -e ov-client || git clone http://github.com/gisogrimm/ov-client"
+    sudo su -l ov -c "make -C ov-client"
 
     # activate overlay image to avoid damage of the SD card upon power off:
     sudo raspi-config nonint enable_overlayfs
