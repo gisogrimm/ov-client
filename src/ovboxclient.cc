@@ -14,6 +14,16 @@ ovboxclient_t::ovboxclient_t(const std::string& desthost, port_t destport,
       recport(recport), portoffset(portoffset), callerid(callerid),
       runsession(true), mode(0)
 {
+  DEBUG(desthost);
+  DEBUG(destport);
+  DEBUG(recport);
+  DEBUG(portoffset);
+  DEBUG(prio);
+  DEBUG(secret);
+  DEBUG((int)callerid);
+  DEBUG(peer2peer_);
+  DEBUG(donotsend_);
+  DEBUG(downmixonly_);
   if(peer2peer_)
     mode |= B_PEER2PEER;
   if(downmixonly_)
@@ -29,10 +39,15 @@ ovboxclient_t::ovboxclient_t(const std::string& desthost, port_t destport,
 
 ovboxclient_t::~ovboxclient_t()
 {
+  DEBUG(1);
   runsession = false;
+  DEBUG(1);
   sendthread.join();
+  DEBUG(1);
   recthread.join();
+  DEBUG(1);
   pingthread.join();
+  DEBUG(1);
 }
 
 void ovboxclient_t::add_extraport(port_t dest)
@@ -84,6 +99,8 @@ void ovboxclient_t::announce_latency(stage_device_id_t cid, double lmin,
 void ovboxclient_t::handle_endpoint_list_update(stage_device_id_t cid,
                                                 const endpoint_t& ep)
 {
+  DEBUG(cid);
+  DEBUG(ep2str(ep));
 }
 
 // ping service
@@ -210,6 +227,7 @@ void ovboxclient_t::recsrv()
     std::cerr << "Error: " << e.what() << std::endl;
     runsession = false;
   }
+  DEBUG(1);
 }
 
 /*

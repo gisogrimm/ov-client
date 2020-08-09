@@ -139,9 +139,11 @@ void ov_render_base_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
 }
 
 void ov_render_base_t::set_render_settings(
-    const render_settings_t& rendersettings)
+    const render_settings_t& rendersettings,
+    stage_device_id_t thisstagedeviceid)
 {
   stage.rendersettings = rendersettings;
+  stage.thisstagedeviceid = thisstagedeviceid;
 }
 
 void ov_render_base_t::set_relay_server(const std::string& host, port_t port,
