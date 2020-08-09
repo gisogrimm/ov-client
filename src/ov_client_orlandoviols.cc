@@ -274,7 +274,8 @@ void ov_client_orlandoviols_t::service()
         rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
-        backend.set_render_settings(rendersettings);
+        backend.set_render_settings(rendersettings,
+                                    js_rendersettings["stagedevid"].as<int>(0));
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
         for(auto dev : js_stagedevs) {
           backend.add_stage_device(get_stage_dev(dev));

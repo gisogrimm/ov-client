@@ -298,6 +298,14 @@ void ov_render_tascar_t::start_session()
       }
     }
     if(!stage.host.empty()) {
+      DEBUG(stage.rendersettings.peer2peer);
+      DEBUG(stage.host);
+      DEBUG(stage.port);
+      DEBUG(stage.pin);
+      DEBUG((int)(stage.thisstagedeviceid));
+      // ovboxclient_t rec(desthost, destport, recport, portoffset, prio,
+      // secret,
+      //                callerid, peer2peer, donotsend, downmixonly);
       ovboxclient = new ovboxclient_t(
           stage.host, stage.port, 4464 + 2 * stage.thisstagedeviceid, 0, 30,
           stage.pin, stage.thisstagedeviceid, stage.rendersettings.peer2peer,
@@ -320,20 +328,31 @@ void ov_render_tascar_t::start_session()
 
 void ov_render_tascar_t::end_session()
 {
+  DEBUG(1);
   ov_render_base_t::end_session();
   if(tascar) {
+    DEBUG(1);
     tascar->stop();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    DEBUG(1);
     delete tascar;
     tascar = NULL;
+    DEBUG(1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    DEBUG(1);
   }
   if(ovboxclient) {
+    DEBUG(1);
     delete ovboxclient;
+    DEBUG(1);
     ovboxclient = NULL;
   }
+  DEBUG(1);
 }
 
 void ov_render_tascar_t::start_audiobackend()
 {
+  DEBUG(1);
   ov_render_base_t::start_audiobackend();
   if((audiodevice.drivername == "jack") &&
      (audiodevice.devicename != "manual")) {
@@ -343,6 +362,7 @@ void ov_render_tascar_t::start_audiobackend()
             "-r %g -p %d -n %d",
             audiodevice.devicename.c_str(), audiodevice.srate,
             audiodevice.periodsize, audiodevice.numperiods);
+    DEBUG(cmd);
     h_pipe_jack = popen(cmd, "w");
     // replace sleep by testing for jack presence with timeout:
     sleep(4);
@@ -351,11 +371,19 @@ void ov_render_tascar_t::start_audiobackend()
 
 void ov_render_tascar_t::stop_audiobackend()
 {
+  DEBUG(1);
   ov_render_base_t::stop_audiobackend();
   if(h_pipe_jack) {
+    DEBUG(1);
     FILE* h_pipe(popen("killall jackd", "w"));
+    DEBUG(1);
     fclose(h_pipe_jack);
+    DEBUG(1);
     fclose(h_pipe);
+    DEBUG(1);
+    // wait for jack to clean up properly:
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    DEBUG(1);
   }
   h_pipe_jack = NULL;
 }
@@ -405,10 +433,12 @@ void ov_render_tascar_t::set_stage_device_gain(stage_device_id_t stagedeviceid,
 }
 
 void ov_render_tascar_t::set_render_settings(
-    const render_settings_t& rendersettings)
+    const render_settings_t& rendersettings,
+    stage_device_id_t thisstagedeviceid)
 {
-  if(rendersettings != stage.rendersettings) {
-    ov_render_base_t::set_render_settings(rendersettings);
+  if((rendersettings != stage.rendersettings) ||
+     (thisstagedeviceid != stage.thisstagedeviceid)) {
+    ov_render_base_t::set_render_settings(rendersettings, thisstagedeviceid);
     if(is_session_active()) {
       end_session();
       start_session();

@@ -131,7 +131,8 @@ public:
   virtual void clear_stage();
   virtual void set_stage_device_gain(stage_device_id_t stagedeviceid,
                                      double gain);
-  virtual void set_render_settings(const render_settings_t& rendersettings);
+  virtual void set_render_settings(const render_settings_t& rendersettings,
+                                   stage_device_id_t thisstagedeviceid);
   virtual void start_audiobackend();
   virtual void stop_audiobackend();
   const bool is_session_active() const;
