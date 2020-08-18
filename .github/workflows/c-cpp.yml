@@ -15,6 +15,6 @@ jobs:
       run: sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential
     - name: tascar
       run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7D6CDF547DA4ABD &&
-           sudo apt-add-repository 'deb http://apt.hoertech.de/ focal universe'
+           sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
     - name: make
       run: make 
