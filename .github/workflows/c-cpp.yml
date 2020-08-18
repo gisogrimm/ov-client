@@ -12,6 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: dependencies
-      run: apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential
+      run: sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential
     - name: make
       run: make 
