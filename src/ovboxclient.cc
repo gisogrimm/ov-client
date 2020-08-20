@@ -35,13 +35,9 @@ ovboxclient_t::ovboxclient_t(const std::string& desthost, port_t destport,
 ovboxclient_t::~ovboxclient_t()
 {
   runsession = false;
-  DEBUG(1);
   sendthread.join();
-  DEBUG(1);
   recthread.join();
-  DEBUG(1);
   pingthread.join();
-  DEBUG(1);
 }
 
 void ovboxclient_t::add_extraport(port_t dest)
@@ -230,7 +226,6 @@ void ovboxclient_t::recsrv()
     std::cerr << "Error: " << e.what() << std::endl;
     runsession = false;
   }
-  DEBUG(1);
 }
 
 /*
