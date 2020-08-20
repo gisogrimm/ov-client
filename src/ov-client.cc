@@ -19,7 +19,7 @@ int main(int argc, char** argv)
   std::string deviceid(getmacaddr());
   std::string lobby("http://box.orlandoviols.com/");
   // std::string lobby("http://localhost:8083/");
-  const char* options = "s:hqv";
+  const char* options = "s:hqvd:";
   struct option long_options[] = {
       {"server", 1, 0, 's'},   {"help", 0, 0, 'h'},    {"quiet", 0, 0, 'q'},
       {"deviceid", 1, 0, 'd'}, {"verbose", 0, 0, 'v'}, {0, 0, 0, 0}};
