@@ -4,6 +4,7 @@
 /// this file defines types for cartesian coordinates (pos_t) and for
 /// Euler angles (zyx_euler_t):
 #include <tascar/coordinates.h>
+#include <unordered_map>
 
 bool operator!=(const TASCAR::pos_t& a, const TASCAR::pos_t& b);
 
@@ -93,6 +94,8 @@ struct render_settings_t {
   /// output ports of device master:
   std::string outputport1;
   std::string outputport2;
+  /// extra ports, key is the source port, value is the destination:
+  std::unordered_map<std::string, std::string> xports;
   /// jitterbuffersize for second data receiver (e.g., for recording or
   /// broadcasting):
   double secrec;

@@ -49,7 +49,7 @@ bool operator!=(const render_settings_t& a, const render_settings_t& b)
          (a.rawmode != b.rawmode) || (a.rectype != b.rectype) ||
          (a.egogain != b.egogain) || (a.peer2peer != b.peer2peer) ||
          (a.outputport1 != b.outputport1) || (a.outputport2 != b.outputport2) ||
-         (a.secrec != b.secrec);
+         (a.secrec != b.secrec) || (a.xports != b.xports);
 }
 
 ov_render_base_t::ov_render_base_t(const std::string& deviceid)
@@ -58,7 +58,7 @@ ov_render_base_t::ov_render_base_t(const std::string& deviceid)
              0,
              0,
              {0, TASCAR::pos_t(), 0.6, 0.7, -8, true, false, "ortf", 1, true,
-              "", "", 0},
+              "", "", std::unordered_map<std::string, std::string>(), 0},
              deviceid,
              0}),
       session_active(false), audio_active(false)

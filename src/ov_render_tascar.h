@@ -24,6 +24,7 @@ public:
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
                                 xmlpp::Element* e_scene);
+  void create_raw_dev(xmlpp::Element* session);
   FILE* h_pipe_jack;
   TASCAR::session_t* tascar;
   ovboxclient_t* ovboxclient;

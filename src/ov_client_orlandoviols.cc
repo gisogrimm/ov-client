@@ -281,6 +281,16 @@ void ov_client_orlandoviols_t::service()
         rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
+        rendersettings.xports.clear();
+        RSJarray js_xports(js_rendersettings["xport"].as_array());
+        for(auto xp : js_xports) {
+          RSJarray js_xp(xp.as_array());
+          if(js_xp.size() == 2) {
+            std::string key(js_xp[0].as<std::string>(""));
+            if(key.size())
+              rendersettings.xports[key] = js_xp[1].as<std::string>("");
+          }
+        }
         backend.set_render_settings(rendersettings,
                                     js_rendersettings["stagedevid"].as<int>(0));
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());

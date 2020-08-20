@@ -222,6 +222,113 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   }
 }
 
+void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
+{
+  stage_device_t& thisdev(stage.stage[stage.thisstagedeviceid]);
+  // list of ports on which TASCAR will wait before attempting to connect:
+  std::vector<std::string> waitports;
+  // configure extra modules:
+  xmlpp::Element* e_mods(e_session->add_child("modules"));
+  //
+  for(auto stagemember : stage.stage) {
+    std::string chanlist;
+    for(uint32_t k = 0; k < stagemember.second.channels.size(); ++k) {
+      if(k)
+        chanlist += ",";
+      chanlist += std::to_string(k + 1);
+    }
+    if(stage.thisstagedeviceid != stagemember.second.id) {
+      std::string clientname(get_stagedev_name(stagemember.second.id));
+      xmlpp::Element* e_sys = e_mods->add_child("system");
+      double buff(thisdev.receiverjitter + stagemember.second.senderjitter);
+      e_sys->set_attribute(
+          "command", "zita-n2j --chan " + chanlist + " --jname " + clientname +
+                         " --buf " + TASCAR::to_string(buff) + " 0.0.0.0 " +
+                         TASCAR::to_string(4464 + 2 * stagemember.second.id));
+      e_sys->set_attribute("onunload", "killall zita-n2j");
+      for(size_t c = 0; c < stagemember.second.channels.size(); ++c) {
+        if(stage.thisstagedeviceid != stagemember.second.id) {
+          std::string srcport(clientname + ":out_" + std::to_string(c + 1));
+          std::string destport("render." + stage.thisdeviceid + ":" +
+                               clientname + "." + std::to_string(c) + ".0");
+          waitports.push_back(srcport);
+          xmlpp::Element* e_port = e_session->add_child("connect");
+          e_port->set_attribute("src", srcport);
+          e_port->set_attribute("dest", destport);
+        }
+      }
+      if(stage.rendersettings.secrec > 0) {
+        if(stage.thisstagedeviceid != stagemember.second.id) {
+          std::string clientname(get_stagedev_name(stagemember.second.id) +
+                                 "_sec");
+          std::string netclientname(
+              "n2j_" + std::to_string(stagemember.second.id) + "_sec");
+          xmlpp::Element* e_sys = e_mods->add_child("system");
+          double buff(thisdev.receiverjitter + stagemember.second.senderjitter);
+          e_sys->set_attribute(
+              "command",
+              "zita-n2j --chan " + chanlist + " --jname " + netclientname +
+                  " --buf " +
+                  TASCAR::to_string(stage.rendersettings.secrec + buff) +
+                  " 0.0.0.0 " +
+                  TASCAR::to_string(4464 + 2 * stagemember.second.id + 100));
+          e_sys->set_attribute("onunload", "killall zita-n2j");
+          xmlpp::Element* e_route = e_mods->add_child("route");
+          e_route->set_attribute("name", clientname);
+          e_route->set_attribute(
+              "channels", std::to_string(stagemember.second.channels.size()));
+          e_route->set_attribute(
+              "gain", TASCAR::to_string(20 * log10(stagemember.second.gain)));
+          e_route->set_attribute("connect", netclientname + ":out_[0-9]*");
+        }
+      }
+    }
+  }
+  // when a second network receiver is used then also create a bus
+  // with a delayed version of the self monitor:
+  if(stage.rendersettings.secrec > 0) {
+    std::string clientname(get_stagedev_name(thisdev.id) + "_sec");
+    xmlpp::Element* mod = e_mods->add_child("route");
+    mod->set_attribute("name", clientname);
+    mod->set_attribute("channels", std::to_string(thisdev.channels.size()));
+    xmlpp::Element* plgs = mod->add_child("plugins");
+    xmlpp::Element* del = plgs->add_child("delay");
+    del->set_attribute("delay",
+                       TASCAR::to_string(0.001 * (stage.rendersettings.secrec +
+                                                  thisdev.receiverjitter +
+                                                  thisdev.senderjitter)));
+    mod->set_attribute("gain", TASCAR::to_string(20 * log10(thisdev.gain)));
+    int chn(0);
+    for(auto ch : thisdev.channels) {
+      xmlpp::Element* e_port = e_session->add_child("connect");
+      e_port->set_attribute("src", ch.sourceport);
+      e_port->set_attribute("dest", clientname + ":in." + std::to_string(chn));
+      ++chn;
+    }
+  }
+  if(thisdev.channels.size() > 0) {
+    xmlpp::Element* e_sys = e_mods->add_child("system");
+    e_sys->set_attribute(
+        "command", "zita-j2n --chan " +
+                       std::to_string(thisdev.channels.size()) +
+                       " --jname sender --16bit 127.0.0.1 " +
+                       std::to_string(4464 + 2 * stage.thisstagedeviceid));
+    e_sys->set_attribute("onunload", "killall zita-j2n");
+    int chn(0);
+    for(auto ch : thisdev.channels) {
+      ++chn;
+      xmlpp::Element* e_port = e_session->add_child("connect");
+      e_port->set_attribute("src", ch.sourceport);
+      e_port->set_attribute("dest", "sender:in_" + std::to_string(chn));
+    }
+  }
+  xmlpp::Element* e_wait = e_mods->add_child("waitforjackport");
+  for(auto port : waitports) {
+    xmlpp::Element* e_p = e_wait->add_child("port");
+    e_p->add_child_text(port);
+  }
+}
+
 void ov_render_tascar_t::clear_stage()
 {
   ov_render_base_t::clear_stage();
@@ -296,6 +403,15 @@ void ov_render_tascar_t::start_session()
         e_sndfile->set_attribute("transport", "false");
         e_sndfile->set_attribute("loop", "0");
       }
+    } else {
+      if(!stage.host.empty()) {
+        create_raw_dev(e_session);
+      }
+    }
+    for(auto xport : stage.rendersettings.xports) {
+      xmlpp::Element* e_con(e_session->add_child("connect"));
+      e_con->set_attribute("src", xport.first);
+      e_con->set_attribute("dest", xport.second);
     }
     if(!stage.host.empty()) {
       // ovboxclient_t rec(desthost, destport, recport, portoffset, prio,
