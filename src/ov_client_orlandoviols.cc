@@ -148,6 +148,11 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
                                                       const std::string& device,
                                                       std::string& hash)
 {
+  char chost[1024];
+  memset(chost, 0, 1024);
+  std::string hostname;
+  if(0 == gethostname(chost, 1023))
+    hostname = chost;
   std::vector<snddevname_t> alsadevs(listdev());
   std::string jsdevs("{");
   for(auto d : alsadevs)
@@ -163,6 +168,8 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
   url += "?ovclient=" + device + "&hash=" + hash;
+  if(hostname.size() > 0)
+    url += "&host=" + hostname;
   curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");

@@ -45,6 +45,7 @@ private:
   std::thread recthread;
   std::thread pingthread;
   epmode_t mode;
+  endpoint_t localep;
 };
 
 #endif

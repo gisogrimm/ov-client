@@ -3,6 +3,8 @@
     # minimal error handling:
     trap "echo an error occured.;exit 1" ERR
 
+		export DEBIAN_FRONTEND=noninteractive
+
     # install dependencies:
     sudo apt update
     sudo apt upgrade --assume-yes
