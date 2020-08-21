@@ -230,6 +230,7 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
   //
+  uint32_t chcnt(0);
   for(auto stagemember : stage.stage) {
     std::string chanlist;
     for(uint32_t k = 0; k < stagemember.second.channels.size(); ++k) {
@@ -247,14 +248,20 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
                          TASCAR::to_string(4464 + 2 * stagemember.second.id));
       e_sys->set_attribute("onunload", "killall zita-n2j");
       for(size_t c = 0; c < stagemember.second.channels.size(); ++c) {
+        ++chcnt;
         if(stage.thisstagedeviceid != stagemember.second.id) {
           std::string srcport(clientname + ":out_" + std::to_string(c + 1));
-          std::string destport("render." + stage.thisdeviceid + ":" +
-                               clientname + "." + std::to_string(c) + ".0");
-          waitports.push_back(srcport);
-          xmlpp::Element* e_port = e_session->add_child("connect");
-          e_port->set_attribute("src", srcport);
-          e_port->set_attribute("dest", destport);
+          std::string destport;
+          if(chcnt & 1)
+            destport = stage.rendersettings.outputport1;
+          else
+            destport = stage.rendersettings.outputport2;
+          if(!destport.empty()) {
+            waitports.push_back(srcport);
+            xmlpp::Element* e_port = e_session->add_child("connect");
+            e_port->set_attribute("src", srcport);
+            e_port->set_attribute("dest", destport);
+          }
         }
       }
       if(stage.rendersettings.secrec > 0) {
