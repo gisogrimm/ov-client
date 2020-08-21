@@ -48,6 +48,8 @@ void ovboxclient_t::add_extraport(port_t dest)
 void ovboxclient_t::announce_new_connection(stage_device_id_t cid,
                                             const ep_desc_t& ep)
 {
+  if( cid == callerid )
+    return;
   log(recport,
       "new connection for " + std::to_string(cid) + " from " + ep2str(ep.ep) +
           " in " + ((ep.mode & B_PEER2PEER) ? "peer-to-peer" : "server") +
@@ -57,6 +59,8 @@ void ovboxclient_t::announce_new_connection(stage_device_id_t cid,
 
 void ovboxclient_t::announce_connection_lost(stage_device_id_t cid)
 {
+  if( cid == callerid )
+    return;
   log(recport, "connection for " + std::to_string(cid) + " lost.");
 }
 
@@ -64,6 +68,8 @@ void ovboxclient_t::announce_latency(stage_device_id_t cid, double lmin,
                                      double lmean, double lmax,
                                      uint32_t received, uint32_t lost)
 {
+  if( cid == callerid )
+    return;
   char ctmp[1024];
   if(lmean > 0) {
     sprintf(ctmp, "latency %d min=%1.2fms, mean=%1.2fms, max=%1.2fms", cid,
