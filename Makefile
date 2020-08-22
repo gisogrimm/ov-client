@@ -1,9 +1,9 @@
-all: build binaries
+all: lib build binaries
 
 VERSION=0.2
 
 BINARIES = ov-client
-OBJ = ov_types errmsg ov_client_orlandoviols ov_render_tascar mactools common udpsocket callerlist ovboxclient
+OBJ = ov_client_orlandoviols ov_render_tascar
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl
 
@@ -31,11 +31,23 @@ PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
 
-LDLIBS += -ltascar -lasound
+LDLIBS += -lasound
 
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl -ltascar
+
+# libov submodule:
+CXXFLAGS += -Ilibov/src
+LDLIBS += -lov
+LDFLAGS += -Llibov/build
+
+lib: libov/Makefile
+	$(MAKE) -C libov
+
+libov/Makefile:
+	git submodule init
+	git submodule update
 
 build: build/.directory
 
@@ -46,7 +58,9 @@ build: build/.directory
 binaries: $(BUILD_BINARIES)
 
 build/%: src/%.cc
-	$(CXX) $(CXXFLAGS) $^ $(LDLIBS) -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+
+#$(BUILD_BINARIES): $(wildcard libov/build/*.o)
 
 build/ov-client: $(wildcard src/*.h)
 
