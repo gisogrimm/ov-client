@@ -4,6 +4,7 @@
 #include <alsa/asoundlib.h>
 #include <curl/curl.h>
 #include <fstream>
+#include <sstream>
 
 CURL* curl;
 

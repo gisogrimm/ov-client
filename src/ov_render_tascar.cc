@@ -1,6 +1,16 @@
 #include "ov_render_tascar.h"
 #include <unistd.h>
 
+TASCAR::pos_t to_tascar(const pos_t& src)
+{
+  return TASCAR::pos_t(src.x, src.y, src.z);
+}
+
+TASCAR::zyx_euler_t to_tascar(const zyx_euler_t& src)
+{
+  return TASCAR::zyx_euler_t(src.z, src.y, src.x);
+}
+
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid)
     : ov_render_base_t(deviceid), h_pipe_jack(NULL), tascar(NULL),
       ovboxclient(NULL)
@@ -24,12 +34,12 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   // list of ports on which TASCAR will wait before attempting to connect:
   std::vector<std::string> waitports;
   // set position and orientation of receiver:
-  e_rec->set_attribute(
-      "dlocation",
-      TASCAR::to_string(stage.stage[stage.rendersettings.id].position));
-  e_rec->set_attribute(
-      "dorientation",
-      TASCAR::to_string(stage.stage[stage.rendersettings.id].orientation));
+  e_rec->set_attribute("dlocation",
+                       TASCAR::to_string(to_tascar(
+                           stage.stage[stage.rendersettings.id].position)));
+  e_rec->set_attribute("dorientation",
+                       TASCAR::to_string(to_tascar(
+                           stage.stage[stage.rendersettings.id].orientation)));
   // the stage is not empty, which means we are on a stage.
   // b_sender is true if this device is sending audio. If this
   // device is not sending audio, then the stage layout will
@@ -48,8 +58,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   //
   for(auto stagemember : stage.stage) {
     az += daz;
-    TASCAR::pos_t pos(stagemember.second.position);
-    TASCAR::zyx_euler_t rot(stagemember.second.orientation);
+    TASCAR::pos_t pos(to_tascar(stagemember.second.position));
+    TASCAR::zyx_euler_t rot(to_tascar(stagemember.second.orientation));
     if(!b_sender) {
       // overwrite stage layout:
       pos.x = radius * cos(az);
@@ -91,7 +101,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
       }
       e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
       // set relative channel positions:
-      TASCAR::pos_t chpos(ch.position);
+      TASCAR::pos_t chpos(to_tascar(ch.position));
       chpos += ego_delta;
       e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
       e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
@@ -102,8 +112,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     // create reverb engine:
     xmlpp::Element* e_rvb(e_scene->add_child("reverb"));
     e_rvb->set_attribute("type", "simplefdn");
-    e_rvb->set_attribute("volumetric",
-                         TASCAR::to_string(stage.rendersettings.roomsize));
+    e_rvb->set_attribute("volumetric", TASCAR::to_string(to_tascar(
+                                           stage.rendersettings.roomsize)));
     e_rvb->set_attribute("image", "false");
     e_rvb->set_attribute("fdnorder", "5");
     e_rvb->set_attribute("dw", "60");
