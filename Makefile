@@ -42,8 +42,12 @@ CXXFLAGS += -Ilibov/src
 LDLIBS += -lov
 LDFLAGS += -Llibov/build
 
-lib:
+lib: libov/Makefile
 	$(MAKE) -C libov
+
+libov/Makefile:
+	git submodule init
+	git submodule update
 
 build: build/.directory
 
