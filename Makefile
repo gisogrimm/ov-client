@@ -57,8 +57,11 @@ build: build/.directory
 
 binaries: $(BUILD_BINARIES)
 
-build/%: src/%.cc $(wildcard src/*.h) $(wildcard libov/src/*.h)
-	$(CXX) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
+build/ov-client: libov/build/libov.a
+
+build/%: src/%.cc
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+
 
 #$(BUILD_BINARIES): $(wildcard libov/build/*.o)
 
