@@ -66,10 +66,10 @@ build/ov-client: $(wildcard src/*.h)
 
 build/ov-client: $(BUILD_OBJ)
 
-build/%.o: src/%.cc src/%.h
+build/%.o: src/%.cc src/%.h libov/src/*.h
 
 build/%.o: src/%.cc
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
