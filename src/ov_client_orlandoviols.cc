@@ -292,6 +292,13 @@ void ov_client_orlandoviols_t::service()
               rendersettings.xports[key] = js_xp[1].as<std::string>("");
           }
         }
+        rendersettings.xrecport.clear();
+        RSJarray js_xrecports(js_rendersettings["xrecport"].as_array());
+        for(auto xrp : js_xrecports) {
+          int p(xrp.as<int>(0));
+          if(p > 0)
+            rendersettings.xrecport.push_back(p);
+        }
         backend.set_render_settings(rendersettings,
                                     js_rendersettings["stagedevid"].as<int>(0));
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());

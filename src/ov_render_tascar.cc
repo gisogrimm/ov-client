@@ -440,6 +440,8 @@ void ov_render_tascar_t::start_session()
           false, false);
       if(stage.rendersettings.secrec > 0)
         ovboxclient->add_extraport(100);
+      for(auto p : stage.rendersettings.xrecport)
+        ovboxclient->add_receiverport(p);
     }
     tsc.doc->write_to_file_formatted("debugsession.tsc");
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),

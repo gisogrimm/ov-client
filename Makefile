@@ -57,8 +57,11 @@ build: build/.directory
 
 binaries: $(BUILD_BINARIES)
 
+build/ov-client: libov/build/libov.a
+
 build/%: src/%.cc
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+
 
 #$(BUILD_BINARIES): $(wildcard libov/build/*.o)
 
@@ -66,13 +69,14 @@ build/ov-client: $(wildcard src/*.h)
 
 build/ov-client: $(BUILD_OBJ)
 
-build/%.o: src/%.cc src/%.h
+build/%.o: src/%.cc $(wildcard src/*.h) $(wildcard libov/src/*.h)
 
 build/%.o: src/%.cc
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
 
 clean:
 	rm -Rf build src/*~
+	$(MAKE) -C libov clean
