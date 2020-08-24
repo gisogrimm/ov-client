@@ -57,8 +57,8 @@ build: build/.directory
 
 binaries: $(BUILD_BINARIES)
 
-build/%: src/%.cc
-	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+build/%: src/%.cc src/%.h libov/src/*.h
+	$(CXX) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 
 #$(BUILD_BINARIES): $(wildcard libov/build/*.o)
 
