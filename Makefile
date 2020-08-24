@@ -76,3 +76,4 @@ clangformat:
 
 clean:
 	rm -Rf build src/*~
+	$(MAKE) -C libov clean
