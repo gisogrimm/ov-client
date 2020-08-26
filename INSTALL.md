@@ -82,7 +82,7 @@ terminal, type:
 
 ````
 sudo apt update
-sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential
+sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libtascar-dev
 git clone https://github.com/gisogrimm/ov-client
 make -C ov-client
 ````
