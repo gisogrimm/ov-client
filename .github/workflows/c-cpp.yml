@@ -15,7 +15,7 @@ jobs:
       run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7D6CDF547DA4ABD &&
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
     - name: dependencies
-      run: sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential &&
-           sudo apt update
+      run: sudo apt update && 
+           sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libtascar-dev
     - name: make
       run: make 
