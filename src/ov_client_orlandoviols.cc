@@ -4,6 +4,7 @@
 #include <alsa/asoundlib.h>
 #include <curl/curl.h>
 #include <fstream>
+#include <sstream>
 
 CURL* curl;
 
@@ -148,6 +149,11 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
                                                       const std::string& device,
                                                       std::string& hash)
 {
+  char chost[1024];
+  memset(chost, 0, 1024);
+  std::string hostname;
+  if(0 == gethostname(chost, 1023))
+    hostname = chost;
   std::vector<snddevname_t> alsadevs(listdev());
   std::string jsdevs("{");
   for(auto d : alsadevs)
@@ -163,6 +169,8 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
   url += "?ovclient=" + device + "&hash=" + hash;
+  if(hostname.size() > 0)
+    url += "&host=" + hostname;
   curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
@@ -274,7 +282,25 @@ void ov_client_orlandoviols_t::service()
         rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
         rendersettings.peer2peer =
             js_rendersettings["peer2peer"].as<bool>(true);
-        backend.set_render_settings(rendersettings);
+        rendersettings.xports.clear();
+        RSJarray js_xports(js_rendersettings["xport"].as_array());
+        for(auto xp : js_xports) {
+          RSJarray js_xp(xp.as_array());
+          if(js_xp.size() == 2) {
+            std::string key(js_xp[0].as<std::string>(""));
+            if(key.size())
+              rendersettings.xports[key] = js_xp[1].as<std::string>("");
+          }
+        }
+        rendersettings.xrecport.clear();
+        RSJarray js_xrecports(js_rendersettings["xrecport"].as_array());
+        for(auto xrp : js_xrecports) {
+          int p(xrp.as<int>(0));
+          if(p > 0)
+            rendersettings.xrecport.push_back(p);
+        }
+        backend.set_render_settings(rendersettings,
+                                    js_rendersettings["stagedevid"].as<int>(0));
         RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
         for(auto dev : js_stagedevs) {
           backend.add_stage_device(get_stage_dev(dev));

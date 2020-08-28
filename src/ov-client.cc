@@ -1,8 +1,8 @@
-#include "mactools.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <stdint.h>
 #include <string>
+#include <udpsocket.h>
 
 static bool quit_app(false);
 
@@ -17,14 +17,12 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
   std::string deviceid(getmacaddr());
-	std::string lobby("http://box.orlandoviols.com/");
-  //std::string lobby("http://localhost:8083/");
-  const char* options = "s:hqv";
-  struct option long_options[] = {{"server", 1, 0, 's'},
-                                  {"help", 0, 0, 'h'},
-                                  {"quiet", 0, 0, 'q'},
-                                  {"verbose", 0, 0, 'v'},
-                                  {0, 0, 0, 0}};
+  std::string lobby("http://box.orlandoviols.com/");
+  // std::string lobby("http://localhost:8083/");
+  const char* options = "s:hqvd:";
+  struct option long_options[] = {
+      {"server", 1, 0, 's'},   {"help", 0, 0, 'h'},    {"quiet", 0, 0, 'q'},
+      {"deviceid", 1, 0, 'd'}, {"verbose", 0, 0, 'v'}, {0, 0, 0, 0}};
   int opt(0);
   int option_index(0);
   while((opt = getopt_long(argc, argv, options, long_options, &option_index)) !=
@@ -38,6 +36,9 @@ int main(int argc, char** argv)
       break;
     case 's':
       lobby = optarg;
+      break;
+    case 'd':
+      deviceid = optarg;
       break;
     case 'v':
       verbose++;

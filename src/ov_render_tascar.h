@@ -17,12 +17,14 @@ public:
   void add_stage_device(const stage_device_t& stagedevice);
   void rm_stage_device(stage_device_id_t stagedeviceid);
   void set_stage_device_gain(stage_device_id_t stagedeviceid, double gain);
-  void set_render_settings(const render_settings_t& rendersettings);
+  void set_render_settings(const render_settings_t& rendersettings,
+                           stage_device_id_t thisstagedeviceid);
   std::string get_stagedev_name(stage_device_id_t stagedeviceid) const;
 
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
                                 xmlpp::Element* e_scene);
+  void create_raw_dev(xmlpp::Element* session);
   FILE* h_pipe_jack;
   TASCAR::session_t* tascar;
   ovboxclient_t* ovboxclient;
