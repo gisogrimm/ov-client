@@ -140,8 +140,10 @@ bool ov_client_orlandoviols_t::download_file(const std::string& url,
   if(res == CURLE_OK) {
     std::ofstream ofh(dest);
     ofh.write(chunk.memory, chunk.size);
+    free(chunk.memory);
     return true;
   }
+  free(chunk.memory);
   return false;
 }
 
