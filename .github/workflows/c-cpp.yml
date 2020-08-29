@@ -2,7 +2,7 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ development ]
+    branches: [ master, development, build-automation ]
 
 jobs:
   build:
