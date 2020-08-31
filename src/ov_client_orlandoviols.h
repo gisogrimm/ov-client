@@ -13,8 +13,9 @@ public:
 
 private:
   void service();
-  std::string get_device_init(std::string url, const std::string& device,
-                              std::string& hash);
+  void device_init(std::string url, const std::string& device);
+  std::string device_update(std::string url, const std::string& device,
+			    std::string& hash);
   void report_error(std::string url, const std::string& device,
                     const std::string& msg);
 

@@ -147,9 +147,9 @@ bool ov_client_orlandoviols_t::download_file(const std::string& url,
   return false;
 }
 
-std::string ov_client_orlandoviols_t::get_device_init(std::string url,
-                                                      const std::string& device,
-                                                      std::string& hash)
+std::string ov_client_orlandoviols_t::device_update(std::string url,
+						    const std::string& device,
+						    std::string& hash)
 {
   char chost[1024];
   memset(chost, 0, 1024);
@@ -201,6 +201,24 @@ std::string ov_client_orlandoviols_t::get_device_init(std::string url,
   return retv;
 }
 
+void ov_client_orlandoviols_t::device_init(std::string url,
+					   const std::string& device)
+{
+  struct webCURL::MemoryStruct chunk;
+  chunk.memory =
+      (char*)malloc(1); /* will be grown as needed by the realloc above */
+  chunk.size = 0;       /* no data at this point */
+  url += "?setver=" + device + "&ver=ovc-"+OVBOXVERSION;
+  curl_easy_reset(curl);
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+  curl_easy_perform(curl);
+  free(chunk.memory);
+}
+
 stage_device_t get_stage_dev(RSJresource& dev)
 {
   stage_device_t stagedev;
@@ -234,12 +252,13 @@ stage_device_t get_stage_dev(RSJresource& dev)
 
 void ov_client_orlandoviols_t::service()
 {
+  device_init(lobby, backend.get_deviceid() );
   report_error(lobby, backend.get_deviceid(), "");
   download_file(lobby + "/announce.flac", "announce.flac");
   std::string hash;
   double gracetime(8.0);
   while(runservice) {
-    std::string stagecfg(get_device_init(lobby, backend.get_deviceid(), hash));
+    std::string stagecfg(device_update(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
       try {
         RSJresource js_stagecfg(stagecfg);
