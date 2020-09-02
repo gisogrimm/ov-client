@@ -1,0 +1,22 @@
+name: Ubuntu make
+
+on:
+  push:
+    branches: [ master, development, build-automation ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: tascar
+      run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7D6CDF547DA4ABD &&
+           sudo apt-add-repository 'deb http://apt.hoertech.de/ focal universe'
+    - name: dependencies
+      run: sudo apt update &&
+           sudo apt install --assume-yes git liblo-dev libcurl4-openssl-dev build-essential libtascar-dev mhamakedev
+    - name: make
+      run: make
+    - name: packaging
+      run: make packaging
