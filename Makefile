@@ -8,7 +8,7 @@ showver:
 BINARIES = ov-client
 OBJ = ov_client_orlandoviols ov_render_tascar
 
-EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl
+EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
