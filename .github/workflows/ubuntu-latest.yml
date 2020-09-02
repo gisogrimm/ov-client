@@ -15,7 +15,7 @@ jobs:
            sudo apt-add-repository 'deb http://apt.hoertech.de/ focal universe'
     - name: dependencies
       run: sudo apt update &&
-           sudo apt install --assume-yes git liblo-dev libcurl4-openssl-dev build-essential libtascar-dev libasound2-dev libfftw3-dev mhamakedeb
+           sudo apt install --assume-yes git liblo-dev libcurl4-openssl-dev build-essential libtascar-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev mhamakedeb
     - name: make
       run: make
     - name: packaging
