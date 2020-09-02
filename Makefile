@@ -1,6 +1,9 @@
 all: lib build binaries
 
-VERSION=0.2
+VERSION=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
+
+showver:
+	echo $(VERSION)
 
 BINARIES = ov-client
 OBJ = ov_client_orlandoviols ov_render_tascar

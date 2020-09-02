@@ -208,7 +208,7 @@ void ov_client_orlandoviols_t::device_init(std::string url,
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
-  url += "?setver=" + device + "&ver=ovc-"+OVBOXVERSION;
+  url += "?setver=" + device + "&ver=ovclient-"+OVBOXVERSION;
   curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
