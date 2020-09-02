@@ -8,7 +8,7 @@ httpserver = http.createServer(function (req, res) {
     var hoscss = fs.readFileSync('ovclient.css');
     var devname = os.hostname();
     try{
-				devname = fs.readFileSync('devicename');
+	devname = fs.readFileSync('devicename');
     }
     catch(ee){
     }
@@ -38,34 +38,34 @@ oscClientMPLX = new osc.Client( 'localhost', 9876 );
 
 io.on('connection', function (socket) {
     socket.on('config', function (obj) {
-				oscClient.send('/status', socket.id + ' connected');
-				oscServer.on('message', async function(msg, rinfo) {
-						if( msg[0] == '/touchosc/scene' ){
-								socket.emit('scene', 'scene');
-						}
-						if( msg[0].startsWith('/touchosc/label') && (!msg[0].endsWith('/color')) && (msg[1].length>1)){
-								socket.emit('newfader', msg[0].substr(15), msg[1] );
-						}
-						if( msg[0].startsWith('/touchosc/fader') && (!msg[0].endsWith('/color')) ){
-								socket.emit('updatefader', msg[0], msg[1] );
-						}
-						if( msg[0].startsWith('/touchosc/level') ){
-								socket.emit('updatefader', msg[0], msg[1] );
-						}
-				});
-				oscClient.send('/touchosc/connect',16);
+	oscClient.send('/status', socket.id + ' connected');
+	oscServer.on('message', async function(msg, rinfo) {
+	    if( msg[0] == '/touchosc/scene' ){
+		socket.emit('scene', 'scene');
+	    }
+	    if( msg[0].startsWith('/touchosc/label') && (!msg[0].endsWith('/color')) && (msg[1].length>1)){
+		socket.emit('newfader', msg[0].substr(15), msg[1] );
+	    }
+	    if( msg[0].startsWith('/touchosc/fader') && (!msg[0].endsWith('/color')) ){
+		socket.emit('updatefader', msg[0], msg[1] );
+	    }
+	    if( msg[0].startsWith('/touchosc/level') ){
+		socket.emit('updatefader', msg[0], msg[1] );
+	    }
+	});
+	oscClient.send('/touchosc/connect',16);
     });
     socket.on('message', function (obj) {
-				oscClient.send(obj);
+	oscClient.send(obj);
     });
     socket.on('msg', function (obj) {
-				if( obj.hasOwnProperty('value') && (obj.value != null) ){
-						oscClient.send( obj.path, obj.value );
-				}else{
-						oscClient.send( obj.path );
-				}
+	if( obj.hasOwnProperty('value') && (obj.value != null) ){
+	    oscClient.send( obj.path, obj.value );
+	}else{
+	    oscClient.send( obj.path );
+	}
     });
     socket.on('defaultgains', function (obj) {
-				fs.unlink('savedgains');
+	fs.unlink('savedgains');
     });
 });
