@@ -17,10 +17,7 @@ BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
 -ggdb -fno-finite-math-only -fext-numeric-literals
 
-GITMODIFIED=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
-COMMITHASH=$(shell git log -1 --abbrev=7 --pretty='format:%h')
-
-FULLVERSION=$(VERSION)-$(COMMITHASH)$(GITMODIFIED)
+FULLVERSION=$(VERSION).$(shell git rev-list --count master..HEAD)-$(shell git rev-parse --short HEAD)$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 
 CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
@@ -82,3 +79,8 @@ clangformat:
 clean:
 	rm -Rf build src/*~
 	$(MAKE) -C libov clean
+
+.PHONY: packaging
+
+packaging:
+	mhamakedeb packaging/deb/ovclient.csv $(FULLVERSION)

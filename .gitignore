@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+*.deb
 
 # output directories:
 build
