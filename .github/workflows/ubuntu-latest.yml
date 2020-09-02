@@ -20,3 +20,7 @@ jobs:
       run: make
     - name: packaging
       run: make packaging
+    - uses: actions/upload-artifact@v2
+      with:
+        name: debian
+        path: *.deb
