@@ -29,7 +29,7 @@ socket.on("newfader", function(faderno,val){
     el_fader.setAttribute("class","fader");
     el_fader.setAttribute("type","range");
     el_fader.setAttribute("min","-20");
-    el_fader.setAttribute("max","5");
+    el_fader.setAttribute("max","10");
     el_fader.setAttribute("value",val);
     el_fader.setAttribute("step","0.1");
     el_fader.setAttribute("id",fader);
@@ -37,7 +37,7 @@ socket.on("newfader", function(faderno,val){
     el_gaintext.setAttribute("type","number");
     el_gaintext.setAttribute("class","gaintxtfader");
     el_gaintext.setAttribute("min","-20");
-    el_gaintext.setAttribute("max","5");
+    el_gaintext.setAttribute("max","10");
     el_gaintext.setAttribute("value",val);
     el_gaintext.setAttribute("step","0.1");
     el_gaintext.setAttribute("id","txt"+fader);
