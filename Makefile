@@ -17,7 +17,7 @@ BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
 -ggdb -fno-finite-math-only -fext-numeric-literals
 
-FULLVERSION=$(VERSION).$(shell git rev-list --count master..HEAD)-$(shell git rev-parse --short HEAD)$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
+FULLVERSION=$(VERSION).$(shell git rev-list --count release..HEAD)-$(shell git rev-parse --short HEAD)$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 
 CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
