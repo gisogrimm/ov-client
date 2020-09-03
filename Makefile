@@ -1,11 +1,16 @@
 all: lib build binaries
 
-VERSION=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
+VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
+MINORVERSION:=$(shell git rev-list --count release..HEAD)
+COMMIT:=$(shell git rev-parse --short HEAD)
+COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
+FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
+
 
 showver:
 	echo $(VERSION)
 
-BINARIES = ov-client
+BINARIES = ov-client ovc_tascar_ver
 OBJ = ov_client_orlandoviols ov_render_tascar
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl
@@ -16,8 +21,6 @@ BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
 -ggdb -fno-finite-math-only -fext-numeric-literals
-
-FULLVERSION=$(VERSION).$(shell git rev-list --count release..HEAD)-$(shell git rev-parse --short HEAD)$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 
 CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
@@ -82,5 +85,5 @@ clean:
 
 .PHONY: packaging
 
-packaging:
-	mhamakedeb packaging/deb/ovclient.csv $(FULLVERSION)
+packaging: build/ovc_tascar_ver
+	TSCVER=$(shell ./build/ovc_tascar_ver) mhamakedeb packaging/deb/ovclient.csv $(VERSION).$(MINORVERSION)-$(shell ./build/ovc_tascar_ver)-$(COMMIT)$(COMMITMOD)
