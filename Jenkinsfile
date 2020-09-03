@@ -29,10 +29,10 @@ pipeline {
     stages {
         stage("build") {
             parallel {
-		//stage(                        "focal && x86_64 && tascardev") {
-                //    agent {label              "focal && x86_64 && tascardev"}
-                //    steps {tascar_build_steps("focal && x86_64 && tascardev")}
-                //}
+		stage(                        "focal && x86_64 && tascardev") {
+                    agent {label              "focal && x86_64 && tascardev"}
+                    steps {tascar_build_steps("focal && x86_64 && tascardev")}
+                }
 		stage(                        "bionic && x86_64 && tascardev") {
                     agent {label              "bionic && x86_64 && tascardev"}
                     steps {tascar_build_steps("bionic && x86_64 && tascardev")}
@@ -53,7 +53,7 @@ pipeline {
 	    when { anyOf { branch 'master'; branch 'development' } }
 	    steps {
                 // receive all deb packages from tascarpro build
-                //unstash "x86_64_focal"
+                unstash "x86_64_focal"
                 unstash "x86_64_bionic"
                 unstash "x86_64_xenial"
                 unstash "armv7_bionic"
