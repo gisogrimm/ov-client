@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: fetchtags
+      run: git fetch -t
     - name: tascar
       run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7D6CDF547DA4ABD &&
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
