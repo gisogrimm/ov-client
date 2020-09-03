@@ -8,6 +8,7 @@ def tascar_build_steps(stage_name) {
     checkout scm
 
     // install TASCAR:
+    sh "DEBIAN_FRONTEND=noninteractive apt update"
     sh "DEBIAN_FRONTEND=noninteractive apt install --assume-yes libtascar-dev mhamakedeb"
 
     // Avoid that artifacts from previous builds influence this build
@@ -58,7 +59,7 @@ pipeline {
                 unstash "armv7_bionic"
 	
                 // Copies the new debs to the stash of existing debs,
-                sh "make storage"
+                sh "make -f htchstorage.mk storage"
 	
                 build job: "/hoertech-aptly/$BRANCH_NAME", quietPeriod: 300, wait: false
 	    }
