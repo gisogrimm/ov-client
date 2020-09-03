@@ -34,7 +34,6 @@ var oscServer, oscClient;
 
 oscServer = new osc.Server( 9000, '0.0.0.0' );
 oscClient = new osc.Client( 'localhost', 9871 );
-oscClientMPLX = new osc.Client( 'localhost', 9876 );
 
 io.on('connection', function (socket) {
     socket.on('config', function (obj) {
@@ -64,8 +63,5 @@ io.on('connection', function (socket) {
 	}else{
 	    oscClient.send( obj.path );
 	}
-    });
-    socket.on('defaultgains', function (obj) {
-	fs.unlink('savedgains');
     });
 });
