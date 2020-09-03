@@ -36,7 +36,7 @@
 
 # There will by $SYSTEM subdirectories below this directory.
 # These subdirectories then contain the package files.
-SUPPLY_DIR = ./
+SUPPLY_DIR = packaging/deb/debian/
 
 PROJECT = ovclient
 

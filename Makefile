@@ -1,11 +1,10 @@
 all: lib build binaries
 
-VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
-MINORVERSION:=$(shell git rev-list --count release..HEAD)
-COMMIT:=$(shell git rev-parse --short HEAD)
-COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
-FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
-
+export VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
+export MINORVERSION:=$(shell git rev-list --count release..HEAD)
+export COMMIT:=$(shell git rev-parse --short HEAD)
+export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
+export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 
 showver:
 	echo $(VERSION)
@@ -86,4 +85,4 @@ clean:
 .PHONY: packaging
 
 packaging: build/ovc_tascar_ver
-	TSCVER=$(shell ./build/ovc_tascar_ver) mhamakedeb packaging/deb/ovclient.csv $(VERSION).$(MINORVERSION)-$(shell ./build/ovc_tascar_ver)-$(COMMIT)$(COMMITMOD)
+	$(MAKE) -C packaging/deb pack

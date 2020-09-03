@@ -21,7 +21,7 @@ def tascar_build_steps(stage_name) {
     sh "make packaging"
 
     // Store debian packets for later retrieval by the repository manager
-    stash name: (arch+"_"+system), includes: 'ovclient*.deb'
+    stash name: (arch+"_"+system), includes: 'packaging/deb/debian/'
 }
 
 pipeline {
@@ -47,23 +47,23 @@ pipeline {
                 }
 	    }
 	}
-	//stage("artifacts") {
-	//    agent {label "aptly"}
-	//    // do not publish packages for any branches except these
-	//    when { anyOf { branch 'master'; branch 'development' } }
-	//    steps {
-        //        // receive all deb packages from tascarpro build
-        //        //unstash "x86_64_focal"
-        //        unstash "x86_64_bionic"
-        //        unstash "x86_64_xenial"
-        //        unstash "armv7_bionic"
-	//
-        //        // Copies the new debs to the stash of existing debs,
-        //        sh "make -f htchstorage.mk storage"
-	//
-        //        //build job: "/hoertech-aptly/$BRANCH_NAME", quietPeriod: 300, wait: false
-	//    }
-	//}
+	stage("artifacts") {
+	    agent {label "aptly"}
+	    // do not publish packages for any branches except these
+	    when { anyOf { branch 'master'; branch 'development' } }
+	    steps {
+                // receive all deb packages from tascarpro build
+                //unstash "x86_64_focal"
+                unstash "x86_64_bionic"
+                unstash "x86_64_xenial"
+                unstash "armv7_bionic"
+	
+                // Copies the new debs to the stash of existing debs,
+                sh "make -f htchstorage.mk storage"
+	
+                build job: "/hoertech-aptly/$BRANCH_NAME", quietPeriod: 300, wait: false
+	    }
+	}
     }
     post {
         failure {

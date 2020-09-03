@@ -25,4 +25,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: debian
-        path: ovclient*.deb
+        path: packaging/deb/debian/*/*.deb
