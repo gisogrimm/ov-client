@@ -1,5 +1,19 @@
 #include "ov_render_tascar.h"
+#include <fstream>
 #include <unistd.h>
+
+bool file_exists(const std::string& fname)
+{
+  try {
+    std::ifstream ifh(fname);
+    if(ifh.good())
+      return true;
+    return false;
+  }
+  catch(...) {
+    return false;
+  }
+}
 
 TASCAR::pos_t to_tascar(const pos_t& src)
 {
@@ -128,9 +142,18 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   xmlpp::Element* e_mods(e_session->add_child("modules"));
   if(!stage.rendersettings.rawmode) {
     // add web mixer tools (node-js server and touchosc interface):
-    xmlpp::Element* e_node(e_mods->add_child("system"));
-    e_node->set_attribute("command", "node webmixer.js");
-    e_mods->add_child("touchosc");
+    std::string command;
+    if(file_exists("/usr/share/ovclient/webmixer.js")) {
+      command = "(cd /usr/share/ovclient/ && node webmixer.js)";
+    }
+    if(file_exists("webmixer.js")) {
+      command = "node webmixer.js";
+    }
+    if(!command.empty()) {
+      xmlpp::Element* e_node(e_mods->add_child("system"));
+      e_node->set_attribute("command", command);
+      e_mods->add_child("touchosc");
+    }
   }
   //
   for(auto stagemember : stage.stage) {
@@ -443,7 +466,7 @@ void ov_render_tascar_t::start_session()
       for(auto p : stage.rendersettings.xrecport)
         ovboxclient->add_receiverport(p);
     }
-    tsc.doc->write_to_file_formatted("debugsession.tsc");
+    // tsc.doc->write_to_file_formatted("debugsession.tsc");
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),
                                    TASCAR::session_t::LOAD_STRING, "");
     tascar->start();

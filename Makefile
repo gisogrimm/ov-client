@@ -77,7 +77,7 @@ clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
 
 clean:
-	rm -Rf build src/*~
+	rm -Rf build src/*~ ovclient*.deb
 	$(MAKE) -C libov clean
 
 .PHONY: packaging

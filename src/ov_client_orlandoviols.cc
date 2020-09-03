@@ -148,8 +148,8 @@ bool ov_client_orlandoviols_t::download_file(const std::string& url,
 }
 
 std::string ov_client_orlandoviols_t::device_update(std::string url,
-						    const std::string& device,
-						    std::string& hash)
+                                                    const std::string& device,
+                                                    std::string& hash)
 {
   char chost[1024];
   memset(chost, 0, 1024);
@@ -202,13 +202,13 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
 }
 
 void ov_client_orlandoviols_t::device_init(std::string url,
-					   const std::string& device)
+                                           const std::string& device)
 {
   struct webCURL::MemoryStruct chunk;
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
-  url += "?setver=" + device + "&ver=ovclient-"+OVBOXVERSION;
+  url += "?setver=" + device + "&ver=ovclient-" + OVBOXVERSION;
   curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
@@ -252,7 +252,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
 
 void ov_client_orlandoviols_t::service()
 {
-  device_init(lobby, backend.get_deviceid() );
+  device_init(lobby, backend.get_deviceid());
   report_error(lobby, backend.get_deviceid(), "");
   download_file(lobby + "/announce.flac", "announce.flac");
   std::string hash;
