@@ -3,6 +3,7 @@
 
 #include "ov_types.h"
 #include "ovboxclient.h"
+#include "spawn_process.h"
 #include <tascar/session.h>
 
 class ov_render_tascar_t : public ov_render_base_t {
@@ -25,7 +26,14 @@ private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
                                 xmlpp::Element* e_scene);
   void create_raw_dev(xmlpp::Element* session);
-  FILE* h_pipe_jack;
+  // for the time being we (optionally if jack is chosen as an audio
+  // backend) start the jack backend. This will be replaced by a more
+  // generic audio backend interface:
+  spawn_process_t* h_jack;
+  // for the time being we start the webmixer as a local nodejs server
+  // on port 8080. This will be replaced (or extended) by a web mixer
+  // on the remote configuration interface:
+  spawn_process_t* h_webmixer;
   TASCAR::session_t* tascar;
   ovboxclient_t* ovboxclient;
 };

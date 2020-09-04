@@ -26,7 +26,7 @@ TASCAR::zyx_euler_t to_tascar(const zyx_euler_t& src)
 }
 
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid)
-    : ov_render_base_t(deviceid), h_pipe_jack(NULL), tascar(NULL),
+    : ov_render_base_t(deviceid), h_jack(NULL), h_webmixer(NULL), tascar(NULL),
       ovboxclient(NULL)
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
@@ -140,21 +140,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   }
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
-  if(!stage.rendersettings.rawmode) {
-    // add web mixer tools (node-js server and touchosc interface):
-    std::string command;
-    if(file_exists("/usr/share/ovclient/webmixer.js")) {
-      command = "(cd /usr/share/ovclient/ && node webmixer.js)";
-    }
-    if(file_exists("webmixer.js")) {
-      command = "node webmixer.js";
-    }
-    if(!command.empty()) {
-      xmlpp::Element* e_node(e_mods->add_child("system"));
-      e_node->set_attribute("command", command);
-      e_mods->add_child("touchosc");
-    }
-  }
+  e_mods->add_child("touchosc");
   //
   for(auto stagemember : stage.stage) {
     std::string chanlist;
@@ -262,6 +248,7 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
   std::vector<std::string> waitports;
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  e_mods->add_child("touchosc");
   //
   uint32_t chcnt(0);
   for(auto stagemember : stage.stage) {
@@ -442,6 +429,8 @@ void ov_render_tascar_t::start_session()
         e_sndfile->set_attribute("level", "57");
         e_sndfile->set_attribute("transport", "false");
         e_sndfile->set_attribute("loop", "0");
+        xmlpp::Element* e_mods(e_session->add_child("modules"));
+        e_mods->add_child("touchosc");
       }
     } else {
       if(!stage.host.empty()) {
@@ -470,6 +459,16 @@ void ov_render_tascar_t::start_session()
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),
                                    TASCAR::session_t::LOAD_STRING, "");
     tascar->start();
+    // add web mixer tools (node-js server and touchosc interface):
+    std::string command;
+    if(file_exists("/usr/share/ovclient/webmixer.js")) {
+      command = "(cd /usr/share/ovclient/ && node webmixer.js)";
+    }
+    if(file_exists("webmixer.js")) {
+      command = "node webmixer.js";
+    }
+    if(!command.empty())
+      h_webmixer = new spawn_process_t(command);
   }
   catch(...) {
     delete tascar;
@@ -482,6 +481,9 @@ void ov_render_tascar_t::start_session()
 void ov_render_tascar_t::end_session()
 {
   ov_render_base_t::end_session();
+  if(h_webmixer)
+    delete h_webmixer;
+  h_webmixer = NULL;
   if(tascar) {
     tascar->stop();
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -500,13 +502,15 @@ void ov_render_tascar_t::start_audiobackend()
   ov_render_base_t::start_audiobackend();
   if((audiodevice.drivername == "jack") &&
      (audiodevice.devicename != "manual")) {
+    if(h_jack)
+      delete h_jack;
     char cmd[1024];
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d alsa -d %s "
             "-r %g -p %d -n %d",
             audiodevice.devicename.c_str(), audiodevice.srate,
             audiodevice.periodsize, audiodevice.numperiods);
-    h_pipe_jack = popen(cmd, "w");
+    h_jack = new spawn_process_t(cmd);
     // replace sleep by testing for jack presence with timeout:
     sleep(4);
   }
@@ -515,14 +519,12 @@ void ov_render_tascar_t::start_audiobackend()
 void ov_render_tascar_t::stop_audiobackend()
 {
   ov_render_base_t::stop_audiobackend();
-  if(h_pipe_jack) {
-    FILE* h_pipe(popen("killall jackd", "w"));
-    fclose(h_pipe_jack);
-    fclose(h_pipe);
+  if(h_jack) {
+    delete h_jack;
+    h_jack = NULL;
     // wait for jack to clean up properly:
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
-  h_pipe_jack = NULL;
 }
 
 void ov_render_tascar_t::add_stage_device(const stage_device_t& stagedevice)

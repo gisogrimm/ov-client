@@ -10,7 +10,7 @@ showver:
 	echo $(VERSION)
 
 BINARIES = ov-client ovc_tascar_ver
-OBJ = ov_client_orlandoviols ov_render_tascar
+OBJ = spawn_process ov_client_orlandoviols ov_render_tascar
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl
 
@@ -43,6 +43,8 @@ CXXFLAGS += -Ilibov/src
 LDLIBS += -lov
 LDFLAGS += -Llibov/build
 
+HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h)
+
 lib: libov/Makefile
 	$(MAKE) -C libov
 
@@ -66,13 +68,11 @@ build/%: src/%.cc
 
 #$(BUILD_BINARIES): $(wildcard libov/build/*.o)
 
-build/ov-client: $(wildcard src/*.h)
+#build/ov-client: $(wildcard src/*.h)
 
 build/ov-client: $(BUILD_OBJ)
 
-build/%.o: src/%.cc $(wildcard src/*.h) $(wildcard libov/src/*.h)
-
-build/%.o: src/%.cc
+build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clangformat:
