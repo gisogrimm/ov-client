@@ -11,8 +11,9 @@ For installation instructions see file [INSTALL.md](INSTALL.md).
 
 Currently, only the [ORLANDOviols](http://box.orlandoviols.com/)
 configuration server is supported. This means that once your
-installation is ready you may wish to get an account at
-box.orlandoviols.com - in that case please contact us via e-mail.
+installation is ready you need to create an account at
+ovbox.orlandoviols.com. If you need assistance do not hesitate to
+contact us via email.
 
 The interface to the [digital stage](https://digital-stage.org/)
 configuration server is currently under development.
