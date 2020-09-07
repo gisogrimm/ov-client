@@ -9,7 +9,7 @@ export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 showver:
 	echo $(VERSION)
 
-BINARIES = ov-client ovc_tascar_ver
+BINARIES = ov-client ov-headtracker ovc_tascar_ver
 OBJ = spawn_process ov_client_orlandoviols ov_render_tascar
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl

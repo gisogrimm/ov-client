@@ -4,3 +4,4 @@ Description: ORLANDOviols consort box client software
   The ORLANDOviols consort box (ovbox) is a Raspberry Pi based
   solution for remote music collaboration.
 Homepage: https://github.com/gisogrimm/ov-client
+Conflicts: ovclient

@@ -1,4 +1,5 @@
 build/ov-client,usr/bin
+build/ov-headtracker,usr/bin
 LICENSE,usr/share/doc/ovclient
 ovclient.css,usr/share/ovclient
 ovclient.js,usr/share/ovclient
