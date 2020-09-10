@@ -1,1 +1,1 @@
-libtascar (>=${TSCVER}), tascarcli (>=${TSCVER}), zita-njbridge,  nodejs, libcurl4
+libtascar (>=${TSCVER}), tascarcli (>=${TSCVER}), zita-njbridge,  nodejs, libcurl4 | libcurl4-openssl-dev
