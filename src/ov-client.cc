@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
   std::string deviceid(getmacaddr());
-  std::string lobby("https://oldbox.orlandoviols.com/");
+  std::string lobby("http://oldbox.orlandoviols.com/");
   int pinglogport(0);
   const char* options = "s:hqvd:p:";
   struct option long_options[] = {{"server", 1, 0, 's'},
@@ -52,11 +52,20 @@ int main(int argc, char** argv)
       break;
     }
   }
+  if(verbose)
+    std::cout << "creating renderer with device id \"" << deviceid
+              << "\" and pinglogport " << pinglogport << ".\n";
   ov_render_tascar_t render(deviceid, pinglogport);
+  if(verbose)
+    std::cout << "creating frontend interface for " << lobby << std::endl;
   ov_client_orlandoviols_t ovclient(render, lobby);
+  if(verbose)
+    std::cout << "starting services\n";
   ovclient.start_service();
   while(!quit_app)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  if(verbose)
+    std::cout << "stopping services\n";
   ovclient.stop_service();
   return 0;
 }
