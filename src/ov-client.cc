@@ -18,11 +18,15 @@ int main(int argc, char** argv)
   signal(SIGINT, &sighandler);
   std::string deviceid(getmacaddr());
   std::string lobby("https://oldbox.orlandoviols.com/");
-  // std::string lobby("http://localhost:8083/");
-  const char* options = "s:hqvd:";
-  struct option long_options[] = {
-      {"server", 1, 0, 's'},   {"help", 0, 0, 'h'},    {"quiet", 0, 0, 'q'},
-      {"deviceid", 1, 0, 'd'}, {"verbose", 0, 0, 'v'}, {0, 0, 0, 0}};
+  int pinglogport(0);
+  const char* options = "s:hqvd:p:";
+  struct option long_options[] = {{"server", 1, 0, 's'},
+                                  {"help", 0, 0, 'h'},
+                                  {"quiet", 0, 0, 'q'},
+                                  {"deviceid", 1, 0, 'd'},
+                                  {"verbose", 0, 0, 'v'},
+                                  {"pinglogport", 1, 0, 'p'},
+                                  {0, 0, 0, 0}};
   int opt(0);
   int option_index(0);
   while((opt = getopt_long(argc, argv, options, long_options, &option_index)) !=
@@ -40,12 +44,15 @@ int main(int argc, char** argv)
     case 'd':
       deviceid = optarg;
       break;
+    case 'p':
+      pinglogport = atoi(optarg);
+      break;
     case 'v':
       verbose++;
       break;
     }
   }
-  ov_render_tascar_t render(deviceid);
+  ov_render_tascar_t render(deviceid, pinglogport);
   ov_client_orlandoviols_t ovclient(render, lobby);
   ovclient.start_service();
   while(!quit_app)

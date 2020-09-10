@@ -25,11 +25,21 @@ TASCAR::zyx_euler_t to_tascar(const zyx_euler_t& src)
   return TASCAR::zyx_euler_t(src.z, src.y, src.x);
 }
 
-ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid)
+void sendpinglog(stage_device_id_t cid, double tms, void* addr)
+{
+  if(addr)
+    lo_send((lo_address)addr, "/ping", "id", cid, tms);
+}
+
+ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid,
+                                       port_t pinglogport_)
     : ov_render_base_t(deviceid), h_jack(NULL), h_webmixer(NULL), tascar(NULL),
-      ovboxclient(NULL)
+      ovboxclient(NULL), pinglogport(pinglogport_), pinglogaddr(nullptr)
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
+  if(pinglogport)
+    pinglogaddr =
+        lo_address_new("localhost", std::to_string(pinglogport_).c_str());
 }
 
 ov_render_tascar_t::~ov_render_tascar_t()
@@ -38,6 +48,8 @@ ov_render_tascar_t::~ov_render_tascar_t()
     end_session();
   if(is_audio_active())
     stop_audiobackend();
+  if(pinglogaddr)
+    lo_address_free(pinglogaddr);
 }
 
 void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
@@ -454,6 +466,8 @@ void ov_render_tascar_t::start_session()
         ovboxclient->add_extraport(100);
       for(auto p : stage.rendersettings.xrecport)
         ovboxclient->add_receiverport(p);
+      if(pinglogaddr)
+        ovboxclient->set_ping_callback(sendpinglog, pinglogaddr);
     }
     // tsc.doc->write_to_file_formatted("debugsession.tsc");
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),

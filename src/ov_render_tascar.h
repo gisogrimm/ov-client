@@ -4,11 +4,12 @@
 #include "ov_types.h"
 #include "ovboxclient.h"
 #include "spawn_process.h"
+#include <lo/lo.h>
 #include <tascar/session.h>
 
 class ov_render_tascar_t : public ov_render_base_t {
 public:
-  ov_render_tascar_t(const std::string& deviceid);
+  ov_render_tascar_t(const std::string& deviceid, port_t pinglogport_);
   ~ov_render_tascar_t();
   void start_session();
   void end_session();
@@ -36,6 +37,8 @@ private:
   spawn_process_t* h_webmixer;
   TASCAR::session_t* tascar;
   ovboxclient_t* ovboxclient;
+  port_t pinglogport;
+  lo_address pinglogaddr;
 };
 
 #endif
