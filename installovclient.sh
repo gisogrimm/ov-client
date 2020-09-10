@@ -18,8 +18,7 @@
 
     # get autorun file:
     rm -f autorun
-    #wget https://github.com/gisogrimm/ov-client/raw/master/tools/pi/autorun
-    wget https://raw.githubusercontent.com/gisogrimm/ov-client/development/tools/pi/autorun
+    wget https://github.com/gisogrimm/ov-client/raw/master/tools/pi/autorun
     chmod a+x autorun
 
     # update real-time priority priviledges:
