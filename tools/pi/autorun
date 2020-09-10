@@ -30,19 +30,12 @@ killall dbus-launch
 ## Stop all wifi/bluetooth devices
 rfkill block all
 
-## power button:
-#while true; do
-#~/shutdown-press-simple.py
-#sleep 1
-#done
+# update ov-client:
+export DEBIAN_FRONTEND=noninteractive
+sudo -E apt update --assume-yes
+sudo -E apt install --assume-yes ov-client
 
-# clone ov-client repo if not yet available:
-sudo su -l ov -c "test -e ov-client || git clone http://github.com/gisogrimm/ov-client"
+# this would be the right moment to activate overlay-fs
 
-# update ov-client repo:
-sudo su -l ov -c "cd ov-client && git pull"
-
-# activate overlay filesystem:
-
-# start tools:
-sudo su -l ov -c "/home/ov/ov-client/start_all.sh"
+# start client:
+sudo su -l ov -c "ov-client"
