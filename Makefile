@@ -1,7 +1,7 @@
 all: lib build binaries
 
 export VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
-export MINORVERSION:=$(shell git rev-list --count release..HEAD)
+export MINORVERSION:=$(shell git rev-list --count release_0_4..HEAD)
 export COMMIT:=$(shell git rev-parse --short HEAD)
 export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
