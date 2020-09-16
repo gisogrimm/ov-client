@@ -31,11 +31,7 @@ double gz0 = 0;
 double rotx = 0;
 double roty = 0;
 double rotz = 0;
-double mrotx = 0;
-double mroty = 0;
-double mrotz = 0;
 double rotscale = 0.061771;
-double mrotcoeff = 0.0002;
 
 Quaternion q;
 VectorInt16 aa; // [x, y, z]            accel sensor measurements
@@ -110,7 +106,6 @@ void loop()
     dt = rt - rtp;
     rtp = rt;
     if(b_calibinit || (digitalRead(15) && (!b_calibrating))) {
-      Serial.println("_start calibration");
       b_calibinit = false;
       b_calibrating = true;
       Serial.println("C1");
@@ -173,34 +168,44 @@ void loop()
         rotx = 0;
         roty = 0;
         rotz = 0;
-        mrotx = 0;
-        mroty = 0;
-        mrotz = 0;
-        mpu.setXGyroOffset(gx0);
-        mpu.setYGyroOffset(gy0);
-        mpu.setZGyroOffset(gz0);
+	// by some reason unknown to me, the offset has to be scaled by -2 to achieve correct values:
+        mpu.setXGyroOffset(-2*gx0);
+        mpu.setYGyroOffset(-2*gy0);
+        mpu.setZGyroOffset(-2*gz0);
         Serial.println("C0");
+	Serial.print('O');
+	Serial.print(mpu.getXGyroOffset());
+        Serial.print(',');
+	Serial.print(mpu.getYGyroOffset());
+        Serial.print(',');
+	Serial.print(mpu.getZGyroOffset());
+        Serial.print(',');
+	Serial.print(gx0);
+        Serial.print(',');
+	Serial.print(gy0);
+        Serial.print(',');
+	Serial.println(gz0);
       }
     } else {
       if(dt > 0) {
-        rotx += (gx - gx0) * dt * rotscale;
-        roty += (gy - gy0) * dt * rotscale;
-        rotz += (gz - gz0) * dt * rotscale;
+        //rotx += (gx - gx0) * dt * rotscale;
+        //roty += (gy - gy0) * dt * rotscale;
+        //rotz += (gz - gz0) * dt * rotscale;
+        rotx += gx * dt * rotscale;
+        roty += gy * dt * rotscale;
+        rotz += gz * dt * rotscale;
         Serial.print('G');
-        Serial.print(rotx - mrotx);
+        Serial.print(rotx);
         Serial.print(',');
-        Serial.print(roty - mroty);
+        Serial.print(roty);
         Serial.print(',');
-        Serial.println(rotz - mrotz);
+        Serial.println(rotz);
         Serial.print('A');
         Serial.print(ax);
         Serial.print(',');
         Serial.print(ay);
         Serial.print(',');
         Serial.println(az);
-        mrotx = (1.0 - mrotcoeff) * mrotx + mrotcoeff * rotx;
-        mroty = (1.0 - mrotcoeff) * mroty + mrotcoeff * roty;
-        mrotz = (1.0 - mrotcoeff) * mrotz + mrotcoeff * rotz;
       }
     }
   }
