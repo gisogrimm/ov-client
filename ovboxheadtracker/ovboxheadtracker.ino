@@ -200,12 +200,12 @@ void loop()
         Serial.print(roty);
         Serial.print(',');
         Serial.println(rotz);
-        Serial.print('A');
-        Serial.print(ax);
-        Serial.print(',');
-        Serial.print(ay);
-        Serial.print(',');
-        Serial.println(az);
+        //Serial.print('A');
+        //Serial.print(ax);
+        //Serial.print(',');
+        //Serial.print(ay);
+        //Serial.print(',');
+        //Serial.println(az);
       }
     }
   }
