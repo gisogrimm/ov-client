@@ -1,7 +1,13 @@
 #include "ov_client_orlandoviols.h"
 #include "RSJparser.tcc"
 #include "errmsg.h"
-#include <alsa/asoundlib.h>
+#include <unistd.h>
+
+#if defined ARCH_LIN
+  #include <alsa/asoundlib.h>
+#endif
+
+
 #include <curl/curl.h>
 #include <fstream>
 #include <sstream>
@@ -34,6 +40,7 @@ namespace webCURL {
   }
 
 } // namespace webCURL
+
 
 ov_client_orlandoviols_t::ov_client_orlandoviols_t(ov_render_base_t& backend,
                                                    const std::string& lobby)
