@@ -31,7 +31,7 @@ double gz0 = 0;
 double rotx = 0;
 double roty = 0;
 double rotz = 0;
-double rotscale = 0.061771;
+double rotscale = 0.0609756;
 
 Quaternion q;
 VectorInt16 aa; // [x, y, z]            accel sensor measurements
