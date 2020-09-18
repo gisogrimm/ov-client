@@ -6,12 +6,12 @@
     export DEBIAN_FRONTEND=noninteractive
 
     wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
-(echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
+    (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
 
     # install dependencies:
-    sudo -E apt update
-    sudo -E apt upgrade --assume-yes
-    sudo -E apt install --no-install-recommends --assume-yes ov-client
+    sudo -E apt update || (sleep 20; sudo -E apt update)
+    sudo -E apt upgrade --assume-yes || (sleep 20; sudo -E apt upgrade --assume-yes)
+    sudo -E apt install --no-install-recommends --assume-yes ov-client || (sleep 20; sudo -E apt install --no-install-recommends --assume-yes ov-client)
 
     # install user to run the scripts - do not provide root priviledges:
     sudo useradd -m -G audio,dialout ov
@@ -27,7 +27,7 @@
     echo "@audio - memlock unlimited"|sudo tee -a /etc/security/limits.conf
 
     # register autorun script in /etc/rc.local:
-    sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -i /etc/rc.local
+    sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local
     echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a /etc/rc.local
     echo "exit 0"|sudo tee -a /etc/rc.local
 
