@@ -4,7 +4,45 @@ The installation instructions are probably incomplete, however, they may
 give a rough idea of the steps involved. Any comments and improvements are
 welcome!
 
-## Download and install raspbian
+To use the ovbox hardware or ov-client desktop application after
+successful installation (e.g., for connecting with other users), you
+will need an account on the configuration frontend
+[https://box.orlandoviols.com/](https://box.orlandoviols.com/).
+
+## Option 1: Download pre-configured raspios image
+
+Download the modified installer image from
+[https://box.orlandoviols.com/2020-08-20-raspios-buster-armhf-lite-ovclientinstaller.zip](https://box.orlandoviols.com/2020-08-20-raspios-buster-armhf-lite-ovclientinstaller.zip)
+and unpack it.
+
+The md5sums of the packed and unpacked files are:
+````
+3cfae32b88b5d4753fc5bf46d5dd3ab9  2020-08-20-raspios-buster-armhf-lite-ovclientinstaller.img
+22ee5cc2caa6147f26a38fb7822f1698  2020-08-20-raspios-buster-armhf-lite-ovclientinstaller.zip
+````
+
+Now with the Raspberry Pi imager, choose the image file by clicking
+"CHOOSE OS" and "Use custom". Select the file
+`2020-08-20-raspios-buster-armhf-lite-ovclientinstaller.img`. Select
+the SD card and write to the card.
+
+Before booting your Raspberry Pi, please make sure that
+
+- it is connected to the internet with a cable
+- a class compliant USB sound card is connected
+- headphones are connected to the USB sound card
+- the new SD card is inserted
+- all HDMI cables are disconnected
+
+Now you can power on the Raspberry Pi. After approximately 5 minutes,
+you should hear an announcement in the headphones, and you can proceed
+with the registration of the device
+[wiki](https://github.com/gisogrimm/ovbox/wiki#configuration-of-your-device).
+
+
+## Option 2: Install with installer script
+
+### Download and install raspbian
 
 Download the Raspberry Pi OS image. The 'Lite' version is sufficient, since the system will be headless:
 
@@ -13,7 +51,7 @@ Download the Raspberry Pi OS image. The 'Lite' version is sufficient, since the 
 If you use the 'Raspberry Pi Imager', choose 'Raspberry Pi OS (other)', 
 then  'Raspberry Pi OS Lite (32-bit)'.
 
-### a) headless installation
+#### a) headless installation
 
 To enable ssh access in a headless environment (no screen connected to the Pi), follow these instructions:
 [https://www.raspberrypi.org/documentation/remote-access/ssh/](https://www.raspberrypi.org/documentation/remote-access/ssh/). Essentially you need to create a file `ssh` in the `/boot` partition, e.g. with
@@ -29,30 +67,34 @@ ssh pi@raspberrypi
 ````
 The default password is `raspberry`. This needs to be changed after first boot; to change the password, type `passwd`.
 
-### b) installation via screen
+#### b) installation via screen
 
 Connect a screen (you will need a micro-HDMI cable) and a keyboard. 
 Login as user 'pi'. Please note that the audio device numbering may change
 when connecting an HDMI screen.
 
-## ov-client installer script
+### ovbox installer script
 
-At this point you may try to use our installer script. If everything goes well, you will have a ready-to-use ov-client. It may take about one hour to run. To use the installer script, type these commands as user pi:
+At this point you may try to use our installer script. If everything goes well, you will have a ready-to-use ovbox. It may take about one hour to run. To use the installer script, type these commands as user pi:
 ````
 wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
 . installovclient.sh
 ````
 
-Please mind the space between the dot and `installovclient.sh`.  Your
-input is required sometimes. Type "yes" when asked if realtime
-priority should be activated. Enter a password for user `ov` when
-asked for it. All names/room numbers etc can left empty, by pressing
-Enter. Finally, the system will restart.
+Please mind the space between the dot and `installovbox.sh`. This
+script will install all required packages, install and compile the
+virtual acoustic simulation toolbox TASCAR and the ovbox tools. After
+installation it will activated the overlay file system to protected
+the SD card from write errors when powering off the device. Finally,
+the system will restart.
 
 If everything went well and if the sound card is connected,
 approximately 1 minute after powering on the device you should hear an
-announcement via headphones. Now you can claim the device in the web interface - see the [wiki](https://github.com/gisogrimm/ov-client/wiki#configuration-of-your-device) for details.  You may shutdown the
-device by simply unplugging the power.
+announcement via headphones. Now you can claim the device in the web
+interface - see the
+[wiki](https://github.com/gisogrimm/ovbox/wiki#configuration-of-your-device)
+for details.  You may shutdown the device by simply unplugging the
+power.
 
 **Warning**: The installer script activates the overlay file system to
 prevent a damage of the SD card when powering off the system. This
@@ -73,9 +115,9 @@ sudo shutdown -r now
 
 ## Installation on an Ubuntu LTS desktop PC
 
-If you plan to install the 'ov-client' system on a x86 64 bit Ubuntu LTS
-system (other debian based systems may also work), it is not
-recommended to use the installer described above.
+If you plan to install the 'ov-client' application system on a x86 64
+bit Ubuntu LTS system (other debian based systems may also work), it
+is not recommended to use the installer described above.
 
 In Ubuntu 20.04:
 
