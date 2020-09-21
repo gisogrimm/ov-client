@@ -440,6 +440,7 @@ void ov_render_tascar_t::start_session()
         e_sndfile->set_attribute("name", "announce.flac");
         e_sndfile->set_attribute("level", "57");
         e_sndfile->set_attribute("transport", "false");
+        e_sndfile->set_attribute("resample", "true");
         e_sndfile->set_attribute("loop", "0");
         xmlpp::Element* e_mods(e_session->add_child("modules"));
         e_mods->add_child("touchosc");
@@ -469,7 +470,7 @@ void ov_render_tascar_t::start_session()
       if(pinglogaddr)
         ovboxclient->set_ping_callback(sendpinglog, pinglogaddr);
     }
-    // tsc.doc->write_to_file_formatted("debugsession.tsc");
+    tsc.doc->write_to_file_formatted("ov-client_debugsession.tsc");
     tascar = new TASCAR::session_t(tsc.doc->write_to_string(),
                                    TASCAR::session_t::LOAD_STRING, "");
     tascar->start();
