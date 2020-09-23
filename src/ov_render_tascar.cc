@@ -25,10 +25,14 @@ TASCAR::zyx_euler_t to_tascar(const zyx_euler_t& src)
   return TASCAR::zyx_euler_t(src.z, src.y, src.x);
 }
 
-void sendpinglog(stage_device_id_t cid, double tms, void* addr)
+void sendpinglog(stage_device_id_t cid, double tms, const endpoint_t& ep,
+                 void* addr)
 {
-  if(addr)
+  if(addr) {
     lo_send((lo_address)addr, "/ping", "id", cid, tms);
+    lo_send((lo_address)addr, "/pinga", "iiid", cid, ep.sin_addr.s_addr,
+            ep.sin_port, tms);
+  }
 }
 
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid,
@@ -462,7 +466,7 @@ void ov_render_tascar_t::start_session()
       ovboxclient = new ovboxclient_t(
           stage.host, stage.port, 4464 + 2 * stage.thisstagedeviceid, 0, 30,
           stage.pin, stage.thisstagedeviceid, stage.rendersettings.peer2peer,
-          false, false);
+          false, false, stage.stage[stage.thisstagedeviceid].sendlocal);
       if(stage.rendersettings.secrec > 0)
         ovboxclient->add_extraport(100);
       for(auto p : stage.rendersettings.xrecport)

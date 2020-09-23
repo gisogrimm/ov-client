@@ -247,6 +247,8 @@ stage_device_t get_stage_dev(RSJresource& dev)
   stagedev.mute = dev["mute"].as<bool>(false);
   stagedev.receiverjitter = dev["jitter"]["receive"].as<double>(5);
   stagedev.senderjitter = dev["jitter"]["send"].as<double>(5);
+  /// send to local IP address if in same network?
+  stagedev.sendlocal = dev["sendlocal"].as<bool>(true);
   return stagedev;
 }
 
