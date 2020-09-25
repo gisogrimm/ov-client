@@ -418,14 +418,20 @@ void ov_render_tascar_t::start_session()
       // connect output ports:
       if(!stage.rendersettings.outputport1.empty()) {
         xmlpp::Element* e_con(e_session->add_child("connect"));
+        std::string srcport("master_l");
+        if(stage.rendersettings.rectype == "itu51")
+          srcport = "master.0L";
         e_con->set_attribute("src",
-                             "render." + stage.thisdeviceid + ":master_l");
+                             "render." + stage.thisdeviceid + ":" + srcport);
         e_con->set_attribute("dest", stage.rendersettings.outputport1);
       }
       if(!stage.rendersettings.outputport2.empty()) {
         xmlpp::Element* e_con(e_session->add_child("connect"));
+        std::string srcport("master_r");
+        if(stage.rendersettings.rectype == "itu51")
+          srcport = "master.1R";
         e_con->set_attribute("src",
-                             "render." + stage.thisdeviceid + ":master_r");
+                             "render." + stage.thisdeviceid + ":" + srcport);
         e_con->set_attribute("dest", stage.rendersettings.outputport2);
       }
       // the host is not empty when this device is on a stage:
