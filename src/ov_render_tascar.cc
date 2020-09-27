@@ -1,4 +1,5 @@
 #include "ov_render_tascar.h"
+#include "soundcardtools.h"
 #include <fstream>
 #include <unistd.h>
 
@@ -529,12 +530,25 @@ void ov_render_tascar_t::start_audiobackend()
      (audiodevice.devicename != "manual")) {
     if(h_jack)
       delete h_jack;
+    std::string devname(audiodevice.devicename);
+    DEBUG(audiodevice.devicename);
+    if(audiodevice.devicename == "highest") {
+      // the device name is not set, use the last one of available
+      // devices because this is most likely the one to use (e.g.,
+      // external sound card):
+      auto devs(list_sound_devices());
+      DEBUG(devs.empty());
+      if(!devs.empty())
+        devname = devs.rbegin()->dev;
+    }
+    DEBUG(devname);
     char cmd[1024];
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d alsa -d %s "
             "-r %g -p %d -n %d",
-            audiodevice.devicename.c_str(), audiodevice.srate,
-            audiodevice.periodsize, audiodevice.numperiods);
+            devname.c_str(), audiodevice.srate, audiodevice.periodsize,
+            audiodevice.numperiods);
+    DEBUG(cmd);
     h_jack = new spawn_process_t(cmd);
     // replace sleep by testing for jack presence with timeout:
     sleep(5);

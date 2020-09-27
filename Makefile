@@ -10,7 +10,7 @@ showver:
 	echo $(VERSION)
 
 BINARIES = ov-client ov-headtracker ovc_tascar_ver
-OBJ = spawn_process ov_client_orlandoviols ov_render_tascar
+OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl
 
