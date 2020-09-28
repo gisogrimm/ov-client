@@ -8,6 +8,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#define DEBUG(x)                                                               \
+  std::cerr << __FILE__ << ":" << __LINE__ << ": " << __PRETTY_FUNCTION__      \
+            << " " << #x << "=" << x << std::endl
+
 CURL* curl;
 
 namespace webCURL {
@@ -124,13 +128,21 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
     jsdevs.erase(jsdevs.end() - 1);
   jsdevs += "}";
   // std::cout << jsdevs << std::endl;
+  double txrate(0);
+  double rxrate(0);
+  backend.getbitrate(txrate, rxrate);
+  std::string jsmsg("{");
+  jsmsg += "\"alsadevs\":" + jsdevs + ",";
+  jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
+           "\",\"rx\":\"" + std::to_string(rxrate) + "\"}";
+  jsmsg += "}";
   CURLcode res;
   std::string retv;
   struct webCURL::MemoryStruct chunk;
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
-  url += "?ovclient=" + device + "&hash=" + hash;
+  url += "?ovclient2=" + device + "&hash=" + hash;
   if(hostname.size() > 0)
     url += "&host=" + hostname;
   curl_easy_reset(curl);
@@ -140,7 +152,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsdevs.c_str());
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsmsg.c_str());
   res = curl_easy_perform(curl);
   if(res == CURLE_OK)
     retv.insert(0, chunk.memory, chunk.size);

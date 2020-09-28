@@ -632,6 +632,12 @@ std::string ov_render_tascar_t::get_stagedev_name(stage_device_id_t id) const
   return stagedev->second.label + "_" + TASCAR::to_string(id);
 }
 
+void ov_render_tascar_t::getbitrate(double& txrate, double& rxrate)
+{
+  if(ovboxclient)
+    ovboxclient->getbitrate(txrate, rxrate);
+}
+
 /*
  * Local Variables:
  * compile-command: "make -C .."

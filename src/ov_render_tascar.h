@@ -22,6 +22,7 @@ public:
   void set_render_settings(const render_settings_t& rendersettings,
                            stage_device_id_t thisstagedeviceid);
   std::string get_stagedev_name(stage_device_id_t stagedeviceid) const;
+  void getbitrate(double& txrate, double& rxrate);
 
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
