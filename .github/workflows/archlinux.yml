@@ -5,15 +5,14 @@ on:
     branches: [ feature/dockeraction ]
 
 jobs:
-  checkout:
-
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: fetchtags
         run: git fetch --unshallow --tags
-
-  build:
-    steps:
-      - uses: 'docker'
-        image: '../../docker/archlinux/Dockerfile'
+      - name: build
+        uses: 'docker'
+        with:
+          image: '../../docker/archlinux/Dockerfile'
 
