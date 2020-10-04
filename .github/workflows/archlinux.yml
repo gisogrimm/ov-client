@@ -1,0 +1,10 @@
+name: archlinux make
+
+on:
+  push:
+    branches: [ feature/dockeraction ]
+
+runs:
+  using: 'docker'
+  image: '../../docker/archlinux/Dockerfile'
+
