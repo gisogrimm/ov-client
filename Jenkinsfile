@@ -7,10 +7,6 @@ def tascar_build_steps(stage_name) {
     // triggered this job on each build slave
     checkout scm
 
-    // install TASCAR:
-    sh "DEBIAN_FRONTEND=noninteractive apt update"
-    sh "DEBIAN_FRONTEND=noninteractive apt install --assume-yes libtascar-dev mhamakedeb"
-
     // Avoid that artifacts from previous builds influence this build
     sh "git reset --hard && git clean -ffdx"
 

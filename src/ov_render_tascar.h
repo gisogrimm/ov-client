@@ -5,7 +5,7 @@
 #include "ovboxclient.h"
 #include "spawn_process.h"
 #include <lo/lo.h>
-#include <tascar/session.h>
+#include "../tascar/libtascar/src/session.h"
 
 class ov_render_tascar_t : public ov_render_base_t {
 public:
