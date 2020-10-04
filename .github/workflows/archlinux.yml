@@ -4,7 +4,10 @@ on:
   push:
     branches: [ feature/dockeraction ]
 
-runs:
-  using: 'docker'
-  image: '../../docker/archlinux/Dockerfile'
+jobs:
+  build:
+
+  runs:
+    using: 'docker'
+    image: '../../docker/archlinux/Dockerfile'
 
