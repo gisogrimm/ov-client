@@ -4,10 +4,16 @@ on:
   push:
     branches: [ feature/dockeraction ]
 
-jobs:
-  build:
+  jobs:
+    checkout:
 
-  runs:
-    using: 'docker'
-    image: '../../docker/archlinux/Dockerfile'
+      runs:
+        steps:
+          - uses: actions/checkout@v2
+          - name: fetchtags
+            run: git fetch --unshallow --tags
+
+    build:
+      using: 'docker'
+      image: '../../docker/archlinux/Dockerfile'
 
