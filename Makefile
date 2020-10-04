@@ -1,4 +1,4 @@
-all: lib build binaries tscplug
+all: lib tscver tscobj build binaries tscplug
 
 export VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
 export MINORVERSION:=$(shell git rev-list --count release_0_4..HEAD)
@@ -65,7 +65,6 @@ TASCARAUDIOPLUGS = sndfile
 
 
 lib: libov/Makefile
-	$(MAKE) tscobj
 	$(MAKE) -C libov
 
 libov/Makefile:
@@ -81,6 +80,8 @@ build: build/.directory
 binaries: $(BUILD_BINARIES)
 
 build/ov-client: libov/build/libov.a
+
+#build/ovc_tascar_ver: tscver
 
 build/%: src/%.cc
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
