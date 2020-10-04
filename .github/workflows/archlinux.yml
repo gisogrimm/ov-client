@@ -7,13 +7,13 @@ on:
 jobs:
   checkout:
 
-    runs:
-      steps:
-        - uses: actions/checkout@v2
-        - name: fetchtags
-          run: git fetch --unshallow --tags
+    steps:
+      - uses: actions/checkout@v2
+      - name: fetchtags
+        run: git fetch --unshallow --tags
 
   build:
-    using: 'docker'
-    image: '../../docker/archlinux/Dockerfile'
+    steps:
+      - uses: 'docker'
+        image: '../../docker/archlinux/Dockerfile'
 
