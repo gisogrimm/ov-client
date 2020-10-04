@@ -12,7 +12,7 @@ jobs:
       - name: fetchtags
         run: git fetch --unshallow --tags
       - name: build
-        uses: gisogrimm/ov-client/buildactions/archlinux
+        uses: gisogrimm/ov-client/buildactions/archlinux@v1
         with:
           buildcommand: 'uname -a'
 
