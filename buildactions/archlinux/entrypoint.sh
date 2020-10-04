@@ -1,3 +1,2 @@
 #!/bin/sh -l
-ls
-pwd
+make
