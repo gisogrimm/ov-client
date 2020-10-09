@@ -1,9 +1,12 @@
 #include "soundcardtools.h"
+#ifndef __APPLE__
 #include <alsa/asoundlib.h>
+#endif
 
 std::vector<snddevname_t> list_sound_devices()
 {
   std::vector<snddevname_t> retv;
+#ifndef __APPLE__
   char** hints;
   int err;
   char** n;
@@ -35,6 +38,7 @@ std::vector<snddevname_t> list_sound_devices()
   }
   // Free hint buffer too
   snd_device_name_free_hint((void**)hints);
+#endif
   return retv;
 }
 

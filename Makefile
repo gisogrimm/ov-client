@@ -93,6 +93,7 @@ else
 	endif
 endif
 
+CXXFLAGS += $(OSFLAG)
 
 
 lib: libov/Makefile
