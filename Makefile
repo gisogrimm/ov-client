@@ -6,10 +6,10 @@ export COMMIT:=$(shell git rev-parse --short HEAD)
 export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 
-showver:
+showver: libov/Makefile
 	echo $(VERSION)
 
-BINARIES = ov-client ov-headtracker ovc_tascar_ver
+BINARIES = ov-client ov-headtracker
 OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
@@ -100,21 +100,21 @@ CXXFLAGS += $(OSFLAG)
 lib: libov/Makefile
 	$(MAKE) -C libov
 
+libov/build/libov.a: lib
+
 libov/Makefile:
-	git submodule init
-	git submodule update
+	git submodule init && git submodule update
 
 build: build/.directory
 
 %/.directory:
-	mkdir -p $*
-	touch $@
+	mkdir -p $* && touch $@
 
 binaries: $(BUILD_BINARIES)
 
-build/ov-client: libov/build/libov.a
+$(BUILD_BINARIES): libov/build/libov.a
 
-#build/ovc_tascar_ver: tscver
+#build/ov-client: libov/build/libov.a
 
 build/%: src/%.cc
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
@@ -136,13 +136,15 @@ tascar: tscver
 tscbuild:
 	$(MAKE) -C tascar/libtascar build
 
+$(BUILD_OBJ) $(patsubst %,tascar/libtascar/build/%,$(TASCAROBJECTS)): tscobj
+
 tscver: tscbuild
 	$(MAKE) -C tascar/libtascar ver
 
 tscobj: tscver
 	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))
 
-tscplug: tscver
+tscplug: tscver tscobj
 	$(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))"
 
 clangformat:
@@ -155,5 +157,5 @@ clean:
 
 .PHONY: packaging
 
-packaging: build/ovc_tascar_ver
+packaging:
 	$(MAKE) -C packaging/deb pack

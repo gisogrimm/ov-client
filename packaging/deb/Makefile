@@ -2,9 +2,7 @@ all:
 
 CODENAME:=$(shell lsb_release -sc)
 REPO=../..
-#TSCVER:=$(shell $(REPO)/build/ovc_tascar_ver)
 PACKVER:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)-$(shell lsb_release -si)$(shell lsb_release -sr)
-#DEBS:=$($(wildcard *.csv):.csv=)
 DEBS:=$(subst .csv,,$(wildcard *.csv))
 STORAGE:=debian/$(CODENAME)
 
