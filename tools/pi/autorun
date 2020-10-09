@@ -33,7 +33,7 @@ rfkill block all
 # update ov-client:
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt update --assume-yes
-sudo -E apt install --assume-yes ov-client
+sudo -E apt upgrade --assume-yes ov-client
 
 # this would be the right moment to activate overlay-fs
 
