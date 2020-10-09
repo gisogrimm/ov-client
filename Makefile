@@ -32,8 +32,6 @@ PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
 
-LDLIBS += -lasound
-
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl
@@ -77,6 +75,7 @@ else
 	ifeq ($(UNAME_S),Linux)
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
+		LDLIBS += -lasound
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
