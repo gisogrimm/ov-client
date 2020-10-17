@@ -226,11 +226,26 @@ stage_device_t get_stage_dev(RSJresource& dev)
 
 void ov_client_orlandoviols_t::service()
 {
-  device_init(lobby, backend.get_deviceid());
-  report_error(lobby, backend.get_deviceid(), "");
-  download_file(lobby + "/announce.flac", "announce.flac");
+  try {
+    device_init(lobby, backend.get_deviceid());
+  }
+  catch(const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
+  try {
+    report_error(lobby, backend.get_deviceid(), "");
+  }
+  catch(const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
+  try {
+    download_file(lobby + "/announce.flac", "announce.flac");
+  }
+  catch(const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
   std::string hash;
-  double gracetime(8.0);
+  double gracetime(9.0);
   while(runservice) {
     std::string stagecfg(device_update(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
