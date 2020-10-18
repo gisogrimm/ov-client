@@ -14,7 +14,7 @@
     sudo -E apt install --no-install-recommends --assume-yes ov-client || (sleep 20; sudo -E apt install --no-install-recommends --assume-yes ov-client)
 
     # install user to run the scripts - do not provide root priviledges:
-    sudo useradd -m -G audio,dialout ov
+    sudo useradd -m -G audio,dialout ov || echo "user already exists."
 
     # get autorun file:
     rm -f autorun

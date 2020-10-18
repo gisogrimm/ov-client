@@ -41,6 +41,10 @@ else
     wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
     # run installer to update to latest version:
     . installovclient.sh
+    # activate overlay image in case the installation script failed, and try the best we can:
+    sudo raspi-config nonint enable_overlayfs
+    # ready, reboot:
+    sudo shutdown -r now
 fi
 
 # start client:
