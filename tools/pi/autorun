@@ -33,6 +33,8 @@ rfkill block all
 
 # if not on overlayfs then update/reinstall:
 if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
+    echo "overlay fs, not updating"
+else
     # remove old installer scripts:
     rm -f installovclient.sh
     # get the latest installer script:
