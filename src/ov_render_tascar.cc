@@ -541,7 +541,6 @@ void ov_render_tascar_t::start_audiobackend()
       if(!devs.empty())
         devname = devs.rbegin()->dev;
     }
-    DEBUG(devname);
     char cmd[1024];
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d alsa -d %s "

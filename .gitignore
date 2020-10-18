@@ -41,3 +41,4 @@ build
 # auto-downloaded:
 announce.flac
 *debugsession.tsc
+*.firmwareupdate

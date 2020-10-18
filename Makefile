@@ -105,6 +105,9 @@ libov/build/libov.a: lib
 libov/Makefile:
 	git submodule init && git submodule update
 
+tascar/Makefile:
+	git submodule init && git submodule update
+
 build: build/.directory
 
 %/.directory:
@@ -131,7 +134,7 @@ build/%.o: src/%.cc $(HEADER)
 
 ## TASCAR stuff:
 
-tascar: tscver
+tascar: tscver tascar/Makefile
 
 tscbuild:
 	$(MAKE) -C tascar/libtascar build

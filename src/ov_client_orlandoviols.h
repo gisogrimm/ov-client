@@ -10,6 +10,7 @@ public:
   void start_service();
   void stop_service();
   bool download_file(const std::string& url, const std::string& dest);
+  bool quitrequest() { return quitrequest_; };
 
 private:
   void service();
@@ -22,6 +23,7 @@ private:
   bool runservice;
   std::thread servicethread;
   std::string lobby;
+  bool quitrequest_;
 };
 
 #endif

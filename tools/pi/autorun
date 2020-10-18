@@ -1,3 +1,4 @@
+#!/bin/sh
 
 # deactivate power saving:
 for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
@@ -30,14 +31,24 @@ killall dbus-launch
 ## Stop all wifi/bluetooth devices
 rfkill block all
 
-# update ov-client:
-#export DEBIAN_FRONTEND=noninteractive
-#sudo -E apt update --assume-yes
-#sudo -E apt upgrade --assume-yes ov-client
-
-# this would be the right moment to activate overlay-fs
+# if not on overlayfs then update/reinstall:
+if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
+    # remove old installer scripts:
+    rm -f installovclient.sh
+    # get the latest installer script:
+    wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
+    # run installer to update to latest version:
+    . installovclient.sh
+fi
 
 # start client:
 while true; do
     sudo su -l ov -c "ov-client"
+    # test for firmware update:
+    if test -e ~ov/ov-client.firmwareupdate; then
+	# firmware update requested: disable overlayfs and restart
+	sudo rm -f ~ov/ov-client.firmwareupdate
+	sudo raspi-config nonint disable_overlayfs
+	sudo shutdown -r now
+    fi
 done

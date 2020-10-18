@@ -43,7 +43,8 @@ namespace webCURL {
 
 ov_client_orlandoviols_t::ov_client_orlandoviols_t(ov_render_base_t& backend,
                                                    const std::string& lobby)
-    : ov_client_base_t(backend), runservice(true), lobby(lobby)
+    : ov_client_base_t(backend), runservice(true), lobby(lobby),
+      quitrequest_(false)
 {
   // curl_global_init(CURL_GLOBAL_DEFAULT);
   curl = curl_easy_init();
@@ -251,75 +252,77 @@ void ov_client_orlandoviols_t::service()
     if(!stagecfg.empty()) {
       try {
         RSJresource js_stagecfg(stagecfg);
-        std::cout << "-----------------------------------------------"
-                  << std::endl;
-        std::cout << stagecfg << std::endl;
-        RSJresource js_audio(js_stagecfg["audiocfg"]);
-        audio_device_t audio;
-        backend.clear_stage();
-        audio.drivername = js_audio["driver"].as<std::string>("jack");
-        audio.devicename = js_audio["device"].as<std::string>("hw:1");
-        audio.srate = js_audio["srate"].as<double>(48000);
-        audio.periodsize = js_audio["periodsize"].as<int>(96);
-        audio.numperiods = js_audio["numperiods"].as<int>(2);
-        backend.configure_audio_backend(audio);
-        RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
-        RSJresource js_stage(js_stagecfg["room"]);
-        std::string stagehost(js_stage["host"].as<std::string>(""));
-        port_t stageport(js_stage["port"].as<int>(0));
-        secret_t stagepin(js_stage["pin"].as<secret_t>(0));
-        backend.set_relay_server(stagehost, stageport, stagepin);
-        RSJresource js_roomsize(js_stage["size"]);
-        RSJresource js_reverb(js_stage["reverb"]);
-        render_settings_t rendersettings;
-        rendersettings.id = js_rendersettings["id"].as<int>(-1);
-        rendersettings.roomsize.x = js_roomsize["x"].as<double>(0);
-        rendersettings.roomsize.y = js_roomsize["y"].as<double>(0);
-        rendersettings.roomsize.z = js_roomsize["z"].as<double>(0);
-        rendersettings.absorption = js_reverb["absorption"].as<double>(0.6);
-        rendersettings.damping = js_reverb["damping"].as<double>(0.7);
-        rendersettings.reverbgain = js_reverb["gain"].as<double>(0.4);
-        rendersettings.renderreverb =
-            js_rendersettings["renderreverb"].as<bool>(true);
-        rendersettings.outputport1 =
-            js_rendersettings["outputport1"].as<std::string>("");
-        rendersettings.outputport2 =
-            js_rendersettings["outputport2"].as<std::string>("");
-        rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
-        rendersettings.rectype =
-            js_rendersettings["rectype"].as<std::string>("ortf");
-        rendersettings.secrec = js_rendersettings["secrec"].as<double>(0);
-        rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
-        rendersettings.peer2peer =
-            js_rendersettings["peer2peer"].as<bool>(true);
-        rendersettings.xports.clear();
-        RSJarray js_xports(js_rendersettings["xport"].as_array());
-        for(auto xp : js_xports) {
-          RSJarray js_xp(xp.as_array());
-          if(js_xp.size() == 2) {
-            std::string key(js_xp[0].as<std::string>(""));
-            if(key.size())
-              rendersettings.xports[key] = js_xp[1].as<std::string>("");
+        if(js_stagecfg["firmwareupdate"].as<bool>(false)) {
+          std::ofstream ofh("ov-client.firmwareupdate");
+          quitrequest_ = true;
+        } else {
+          RSJresource js_audio(js_stagecfg["audiocfg"]);
+          audio_device_t audio;
+          backend.clear_stage();
+          audio.drivername = js_audio["driver"].as<std::string>("jack");
+          audio.devicename = js_audio["device"].as<std::string>("hw:1");
+          audio.srate = js_audio["srate"].as<double>(48000);
+          audio.periodsize = js_audio["periodsize"].as<int>(96);
+          audio.numperiods = js_audio["numperiods"].as<int>(2);
+          backend.configure_audio_backend(audio);
+          RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
+          RSJresource js_stage(js_stagecfg["room"]);
+          std::string stagehost(js_stage["host"].as<std::string>(""));
+          port_t stageport(js_stage["port"].as<int>(0));
+          secret_t stagepin(js_stage["pin"].as<secret_t>(0));
+          backend.set_relay_server(stagehost, stageport, stagepin);
+          RSJresource js_roomsize(js_stage["size"]);
+          RSJresource js_reverb(js_stage["reverb"]);
+          render_settings_t rendersettings;
+          rendersettings.id = js_rendersettings["id"].as<int>(-1);
+          rendersettings.roomsize.x = js_roomsize["x"].as<double>(0);
+          rendersettings.roomsize.y = js_roomsize["y"].as<double>(0);
+          rendersettings.roomsize.z = js_roomsize["z"].as<double>(0);
+          rendersettings.absorption = js_reverb["absorption"].as<double>(0.6);
+          rendersettings.damping = js_reverb["damping"].as<double>(0.7);
+          rendersettings.reverbgain = js_reverb["gain"].as<double>(0.4);
+          rendersettings.renderreverb =
+              js_rendersettings["renderreverb"].as<bool>(true);
+          rendersettings.outputport1 =
+              js_rendersettings["outputport1"].as<std::string>("");
+          rendersettings.outputport2 =
+              js_rendersettings["outputport2"].as<std::string>("");
+          rendersettings.rawmode = js_rendersettings["rawmode"].as<bool>(false);
+          rendersettings.rectype =
+              js_rendersettings["rectype"].as<std::string>("ortf");
+          rendersettings.secrec = js_rendersettings["secrec"].as<double>(0);
+          rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
+          rendersettings.peer2peer =
+              js_rendersettings["peer2peer"].as<bool>(true);
+          rendersettings.xports.clear();
+          RSJarray js_xports(js_rendersettings["xport"].as_array());
+          for(auto xp : js_xports) {
+            RSJarray js_xp(xp.as_array());
+            if(js_xp.size() == 2) {
+              std::string key(js_xp[0].as<std::string>(""));
+              if(key.size())
+                rendersettings.xports[key] = js_xp[1].as<std::string>("");
+            }
           }
+          rendersettings.xrecport.clear();
+          RSJarray js_xrecports(js_rendersettings["xrecport"].as_array());
+          for(auto xrp : js_xrecports) {
+            int p(xrp.as<int>(0));
+            if(p > 0)
+              rendersettings.xrecport.push_back(p);
+          }
+          backend.set_render_settings(
+              rendersettings, js_rendersettings["stagedevid"].as<int>(0));
+          RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
+          for(auto dev : js_stagedevs) {
+            backend.add_stage_device(get_stage_dev(dev));
+          }
+          if(!backend.is_audio_active())
+            backend.start_audiobackend();
+          if(!backend.is_session_active())
+            backend.start_session();
+          report_error(lobby, backend.get_deviceid(), "");
         }
-        rendersettings.xrecport.clear();
-        RSJarray js_xrecports(js_rendersettings["xrecport"].as_array());
-        for(auto xrp : js_xrecports) {
-          int p(xrp.as<int>(0));
-          if(p > 0)
-            rendersettings.xrecport.push_back(p);
-        }
-        backend.set_render_settings(rendersettings,
-                                    js_rendersettings["stagedevid"].as<int>(0));
-        RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
-        for(auto dev : js_stagedevs) {
-          backend.add_stage_device(get_stage_dev(dev));
-        }
-        if(!backend.is_audio_active())
-          backend.start_audiobackend();
-        if(!backend.is_session_active())
-          backend.start_session();
-        report_error(lobby, backend.get_deviceid(), "");
       }
       catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
