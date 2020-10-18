@@ -31,11 +31,13 @@ killall dbus-launch
 rfkill block all
 
 # update ov-client:
-export DEBIAN_FRONTEND=noninteractive
-sudo -E apt update --assume-yes
-sudo -E apt upgrade --assume-yes ov-client
+#export DEBIAN_FRONTEND=noninteractive
+#sudo -E apt update --assume-yes
+#sudo -E apt upgrade --assume-yes ov-client
 
 # this would be the right moment to activate overlay-fs
 
 # start client:
-sudo su -l ov -c "ov-client"
+while true; do
+    sudo su -l ov -c "ov-client"
+done
