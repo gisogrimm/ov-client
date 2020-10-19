@@ -4,3 +4,6 @@
 [submodule "tascar"]
 	path = tascar
 	url = ../tascar
+[submodule "miniaudio"]
+	path = miniaudio
+	url = https://github.com/mackron/miniaudio.git
