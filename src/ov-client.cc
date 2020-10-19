@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
+#include "soundcardtools.h"
 
 static bool quit_app(false);
 

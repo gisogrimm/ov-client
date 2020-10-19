@@ -13,6 +13,8 @@ struct snddevname_t {
 // audio backend
 std::vector<snddevname_t> list_sound_devices();
 
+void mini_device_print();
+
 #endif
 
 /*

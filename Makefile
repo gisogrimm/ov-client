@@ -44,6 +44,7 @@ LDFLAGS += -Llibov/build
 HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 
 CXXFLAGS += -Itascar/libtascar/build
+CXXFLAGS += -Iminiaudio
 
 TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   audiochunks.o xmlconfig.o dynamicobjects.o sourcemod.o		\
