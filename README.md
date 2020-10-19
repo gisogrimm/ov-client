@@ -1,5 +1,7 @@
 # ov-client
 
+![miniaudio MacOS make](https://github.com/gisogrimm/ov-client/workflows/miniaudio%20MacOS%20make/badge.svg?branch=miniaudio)
+
 ## Dependencies
 
 This tool requires the TASCAR components libtascar (library),
