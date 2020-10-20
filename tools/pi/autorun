@@ -57,4 +57,5 @@ while true; do
 	sudo raspi-config nonint disable_overlayfs
 	sudo shutdown -r now
     fi
+    sleep 10
 done
