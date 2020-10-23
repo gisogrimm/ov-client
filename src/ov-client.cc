@@ -17,6 +17,9 @@ int main(int argc, char** argv)
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
+
+  mini_device_print();
+
   try {
     std::string deviceid(getmacaddr());
     std::string lobby("http://oldbox.orlandoviols.com/");
@@ -77,6 +80,8 @@ int main(int argc, char** argv)
   catch(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
   }
+
+
   return 0;
 }
 
