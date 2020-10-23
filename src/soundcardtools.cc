@@ -3,6 +3,10 @@
 #include <alsa/asoundlib.h>
 #endif
 
+
+#define MA_LOG_LEVELVERBOSE
+#define MA_NO_JACK
+#define MA_NO_WEBAUDIO
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
@@ -30,16 +34,41 @@ void mini_device_print()
     // return -3;
   }
 
-  printf("Playback Devices\n");
+  printf("\n\nPlayback Devices \n\n");
   for(iDevice = 0; iDevice < playbackDeviceCount; ++iDevice) {
-    printf("    %u: %s\n", iDevice, pPlaybackDeviceInfos[iDevice].name);
+
+
+    if (ma_context_get_device_info(&context,
+                                     ma_device_type_playback,
+                                    &pPlaybackDeviceInfos[iDevice].id,
+                                    ma_share_mode_shared,
+                                     &pPlaybackDeviceInfos[iDevice])
+            != MA_SUCCESS)
+            continue;
+        printf("+---------------- %u: %s\n", iDevice, pPlaybackDeviceInfos[iDevice].name);
+        //printf("|                 id: %u\n", pPlaybackDeviceInfos[iDevice].id);
+        printf("|max output channels: %u\n", pPlaybackDeviceInfos[iDevice].maxChannels);
+        printf("|     min samplerate: %u\n", pPlaybackDeviceInfos[iDevice].minSampleRate);
+        printf("|     max samplerate: %u\n", pPlaybackDeviceInfos[iDevice].maxSampleRate);
+        printf("+----------------------------------------+\n\n\n");
+
   }
 
-  printf("\n");
+  printf("\n\n\n");
 
-  printf("Capture Devices\n");
+  printf("\n\nCapture Devices \n\n");
   for(iDevice = 0; iDevice < captureDeviceCount; ++iDevice) {
-    printf("    %u: %s\n", iDevice, pCaptureDeviceInfos[iDevice].name);
+
+    if (ma_context_get_device_info(&context, ma_device_type_capture,
+                                       &pCaptureDeviceInfos[iDevice].id, ma_share_mode_shared, &pCaptureDeviceInfos[iDevice])
+            != MA_SUCCESS)
+            continue;
+        printf("+----------------%u: %s\n", iDevice, pCaptureDeviceInfos[iDevice].name);
+        //printf("|                id: %u\n", pCaptureDeviceInfos[iDevice].id);
+        printf("|max input channels: %u\n", pCaptureDeviceInfos[iDevice].maxChannels);
+        printf("|    min samplerate: %u\n", pCaptureDeviceInfos[iDevice].minSampleRate);
+        printf("|    max samplerate: %u\n", pCaptureDeviceInfos[iDevice].maxSampleRate);
+        printf("+-----------------------------------------+\n\n\n");
   }
 
   ma_context_uninit(&context);
