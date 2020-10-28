@@ -161,3 +161,47 @@ persistent port connections you may use the 'extra ports' field in the
 
 A graphical desktop client and installer for all commonly used
 operating systems is planned as part of the digital stage project.
+
+## Installation on macOS
+
+### Compile
+
+If you plan to install the 'ov-client' application system on a macOS system, 
+it is not recommended to use the installer described above.
+
+Instead install the required dependencies via brew and compile the 'ov-client':
+
+Install [brew](https://brew.sh/index_de) first:
+
+````
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" 
+````
+
+Then install all dependencies:
+````
+brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate
+````
+
+Afterwards checkout this project and compile it:
+````
+cd ov-client
+make
+````
+
+### Run
+
+Before running 'ov-client' on macOS, start the jack audio server first:
+````
+brew start jack
+````
+
+Alternatively start the jack audio server on each login automatically:
+````
+brew services start jack
+````
+
+Afterwards just run the 'ov-client':
+````
+cd bin
+./ov-client
+````
