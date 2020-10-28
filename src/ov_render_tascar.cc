@@ -542,11 +542,25 @@ void ov_render_tascar_t::start_audiobackend()
         devname = devs.rbegin()->dev;
     }
     char cmd[1024];
+#ifdef __APPLE__
+    unsigned int finalperiodsize(1 << (log2(audiodevice.periodsize)));
+    if(finalperiodsize != audiodevice.periodsize) {
+      std::cerr << "Warning: Using period size "
+                << finalperiodsize " instead of " << audiodevice.periodsize
+                << ".\n";
+    }
+    sprintf(cmd,
+            "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d coreaudio -d %s "
+            "-r %g -p %d -n %d",
+            devname.c_str(), audiodevice.srate, finalperiodsize,
+            audiodevice.numperiods);
+#else
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d alsa -d %s "
             "-r %g -p %d -n %d",
             devname.c_str(), audiodevice.srate, audiodevice.periodsize,
             audiodevice.numperiods);
+#endif
     DEBUG(cmd);
     h_jack = new spawn_process_t(cmd);
     // replace sleep by testing for jack presence with timeout:
