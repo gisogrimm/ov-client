@@ -543,7 +543,7 @@ void ov_render_tascar_t::start_audiobackend()
     }
     char cmd[1024];
 #ifdef __APPLE__
-    unsigned int finalperiodsize(1 << (log2(audiodevice.periodsize)));
+    unsigned int finalperiodsize = pow(2.0,floor(log2(audiodevice.periodsize)));
     if(finalperiodsize != audiodevice.periodsize) {
       std::cerr << "Warning: Using period size "
                 << finalperiodsize << " instead of " << audiodevice.periodsize
