@@ -546,7 +546,7 @@ void ov_render_tascar_t::start_audiobackend()
     unsigned int finalperiodsize(1 << (log2(audiodevice.periodsize)));
     if(finalperiodsize != audiodevice.periodsize) {
       std::cerr << "Warning: Using period size "
-                << finalperiodsize " instead of " << audiodevice.periodsize
+                << finalperiodsize << " instead of " << audiodevice.periodsize
                 << ".\n";
     }
     sprintf(cmd,
