@@ -75,6 +75,12 @@ void mini_device_print()
 }
 
 
+
+std::vector<snddevname_t> list_sound_devices_miniaudio()
+{
+  std::vector<snddevname_t> retv;
+}
+
 std::vector<snddevname_t> list_sound_devices()
 {
   std::vector<snddevname_t> retv;
@@ -112,6 +118,9 @@ std::vector<snddevname_t> list_sound_devices()
   snd_device_name_free_hint((void**)hints);
 #endif
 
+#ifdef __APPLE__
+
+#endif // __APPLE__
   return retv;
 }
 

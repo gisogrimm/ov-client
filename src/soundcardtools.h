@@ -12,7 +12,7 @@ struct snddevname_t {
 // get a list of available device names. Implementation may depend on OS and
 // audio backend
 std::vector<snddevname_t> list_sound_devices();
-
+std::vector<snddevname_t> list_sound_devices_miniaudio();
 void mini_device_print();
 
 #endif
