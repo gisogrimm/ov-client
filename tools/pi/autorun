@@ -47,8 +47,27 @@ else
     sudo shutdown -r now
 fi
 
+# activate WiFi if required:
+if test -e /boot/ovclient-wifi.txt; then
+    WIFICFG=$(cat /boot/ovclient-wifi.txt)
+    SSID=$(echo $WIFICFG|sed -e 's/[[:blank:]].*//g')
+    PW=$(echo $WIFICFG|sed -e 's/^[^[:blank:]]*[[:blank:]]*//g')
+    COUNTRYCODE=DE
+    test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
+    echo "connecting to WiFi ${SSID}"
+    if test -n "${SSID}"; then
+	sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+	sleep 2
+	rfkill unblock wifi
+	sleep 10
+	sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+	sleep 20
+    fi
+fi
+
 # start client:
 while true; do
+    
     sudo su -l ov -c "ov-client"
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
@@ -57,5 +76,5 @@ while true; do
 	sudo raspi-config nonint disable_overlayfs
 	sudo shutdown -r now
     fi
-    sleep 10
+    sleep 20
 done

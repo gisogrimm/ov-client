@@ -7,10 +7,7 @@
 #include <sstream>
 #include <string.h>
 #include <unistd.h>
-
-#define DEBUG(x)                                                               \
-  std::cerr << __FILE__ << ":" << __LINE__ << ": " << __PRETTY_FUNCTION__      \
-            << " " << #x << "=" << x << std::endl
+#include <udpsocket.h>
 
 CURL* curl;
 
@@ -135,7 +132,8 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   std::string jsmsg("{");
   jsmsg += "\"alsadevs\":" + jsdevs + ",";
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
-           "\",\"rx\":\"" + std::to_string(rxrate) + "\"}";
+           "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
+  jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\"";
   jsmsg += "}";
   CURLcode res;
   std::string retv;

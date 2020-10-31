@@ -36,6 +36,9 @@
     echo ovbox | sudo tee /etc/hostname
     sudo sed -i "s/127.0.1.1.*raspberry/127.0.1.1\tovbox/g" /etc/hosts
 
+    # configure country code and prepare WiFi config:
+    sudo touch /boot/ovclient-wifi.txt
+
     # activate overlay image to avoid damage of the SD card upon power off:
     sudo raspi-config nonint enable_overlayfs
 

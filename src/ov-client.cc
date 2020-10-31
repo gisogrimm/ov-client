@@ -1,9 +1,9 @@
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
+#include <errmsg.h>
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
-#include <errmsg.h>
 
 static bool quit_app(false);
 
@@ -54,8 +54,9 @@ int main(int argc, char** argv)
         break;
       }
     }
-    if( deviceid.empty() ){
-      throw ErrMsg("Invalid (empty) device id. Please ensure that the network device is active or specify a valid device id.");
+    if(deviceid.empty()) {
+      throw ErrMsg("Invalid (empty) device id. Please ensure that the network "
+                   "device is active or specify a valid device id.");
     }
     if(verbose)
       std::cout << "creating renderer with device id \"" << deviceid
