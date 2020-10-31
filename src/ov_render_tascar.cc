@@ -537,22 +537,15 @@ void ov_render_tascar_t::start_audiobackend()
       // devices because this is most likely the one to use (e.g.,
       // external sound card):
       auto devs(list_sound_devices());
-      DEBUG(devs.empty());
       if(!devs.empty())
         devname = devs.rbegin()->dev;
     }
     char cmd[1024];
 #ifdef __APPLE__
-    unsigned int finalperiodsize = pow(2.0,floor(log2(audiodevice.periodsize)));
-    if(finalperiodsize != audiodevice.periodsize) {
-      std::cerr << "Warning: Using period size "
-                << finalperiodsize << " instead of " << audiodevice.periodsize
-                << ".\n";
-    }
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d coreaudio -d %s "
             "-r %g -p %d -n %d",
-            devname.c_str(), audiodevice.srate, finalperiodsize,
+            devname.c_str(), audiodevice.srate, audiodevice.periodsize,
             audiodevice.numperiods);
 #else
     sprintf(cmd,
