@@ -6,8 +6,8 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
-#include <unistd.h>
 #include <udpsocket.h>
+#include <unistd.h>
 
 CURL* curl;
 
