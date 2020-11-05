@@ -64,18 +64,24 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   stage_device_t& thisdev(stage.stage[stage.thisstagedeviceid]);
   // list of ports on which TASCAR will wait before attempting to connect:
   std::vector<std::string> waitports;
-  // set position and orientation of receiver:
-  e_rec->set_attribute("dlocation",
-                       TASCAR::to_string(to_tascar(
-                           stage.stage[stage.rendersettings.id].position)));
-  e_rec->set_attribute("dorientation",
-                       TASCAR::to_string(to_tascar(
-                           stage.stage[stage.rendersettings.id].orientation)));
-  // the stage is not empty, which means we are on a stage.
   // b_sender is true if this device is sending audio. If this
   // device is not sending audio, then the stage layout will
   // differ.
   bool b_sender(!thisdev.channels.empty());
+  if(b_sender) {
+    // set position and orientation of receiver:
+    e_rec->set_attribute("dlocation",
+                         TASCAR::to_string(to_tascar(
+                             stage.stage[stage.rendersettings.id].position)));
+    e_rec->set_attribute(
+        "dorientation", TASCAR::to_string(to_tascar(
+                            stage.stage[stage.rendersettings.id].orientation)));
+  } else {
+    // set position and orientation of receiver:
+    e_rec->set_attribute("dlocation", "0 0 0");
+    e_rec->set_attribute("dorientation", "0 0 0");
+  }
+  // the stage is not empty, which means we are on a stage.
   // width of stage in degree:
   double stagewidth(160);
   double az(-0.5 * stagewidth);
@@ -83,60 +89,61 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     stagewidth = 360;
     az = 0;
   }
-  double daz(stagewidth / stage.stage.size() * (M_PI / 180.0));
+  double daz(stagewidth / (stage.stage.size() - (!b_sender)) * (M_PI / 180.0));
   az = az * (M_PI / 180.0) - 0.5 * daz;
   double radius(1.2);
-  //
   for(auto stagemember : stage.stage) {
-    az += daz;
-    TASCAR::pos_t pos(to_tascar(stagemember.second.position));
-    TASCAR::zyx_euler_t rot(to_tascar(stagemember.second.orientation));
-    if(!b_sender) {
-      // overwrite stage layout:
-      pos.x = radius * cos(az);
-      pos.y = -radius * sin(az);
-      pos.z = 0;
-      rot.z = (180 / M_PI * (-az + M_PI));
-      rot.y = 0;
-      rot.x = 0;
-    }
-    // create a sound source for each device on stage:
-    xmlpp::Element* e_src(e_scene->add_child("source"));
-    TASCAR::pos_t ego_delta;
-    if(stagemember.second.id == thisdev.id) {
-      // in case of self-monitoring, this source is called "ego", and the
-      // position is slightly shifted:
-      e_src->set_attribute("name", "ego");
-      ego_delta.x = 0.2;
-      ego_delta.z = -0.3;
-    } else {
-      e_src->set_attribute("name", get_stagedev_name(stagemember.second.id));
-    }
-    e_src->set_attribute("dlocation", to_string(pos));
-    e_src->set_attribute("dorientation", to_string(rot));
-    uint32_t kch(0);
-    for(auto ch : stagemember.second.channels) {
-      // create a sound for each channel:
-      ++kch;
-      xmlpp::Element* e_snd(e_src->add_child("sound"));
-      e_snd->set_attribute("maxdist", "50");
-      e_snd->set_attribute("gainmodel", "1");
-      double gain(ch.gain * stagemember.second.gain);
-      if(stagemember.second.id == thisdev.id) {
-        // connect self-monitoring source ports:
-        e_snd->set_attribute("connect", ch.sourceport);
-        gain *= stage.rendersettings.egogain;
-      } else {
-        // if not self-monitor then decrease gain:
-        gain *= 0.6;
+    if(b_sender || (stagemember.second.id != thisdev.id)) {
+      az += daz;
+      TASCAR::pos_t pos(to_tascar(stagemember.second.position));
+      TASCAR::zyx_euler_t rot(to_tascar(stagemember.second.orientation));
+      if(!b_sender) {
+        // overwrite stage layout:
+        pos.x = radius * cos(az);
+        pos.y = -radius * sin(az);
+        pos.z = 0;
+        rot.z = (180 / M_PI * (-az + M_PI));
+        rot.y = 0;
+        rot.x = 0;
       }
-      e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
-      // set relative channel positions:
-      TASCAR::pos_t chpos(to_tascar(ch.position));
-      chpos += ego_delta;
-      e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
-      e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
-      e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+      // create a sound source for each device on stage:
+      xmlpp::Element* e_src(e_scene->add_child("source"));
+      TASCAR::pos_t ego_delta;
+      if(stagemember.second.id == thisdev.id) {
+        // in case of self-monitoring, this source is called "ego", and the
+        // position is slightly shifted:
+        e_src->set_attribute("name", "ego");
+        ego_delta.x = 0.2;
+        ego_delta.z = -0.3;
+      } else {
+        e_src->set_attribute("name", get_stagedev_name(stagemember.second.id));
+      }
+      e_src->set_attribute("dlocation", to_string(pos));
+      e_src->set_attribute("dorientation", to_string(rot));
+      uint32_t kch(0);
+      for(auto ch : stagemember.second.channels) {
+        // create a sound for each channel:
+        ++kch;
+        xmlpp::Element* e_snd(e_src->add_child("sound"));
+        e_snd->set_attribute("maxdist", "50");
+        e_snd->set_attribute("gainmodel", "1");
+        double gain(ch.gain * stagemember.second.gain);
+        if(stagemember.second.id == thisdev.id) {
+          // connect self-monitoring source ports:
+          e_snd->set_attribute("connect", ch.sourceport);
+          gain *= stage.rendersettings.egogain;
+        } else {
+          // if not self-monitor then decrease gain:
+          gain *= 0.6;
+        }
+        e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
+        // set relative channel positions:
+        TASCAR::pos_t chpos(to_tascar(ch.position));
+        chpos += ego_delta;
+        e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
+        e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
+        e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+      }
     }
   }
   if(stage.rendersettings.renderreverb) {
