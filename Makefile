@@ -55,7 +55,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
-TASCARMODULS = system touchosc waitforjackport route ovheadtracker
+TASCARMODULS = system touchosc waitforjackport route
 
 TASCARAUDIOPLUGS = sndfile
 
