@@ -53,11 +53,11 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
-TASCARDMXOBJECTS = termsetbaud.o serialport.o dmxdriver.o
+TASCARDMXOBJECTS = 
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
-TASCARMODULS = system touchosc waitforjackport route ovheadtracker
+TASCARMODULS = system touchosc waitforjackport route
 
 TASCARAUDIOPLUGS = sndfile delay
 
@@ -78,6 +78,8 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
+	 	TASCARMODULS += ovheadtracker
+		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
