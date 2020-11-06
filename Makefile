@@ -53,9 +53,11 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
+TASCARDMXOBJECTS = termsetbaud.o serialport.o dmxdriver.o
+
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
-TASCARMODULS = system touchosc waitforjackport route
+TASCARMODULS = system touchosc waitforjackport route ovheadtracker
 
 TASCARAUDIOPLUGS = sndfile delay
 
@@ -145,10 +147,10 @@ tscver: tscbuild
 	$(MAKE) -C tascar/libtascar ver
 
 tscobj: tscver
-	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))
+	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))  $(patsubst %,build/%,$(TASCARDMXOBJECTS))
 
 tscplug: tscver tscobj
-	$(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))"
+	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
