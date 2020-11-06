@@ -4,6 +4,7 @@ build/ov-headtracker,usr/bin
 node_modules,usr/share/ovclient
 ovclient.css,usr/share/ovclient
 ovclient.js,usr/share/ovclient
+tascar/plugins/build/ovclienttascar_ap_delay.so,usr/lib
 tascar/plugins/build/ovclienttascar_ap_sndfile.so,usr/lib
 tascar/plugins/build/ovclienttascar_route.so,usr/lib
 tascar/plugins/build/ovclienttascar_system.so,usr/lib

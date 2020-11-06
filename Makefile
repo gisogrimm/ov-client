@@ -57,7 +57,7 @@ TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
 TASCARMODULS = system touchosc waitforjackport route
 
-TASCARAUDIOPLUGS = sndfile
+TASCARAUDIOPLUGS = sndfile delay
 
 #viewport.o sampler.o cli.o irrender.o async_file.o vbap3d.o hoa.o
 

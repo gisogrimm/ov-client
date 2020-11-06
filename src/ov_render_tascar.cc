@@ -564,7 +564,7 @@ void ov_render_tascar_t::start_audiobackend()
     DEBUG(cmd);
     h_jack = new spawn_process_t(cmd);
     // replace sleep by testing for jack presence with timeout:
-    sleep(5);
+    sleep(7);
   }
 }
 
