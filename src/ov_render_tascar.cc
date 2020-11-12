@@ -550,10 +550,7 @@ void ov_render_tascar_t::start_audiobackend()
     char cmd[1024];
 #ifdef __APPLE__
     sprintf(cmd,
-            "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d coreaudio -d %s "
-            "-r %g -p %d -n %d",
-            devname.c_str(), audiodevice.srate, audiodevice.periodsize,
-            audiodevice.numperiods);
+            "JACK_NO_AUDIO_RESERVATION=1 jackd -m --sync -d coreaudio");
 #else
     sprintf(cmd,
             "JACK_NO_AUDIO_RESERVATION=1 jackd --sync -P 40 -d alsa -d %s "

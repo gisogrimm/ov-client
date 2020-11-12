@@ -34,7 +34,7 @@ SOURCE_DIR = src
 
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
-LDLIBS += -ldl
+LDLIBS += -ldl -framework IOKit -framework CoreFoundation
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
@@ -53,7 +53,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
-TASCARDMXOBJECTS = 
+TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
