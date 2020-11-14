@@ -20,15 +20,14 @@ int main(int argc, char** argv)
   try {
     std::string deviceid(getmacaddr());
     std::string lobby("http://oldbox.orlandoviols.com/");
+    bool showdevname(false);
     int pinglogport(0);
-    const char* options = "s:hqvd:p:";
-    struct option long_options[] = {{"server", 1, 0, 's'},
-                                    {"help", 0, 0, 'h'},
-                                    {"quiet", 0, 0, 'q'},
-                                    {"deviceid", 1, 0, 'd'},
-                                    {"verbose", 0, 0, 'v'},
-                                    {"pinglogport", 1, 0, 'p'},
-                                    {0, 0, 0, 0}};
+    const char* options = "s:hqvd:p:n";
+    struct option long_options[] = {
+        {"server", 1, 0, 's'},  {"help", 0, 0, 'h'},
+        {"quiet", 0, 0, 'q'},   {"deviceid", 1, 0, 'd'},
+        {"verbose", 0, 0, 'v'}, {"pinglogport", 1, 0, 'p'},
+        {"devname", 0, 0, 'n'}, {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
     while((opt = getopt_long(argc, argv, options, long_options,
@@ -52,7 +51,17 @@ int main(int argc, char** argv)
       case 'v':
         verbose++;
         break;
+      case 'n':
+        showdevname = true;
       }
+    }
+    if(showdevname) {
+      std::string devname(getmacaddr());
+      if(devname.size() > 6)
+        devname.erase(0, 6);
+      devname = "_" + devname;
+      std::cout << devname << std::endl;
+      return 0;
     }
     if(deviceid.empty()) {
       throw ErrMsg("Invalid (empty) device id. Please ensure that the network "
