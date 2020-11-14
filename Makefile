@@ -9,7 +9,7 @@ export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 showver: libov/Makefile
 	echo $(VERSION)
 
-BINARIES = ov-client ov-headtracker
+BINARIES = ov-client ov-headtracker ov-client_hostname
 OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f

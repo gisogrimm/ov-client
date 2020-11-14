@@ -33,7 +33,7 @@
     echo "exit 0"|sudo tee -a /etc/rc.local
 
     # setup host name
-    HOSTN=$(ov-client -n)
+    HOSTN=$(ov-client_hostname)
     echo "ovbox${HOSTN}" | sudo tee /etc/hostname
     sudo sed -i "s/127.0.1.1.*raspberry/127.0.1.1\tovbox${HOSTN}/g" /etc/hosts
 

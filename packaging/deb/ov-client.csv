@@ -1,5 +1,6 @@
 LICENSE,usr/share/doc/ovclient
 build/ov-client,usr/bin
+build/ov-client_hostname,usr/bin
 build/ov-headtracker,usr/bin
 node_modules,usr/share/ovclient
 ovclient.css,usr/share/ovclient
