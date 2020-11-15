@@ -9,7 +9,7 @@ export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 showver: libov/Makefile
 	echo $(VERSION)
 
-BINARIES = ov-client ov-headtracker
+BINARIES = ov-client ov-headtracker ov-client_hostname
 OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
@@ -53,11 +53,13 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
+TASCARDMXOBJECTS = 
+
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn
 
-TASCARMODULS = system touchosc waitforjackport
+TASCARMODULS = system touchosc waitforjackport route
 
-TASCARAUDIOPLUGS = sndfile
+TASCARAUDIOPLUGS = sndfile delay
 
 #viewport.o sampler.o cli.o irrender.o async_file.o vbap3d.o hoa.o
 
@@ -76,6 +78,8 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
+	 	TASCARMODULS += ovheadtracker
+		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
@@ -145,10 +149,10 @@ tscver: tscbuild
 	$(MAKE) -C tascar/libtascar ver
 
 tscobj: tscver
-	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))
+	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))  $(patsubst %,build/%,$(TASCARDMXOBJECTS))
 
 tscplug: tscver tscobj
-	$(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))"
+	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
