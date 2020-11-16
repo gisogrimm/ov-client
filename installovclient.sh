@@ -35,7 +35,7 @@
     # setup host name
     HOSTN=$(ov-client_hostname)
     echo "ovbox${HOSTN}" | sudo tee /etc/hostname
-    sudo sed -i "s/127.0.1.1.*raspberry/127.0.1.1\tovbox${HOSTN}/g" /etc/hosts
+    sudo sed -i "s/127.0.1.1.*(?!localhost)/127.0.1.1\tovbox${HOSTN}/g" /etc/hosts
 
     # configure country code and prepare WiFi config:
     sudo touch /boot/ovclient-wifi.txt
