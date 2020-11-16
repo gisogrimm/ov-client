@@ -39,7 +39,9 @@ void sendpinglog(stage_device_id_t cid, double tms, const endpoint_t& ep,
 ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid,
                                        port_t pinglogport_)
     : ov_render_base_t(deviceid), h_jack(NULL), h_webmixer(NULL), tascar(NULL),
-      ovboxclient(NULL), pinglogport(pinglogport_), pinglogaddr(nullptr)
+      ovboxclient(NULL), pinglogport(pinglogport_), pinglogaddr(nullptr),
+      inputports({"system:capture_1", "system:capture_2"})
+
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
   if(pinglogport)
@@ -566,6 +568,28 @@ void ov_render_tascar_t::start_audiobackend()
     // replace sleep by testing for jack presence with timeout:
     sleep(7);
   }
+  // get list of input ports:
+  jack_client_t* jc;
+  jack_options_t opt((jack_options_t)(JackNoStartServer));
+  jack_status_t jstat;
+  jc = jack_client_open("listchannels", opt, &jstat);
+  if(jc) {
+    std::vector<std::string> ports;
+    const char** pp_ports(
+        jack_get_ports(jc, NULL, NULL, JackPortIsInput | JackPortIsPhysical));
+    if(pp_ports) {
+      const char** p(pp_ports);
+      while(*p) {
+        ports.push_back(*p);
+        ++p;
+      }
+      jack_free(pp_ports);
+    }
+    jack_client_close(jc);
+    inputports = ports;
+  } else {
+    inputports = {"system:capture_1", "system:capture_2"};
+  }
 }
 
 void ov_render_tascar_t::stop_audiobackend()
@@ -649,6 +673,11 @@ void ov_render_tascar_t::getbitrate(double& txrate, double& rxrate)
 {
   if(ovboxclient)
     ovboxclient->getbitrate(txrate, rxrate);
+}
+
+std::vector<std::string> ov_render_tascar_t::get_input_channel_ids() const
+{
+  return inputports;
 }
 
 /*

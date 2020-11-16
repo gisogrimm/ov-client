@@ -118,6 +118,15 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   std::string hostname;
   if(0 == gethostname(chost, 1023))
     hostname = chost;
+  std::string jsinchannels("{");
+  uint32_t nch(0);
+  for(auto ch : backend.get_input_channel_ids()){
+    jsinchannels += "\"" + std::to_string(nch) + "\":\"" + ch + "\",";
+    ++nch;
+  }
+  if(jsinchannels.size())
+    jsinchannels.erase(jsinchannels.end() - 1);
+  jsinchannels += "}";
   std::vector<snddevname_t> alsadevs(list_sound_devices());
   std::string jsdevs("{");
   for(auto d : alsadevs)
@@ -131,6 +140,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   backend.getbitrate(txrate, rxrate);
   std::string jsmsg("{");
   jsmsg += "\"alsadevs\":" + jsdevs + ",";
+  jsmsg += "\"hwinputchannels\":"+jsinchannels+",";
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
            "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
   jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\"";
@@ -172,8 +182,8 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   return retv;
 }
 
-void ov_client_orlandoviols_t::device_init(std::string url,
-                                           const std::string& device)
+void ov_client_orlandoviols_t::register_device(std::string url,
+                                               const std::string& device)
 {
   struct webCURL::MemoryStruct chunk;
   chunk.memory =
@@ -226,7 +236,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
 void ov_client_orlandoviols_t::service()
 {
   try {
-    device_init(lobby, backend.get_deviceid());
+    register_device(lobby, backend.get_deviceid());
   }
   catch(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
