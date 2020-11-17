@@ -265,6 +265,17 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     xmlpp::Element* e_p = e_wait->add_child("port");
     e_p->add_child_text(port);
   }
+  // head tracking:
+  if(stage.rendersettings.headtracking) {
+    xmlpp::Element* e_head = e_mods->add_child("ovheadtracker");
+    e_head->set_attribute("url", "osc.udp://localhost:51001/");
+    e_head->set_attribute("actor", "/*/master");
+    if(stage.rendersettings.headtrackingrot)
+      e_head->set_attribute("apply_rot", "true");
+    else
+      e_head->set_attribute("apply_rot", "false");
+    e_head->set_attribute("apply_loc", "false");
+  }
 }
 
 void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)

@@ -120,7 +120,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
     hostname = chost;
   std::string jsinchannels("{");
   uint32_t nch(0);
-  for(auto ch : backend.get_input_channel_ids()){
+  for(auto ch : backend.get_input_channel_ids()) {
     jsinchannels += "\"" + std::to_string(nch) + "\":\"" + ch + "\",";
     ++nch;
   }
@@ -140,7 +140,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   backend.getbitrate(txrate, rxrate);
   std::string jsmsg("{");
   jsmsg += "\"alsadevs\":" + jsdevs + ",";
-  jsmsg += "\"hwinputchannels\":"+jsinchannels+",";
+  jsmsg += "\"hwinputchannels\":" + jsinchannels + ",";
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
            "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
   jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\"";
@@ -319,6 +319,10 @@ void ov_client_orlandoviols_t::service()
             if(p > 0)
               rendersettings.xrecport.push_back(p);
           }
+          rendersettings.headtracking =
+              js_rendersettings["headtracking"].as<bool>(false);
+          rendersettings.headtrackingrot =
+              js_rendersettings["headtrackingrot"].as<bool>(true);
           backend.set_render_settings(
               rendersettings, js_rendersettings["stagedevid"].as<int>(0));
           RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());
