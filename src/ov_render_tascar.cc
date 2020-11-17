@@ -576,7 +576,7 @@ void ov_render_tascar_t::start_audiobackend()
   if(jc) {
     std::vector<std::string> ports;
     const char** pp_ports(
-        jack_get_ports(jc, NULL, NULL, JackPortIsInput | JackPortIsPhysical));
+        jack_get_ports(jc, NULL, NULL, JackPortIsOutput | JackPortIsPhysical));
     if(pp_ports) {
       const char** p(pp_ports);
       while(*p) {
