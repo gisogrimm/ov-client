@@ -323,6 +323,8 @@ void ov_client_orlandoviols_t::service()
               js_rendersettings["headtracking"].as<bool>(false);
           rendersettings.headtrackingrot =
               js_rendersettings["headtrackingrot"].as<bool>(true);
+          rendersettings.headtrackingport =
+              js_rendersettings["headtrackingport"].as<int>(0);
           backend.set_render_settings(
               rendersettings, js_rendersettings["stagedevid"].as<int>(0));
           RSJarray js_stagedevs(js_stagecfg["roomdev"].as_array());

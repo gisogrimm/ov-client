@@ -72,16 +72,14 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   bool b_sender(!thisdev.channels.empty());
   if(b_sender) {
     // set position and orientation of receiver:
-    e_rec->set_attribute("dlocation",
-                         TASCAR::to_string(to_tascar(
-                             stage.stage[stage.rendersettings.id].position)));
-    e_rec->set_attribute(
-        "dorientation", TASCAR::to_string(to_tascar(
-                            stage.stage[stage.rendersettings.id].orientation)));
-  } else {
-    // set position and orientation of receiver:
-    e_rec->set_attribute("dlocation", "0 0 0");
-    e_rec->set_attribute("dorientation", "0 0 0");
+    xmlpp::Element* e_pos = e_rec->add_child("position");
+    e_pos->add_child_text(
+        "0 " + TASCAR::to_string(
+                   to_tascar(stage.stage[stage.rendersettings.id].position)));
+    xmlpp::Element* e_rot = e_rec->add_child("orientation");
+    e_rot->add_child_text(
+        "0 " + TASCAR::to_string(to_tascar(
+                   stage.stage[stage.rendersettings.id].orientation)));
   }
   // the stage is not empty, which means we are on a stage.
   // width of stage in degree:
@@ -268,8 +266,15 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   // head tracking:
   if(stage.rendersettings.headtracking) {
     xmlpp::Element* e_head = e_mods->add_child("ovheadtracker");
-    e_head->set_attribute("url", "osc.udp://localhost:51001/");
+    if(stage.rendersettings.headtrackingport > 0)
+      e_head->set_attribute(
+          "url", "osc.udp://localhost:" +
+                     std::to_string(stage.rendersettings.headtrackingport) +
+                     "/");
     e_head->set_attribute("actor", "/*/master");
+    e_head->set_attribute("autoref", "0.001");
+    e_head->set_attribute("name", stage.thisdeviceid);
+    e_head->set_attribute("send_only_quaternion", "true");
     if(stage.rendersettings.headtrackingrot)
       e_head->set_attribute("apply_rot", "true");
     else
