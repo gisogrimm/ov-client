@@ -273,6 +273,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                      "/");
     e_head->set_attribute("actor", "/*/master");
     e_head->set_attribute("autoref", "0.001");
+    e_head->set_attribute("levelpattern", "/*/ego/*");
     e_head->set_attribute("name", stage.thisdeviceid);
     e_head->set_attribute("send_only_quaternion", "true");
     if(stage.rendersettings.headtrackingrot)
