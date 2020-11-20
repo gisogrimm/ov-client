@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<session license="CC0" srv_port="50100" duration="36000">
+  <modules>
+    <datalogging fileformat="mat">
+      <osc path="/ping" size="2" ignorefirst="true"/>
+    </datalogging>
+    <system command="ov-client -p 50100"/>
+  </modules>
+</session>
