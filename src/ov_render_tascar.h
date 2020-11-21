@@ -24,6 +24,7 @@ public:
   std::string get_stagedev_name(stage_device_id_t stagedeviceid) const;
   void getbitrate(double& txrate, double& rxrate);
   std::vector<std::string> get_input_channel_ids() const;
+  double get_load() const;
 
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,

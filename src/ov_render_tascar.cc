@@ -146,6 +146,18 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
       }
     }
   }
+  if(stage.rendersettings.renderism) {
+    // create shoebox room:
+    xmlpp::Element* e_rvb(e_scene->add_child("facegroup"));
+    e_rvb->set_attribute("name", "room");
+    e_rvb->set_attribute(
+        "shoebox", TASCAR::to_string(to_tascar(stage.rendersettings.roomsize)));
+    e_rvb->set_attribute(
+        "reflectivity",
+        TASCAR::to_string(1.0 - stage.rendersettings.absorption));
+    e_rvb->set_attribute("damping",
+                         TASCAR::to_string(stage.rendersettings.damping));
+  }
   if(stage.rendersettings.renderreverb) {
     // create reverb engine:
     xmlpp::Element* e_rvb(e_scene->add_child("reverb"));
@@ -695,6 +707,13 @@ void ov_render_tascar_t::getbitrate(double& txrate, double& rxrate)
 std::vector<std::string> ov_render_tascar_t::get_input_channel_ids() const
 {
   return inputports;
+}
+
+double ov_render_tascar_t::get_load() const {
+  if( tascar ){
+    return 0.01*tascar->get_cpu_load();
+  }
+  return 0;
 }
 
 /*

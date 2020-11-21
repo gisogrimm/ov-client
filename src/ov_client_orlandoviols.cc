@@ -141,6 +141,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   std::string jsmsg("{");
   jsmsg += "\"alsadevs\":" + jsdevs + ",";
   jsmsg += "\"hwinputchannels\":" + jsinchannels + ",";
+  jsmsg += "\"cpuload\":" + std::to_string(backend.get_load()) + ",";
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
            "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
   jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\"";
@@ -291,6 +292,8 @@ void ov_client_orlandoviols_t::service()
           rendersettings.reverbgain = js_reverb["gain"].as<double>(0.4);
           rendersettings.renderreverb =
               js_rendersettings["renderreverb"].as<bool>(true);
+          rendersettings.renderism =
+              js_rendersettings["renderism"].as<bool>(false);
           rendersettings.outputport1 =
               js_rendersettings["outputport1"].as<std::string>("");
           rendersettings.outputport2 =
