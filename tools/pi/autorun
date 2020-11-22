@@ -49,9 +49,8 @@ fi
 
 # activate WiFi if required:
 if test -e /boot/ovclient-wifi.txt; then
-    WIFICFG=$(cat /boot/ovclient-wifi.txt)
-    SSID=$(echo $WIFICFG|sed -e 's/[[:blank:]].*//g')
-    PW=$(echo $WIFICFG|sed -e 's/^[^[:blank:]]*[[:blank:]]*//g')
+    SSID=$(cat /boot/ovclient-wifi.txt|sed -e "2 d")
+    PW=$(cat /boot/ovclient-wifi.txt|sed -e "1 d")
     COUNTRYCODE=DE
     test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
     echo "connecting to WiFi ${SSID}"
