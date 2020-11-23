@@ -53,7 +53,7 @@ function plot_pinghist( ping )
   set(gca,'FontSize',16,'Fontname','Nunito Sans light');
   xlabel('ping time in ms');
   ylabel('rel. frequency of occurrence');
-  %saveas(gcf,'slides/pingtime.eps','epsc');
+  saveas(gcf,'pingtime.png');
   %system('inkscape slides/pingtime.eps -l slides/pingtime.svg');
   %delete(vobj);
   %set(vinv,'visible','on');
