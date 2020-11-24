@@ -1,4 +1,5 @@
 #include "soundcardtools.h"
+#include <iostream>
 #ifndef __APPLE__
 #include <alsa/asoundlib.h>
 #endif
@@ -16,6 +17,8 @@ std::vector<snddevname_t> list_sound_devices()
   /* Enumerate sound devices */
   err = snd_device_name_hint(-1, "pcm", (void***)&hints);
   if(err != 0) {
+    std::cerr << "Warning: unable to get name hints (list_sound_devices)"
+              << std::endl;
     return retv;
   }
   n = hints;

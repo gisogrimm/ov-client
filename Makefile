@@ -9,7 +9,7 @@ export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 showver: libov/Makefile
 	echo $(VERSION)
 
-BINARIES = ov-client ov-headtracker ov-client_hostname
+BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
 OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
@@ -131,7 +131,7 @@ build/%: src/%.cc
 
 #build/ov-client: $(wildcard src/*.h)
 
-build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/libtascar/build/%,$(TASCAROBJECTS))
+build/ov-client_listsounddevs build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/libtascar/build/%,$(TASCAROBJECTS))
 
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

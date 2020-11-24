@@ -709,9 +709,10 @@ std::vector<std::string> ov_render_tascar_t::get_input_channel_ids() const
   return inputports;
 }
 
-double ov_render_tascar_t::get_load() const {
-  if( tascar ){
-    return 0.01*tascar->get_cpu_load();
+double ov_render_tascar_t::get_load() const
+{
+  if(tascar) {
+    return 0.01 * tascar->get_cpu_load();
   }
   return 0;
 }

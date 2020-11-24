@@ -131,7 +131,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   std::string jsdevs("{");
   for(auto d : alsadevs)
     jsdevs += "\"" + d.dev + "\":\"" + d.desc + "\",";
-  if(jsdevs.size())
+  if(alsadevs.size())
     jsdevs.erase(jsdevs.end() - 1);
   jsdevs += "}";
   // std::cout << jsdevs << std::endl;
