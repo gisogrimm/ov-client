@@ -29,7 +29,7 @@ std::vector<snddevname_t> list_sound_devices()
       snddevname_t dname;
       dname.dev = name;
       dname.desc = desc;
-      if(dname.desc.find("\n"))
+      if(dname.desc.find("\n") != std::string::npos)
         dname.desc.erase(dname.desc.find("\n"));
       retv.push_back(dname);
     }
@@ -56,7 +56,7 @@ std::vector<snddevname_t> list_sound_devices()
       snddevname_t dname;
       dname.dev = name;
       dname.desc = desc;
-      if(dname.desc.find("\n"))
+      if(dname.desc.find("\n") != std::string::npos)
         dname.desc.erase(dname.desc.find("\n"));
       retv.push_back(dname);
       if(name && strcmp("null", name))
