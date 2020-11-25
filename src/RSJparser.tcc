@@ -737,6 +737,7 @@ std::string  RSJresource::as<std::string> (const std::string& def) {
 template <> inline 
 int  RSJresource::as<int> (const int& def) {
     if (!exists()) return (def);
+    if( strip_outer_quotes(data).empty() ) return (def);
     return (atoi (strip_outer_quotes(data).c_str() ) );
 }
 
