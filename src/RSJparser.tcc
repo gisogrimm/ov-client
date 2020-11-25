@@ -81,7 +81,7 @@ std::string strtrim (std::string str, std::string chars=" \t\n\r", int max_count
     if (dirs & STRTRIM_R) { // right trim
         int q, strlenm1=str.length()-1;
         for (q=0; q<max_count; ++q)
-            if (chars.find(str[strlenm1-q])==std::string::npos) break;
+	  if ((strlenm1-q<0)||(chars.find(str[strlenm1-q])==std::string::npos)) break;
         str.erase (str.length()-q, q);
     }
     
