@@ -19,7 +19,7 @@ BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
--ggdb -fno-finite-math-only
+-ggdb -fno-finite-math-only -I/usr/local/opt/openssl@1.1/include/openssl -stdlib=libc++
 
 CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
@@ -27,14 +27,16 @@ ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
 endif
 
-CPPFLAGS = -std=c++11
+CPPFLAGS =-std=c++11
 PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
+CXXFLAGS += -I/usr/local/opt/openssl@1.1/include/openssl
+LDFLAGS += -L/usr/local/opt/openssl@1.1/lib
 
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
-LDLIBS += -ldl -framework IOKit -framework CoreFoundation
+LDLIBS += -ldl -framework IOKit -framework CoreFoundation -lc++ -lcpprest -lssl -lcrypto -lboost_system -lboost_thread-mt -lboost_chrono-mt
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
@@ -124,7 +126,7 @@ $(BUILD_BINARIES): libov/build/libov.a
 #build/ov-client: libov/build/libov.a
 
 build/%: src/%.cc
-	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
 
 #$(BUILD_BINARIES): $(wildcard libov/build/*.o)

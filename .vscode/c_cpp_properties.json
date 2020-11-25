@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/Cellar/libxml++/2.40.1_2/include/libxml++-2.6",
+                "/usr/local/Cellar/glibmm/2.64.2/include/glibmm-2.4",
+                "/usr/local/opt/",
+                "/usr/local/Cellar/glibmm/2.64.2/lib/glibmm-2.4/include",
+                "/usr/local/Cellar/glib/2.66.2_1/include/glib-2.0",
+                "/usr/local/Cellar/glib/2.66.2_1/lib/glib-2.0/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "/usr/local/bin/gcc-10"
+        }
+    ],
+    "version": 4
+}
