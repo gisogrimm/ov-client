@@ -125,14 +125,14 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
     ++nch;
   }
   if(jsinchannels.size())
-    jsinchannels.erase(jsinchannels.end() - 1);
+    jsinchannels.erase(jsinchannels.size() - 1, 1);
   jsinchannels += "}";
   std::vector<snddevname_t> alsadevs(list_sound_devices());
   std::string jsdevs("{");
   for(auto d : alsadevs)
     jsdevs += "\"" + d.dev + "\":\"" + d.desc + "\",";
-  if(alsadevs.size())
-    jsdevs.erase(jsdevs.end() - 1);
+  if((jsdevs.size() > 0) && (alsadevs.size() > 0))
+    jsdevs.erase(jsdevs.size() - 1, 1);
   jsdevs += "}";
   // std::cout << jsdevs << std::endl;
   double txrate(0);
@@ -179,7 +179,7 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
     first = false;
   }
   if(retv.size())
-    retv.erase(retv.size() - 1);
+    retv.erase(retv.size() - 1, 1);
   return retv;
 }
 
