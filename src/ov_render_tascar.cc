@@ -81,68 +81,65 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
         "0 " + TASCAR::to_string(to_tascar(
                    stage.stage[stage.rendersettings.id].orientation)));
   }
-  // the stage is not empty, which means we are on a stage.
-  // width of stage in degree:
+  // the stage is not empty, which means we are on a stage.  width of
+  // stage in degree, for listener-only devices (for sending devices
+  // we take positions transferred from database server):
   double stagewidth(160);
   double az(-0.5 * stagewidth);
-  if(b_sender) {
-    stagewidth = 360;
-    az = 0;
-  }
   double daz(stagewidth / (stage.stage.size() - (!b_sender)) * (M_PI / 180.0));
   az = az * (M_PI / 180.0) - 0.5 * daz;
   double radius(1.2);
+  // create sound sources:
   for(auto stagemember : stage.stage) {
-    if(b_sender || (stagemember.second.id != thisdev.id)) {
-      az += daz;
-      TASCAR::pos_t pos(to_tascar(stagemember.second.position));
-      TASCAR::zyx_euler_t rot(to_tascar(stagemember.second.orientation));
-      if(!b_sender) {
-        // overwrite stage layout:
-        pos.x = radius * cos(az);
-        pos.y = -radius * sin(az);
-        pos.z = 0;
-        rot.z = (180 / M_PI * (-az + M_PI));
-        rot.y = 0;
-        rot.x = 0;
-      }
-      // create a sound source for each device on stage:
-      xmlpp::Element* e_src(e_scene->add_child("source"));
-      TASCAR::pos_t ego_delta;
-      if(stagemember.second.id == thisdev.id) {
-        // in case of self-monitoring, this source is called "ego", and the
-        // position is slightly shifted:
-        e_src->set_attribute("name", "ego");
-        ego_delta.x = 0.2;
-        ego_delta.z = -0.3;
-      } else {
-        e_src->set_attribute("name", get_stagedev_name(stagemember.second.id));
-      }
-      e_src->set_attribute("dlocation", to_string(pos));
-      e_src->set_attribute("dorientation", to_string(rot));
-      uint32_t kch(0);
-      for(auto ch : stagemember.second.channels) {
-        // create a sound for each channel:
-        ++kch;
-        xmlpp::Element* e_snd(e_src->add_child("sound"));
-        e_snd->set_attribute("maxdist", "50");
-        e_snd->set_attribute("gainmodel", "1");
-        double gain(ch.gain * stagemember.second.gain);
-        if(stagemember.second.id == thisdev.id) {
-          // connect self-monitoring source ports:
-          e_snd->set_attribute("connect", ch.sourceport);
-          gain *= stage.rendersettings.egogain;
-        } else {
-          // if not self-monitor then decrease gain:
-          gain *= 0.6;
+    if(stagemember.second.channels.size()) {
+      // create sound source only for sending devices:
+      if(b_sender || (stagemember.second.id != thisdev.id)) {
+        TASCAR::pos_t pos(to_tascar(stagemember.second.position));
+        TASCAR::zyx_euler_t rot(to_tascar(stagemember.second.orientation));
+        if(!b_sender) {
+          // this device is not sending, overwrite stage layout:
+          az += daz;
+          pos.x = radius * cos(az);
+          pos.y = -radius * sin(az);
+          pos.z = 0;
+          rot.z = (180 / M_PI * (-az + M_PI));
+          rot.y = 0;
+          rot.x = 0;
         }
-        e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
-        // set relative channel positions:
-        TASCAR::pos_t chpos(to_tascar(ch.position));
-        chpos += ego_delta;
-        e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
-        e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
-        e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+        // create a sound source for each device on stage:
+        xmlpp::Element* e_src(e_scene->add_child("source"));
+        if(stagemember.second.id == thisdev.id) {
+          // in case of self-monitoring, this source is called "ego":
+          e_src->set_attribute("name", "ego");
+        } else {
+          e_src->set_attribute("name",
+                               get_stagedev_name(stagemember.second.id));
+        }
+        e_src->set_attribute("dlocation", to_string(pos));
+        e_src->set_attribute("dorientation", to_string(rot));
+        uint32_t kch(0);
+        for(auto ch : stagemember.second.channels) {
+          // create a sound for each channel:
+          ++kch;
+          xmlpp::Element* e_snd(e_src->add_child("sound"));
+          e_snd->set_attribute("maxdist", "50");
+          e_snd->set_attribute("gainmodel", "1");
+          double gain(ch.gain * stagemember.second.gain);
+          if(stagemember.second.id == thisdev.id) {
+            // connect self-monitoring source ports:
+            e_snd->set_attribute("connect", ch.sourceport);
+            gain *= stage.rendersettings.egogain;
+          } else {
+            // if not self-monitor then decrease gain:
+            gain *= 0.6;
+          }
+          e_snd->set_attribute("gain", TASCAR::to_string(20.0 * log10(gain)));
+          // set relative channel positions:
+          TASCAR::pos_t chpos(to_tascar(ch.position));
+          e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
+          e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
+          e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+        }
       }
     }
   }
@@ -177,64 +174,73 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
   e_mods->add_child("touchosc");
-  //
+  // create zita-n2j receivers:
   for(auto stagemember : stage.stage) {
-    std::string chanlist;
-    for(uint32_t k = 0; k < stagemember.second.channels.size(); ++k) {
-      if(k)
-        chanlist += ",";
-      chanlist += std::to_string(k + 1);
-    }
-    if(stage.thisstagedeviceid != stagemember.second.id) {
-      std::string clientname(get_stagedev_name(stagemember.second.id));
-      xmlpp::Element* e_sys = e_mods->add_child("system");
-      double buff(thisdev.receiverjitter + stagemember.second.senderjitter);
-      e_sys->set_attribute(
-          "command", "zita-n2j --chan " + chanlist + " --jname " + clientname +
-                         " --buf " + TASCAR::to_string(buff) + " 0.0.0.0 " +
-                         TASCAR::to_string(4464 + 2 * stagemember.second.id));
-      e_sys->set_attribute("onunload", "killall zita-n2j");
-      for(size_t c = 0; c < stagemember.second.channels.size(); ++c) {
-        if(stage.thisstagedeviceid != stagemember.second.id) {
-          std::string srcport(clientname + ":out_" + std::to_string(c + 1));
-          std::string destport("render." + stage.thisdeviceid + ":" +
-                               clientname + "." + std::to_string(c) + ".0");
-          waitports.push_back(srcport);
-          xmlpp::Element* e_port = e_session->add_child("connect");
-          e_port->set_attribute("src", srcport);
-          e_port->set_attribute("dest", destport);
-        }
+    // only create a network receiver when the stage member is sending audio:
+    if(stagemember.second.channels.size()) {
+      std::string chanlist;
+      for(uint32_t k = 0; k < stagemember.second.channels.size(); ++k) {
+        if(k)
+          chanlist += ",";
+        chanlist += std::to_string(k + 1);
       }
-      if(stage.rendersettings.secrec > 0) {
-        if(stage.thisstagedeviceid != stagemember.second.id) {
-          std::string clientname(get_stagedev_name(stagemember.second.id) +
-                                 "_sec");
-          std::string netclientname(
-              "n2j_" + std::to_string(stagemember.second.id) + "_sec");
-          xmlpp::Element* e_sys = e_mods->add_child("system");
-          double buff(thisdev.receiverjitter + stagemember.second.senderjitter);
-          e_sys->set_attribute(
-              "command",
-              "zita-n2j --chan " + chanlist + " --jname " + netclientname +
-                  " --buf " +
-                  TASCAR::to_string(stage.rendersettings.secrec + buff) +
-                  " 0.0.0.0 " +
-                  TASCAR::to_string(4464 + 2 * stagemember.second.id + 100));
-          e_sys->set_attribute("onunload", "killall zita-n2j");
-          xmlpp::Element* e_route = e_mods->add_child("route");
-          e_route->set_attribute("name", clientname);
-          e_route->set_attribute(
-              "channels", std::to_string(stagemember.second.channels.size()));
-          e_route->set_attribute(
-              "gain", TASCAR::to_string(20 * log10(stagemember.second.gain)));
-          e_route->set_attribute("connect", netclientname + ":out_[0-9]*");
+      // do not create a network receiver for local device:
+      if(stage.thisstagedeviceid != stagemember.second.id) {
+        std::string clientname(get_stagedev_name(stagemember.second.id));
+        xmlpp::Element* e_sys = e_mods->add_child("system");
+        double buff(thisdev.receiverjitter + stagemember.second.senderjitter);
+        e_sys->set_attribute(
+            "command", "zita-n2j --chan " + chanlist + " --jname " +
+                           clientname + " --buf " + TASCAR::to_string(buff) +
+                           " 0.0.0.0 " +
+                           TASCAR::to_string(4464 + 2 * stagemember.second.id));
+        e_sys->set_attribute("onunload", "killall zita-n2j");
+        // create connections:
+        for(size_t c = 0; c < stagemember.second.channels.size(); ++c) {
+          if(stage.thisstagedeviceid != stagemember.second.id) {
+            std::string srcport(clientname + ":out_" + std::to_string(c + 1));
+            std::string destport("render." + stage.thisdeviceid + ":" +
+                                 clientname + "." + std::to_string(c) + ".0");
+            waitports.push_back(srcport);
+            xmlpp::Element* e_port = e_session->add_child("connect");
+            e_port->set_attribute("src", srcport);
+            e_port->set_attribute("dest", destport);
+          }
+        }
+        if(stage.rendersettings.secrec > 0) {
+          // create a secondary network receiver with additional jitter buffer:
+          if(stage.thisstagedeviceid != stagemember.second.id) {
+            std::string clientname(get_stagedev_name(stagemember.second.id) +
+                                   "_sec");
+            std::string netclientname(
+                "n2j_" + std::to_string(stagemember.second.id) + "_sec");
+            xmlpp::Element* e_sys = e_mods->add_child("system");
+            double buff(thisdev.receiverjitter +
+                        stagemember.second.senderjitter);
+            e_sys->set_attribute(
+                "command",
+                "zita-n2j --chan " + chanlist + " --jname " + netclientname +
+                    " --buf " +
+                    TASCAR::to_string(stage.rendersettings.secrec + buff) +
+                    " 0.0.0.0 " +
+                    TASCAR::to_string(4464 + 2 * stagemember.second.id + 100));
+            e_sys->set_attribute("onunload", "killall zita-n2j");
+            // create also a route with correct gain settings:
+            xmlpp::Element* e_route = e_mods->add_child("route");
+            e_route->set_attribute("name", clientname);
+            e_route->set_attribute(
+                "channels", std::to_string(stagemember.second.channels.size()));
+            e_route->set_attribute(
+                "gain", TASCAR::to_string(20 * log10(stagemember.second.gain)));
+            e_route->set_attribute("connect", netclientname + ":out_[0-9]*");
+          }
         }
       }
     }
   }
   // when a second network receiver is used then also create a bus
   // with a delayed version of the self monitor:
-  if(stage.rendersettings.secrec > 0) {
+  if((stage.rendersettings.secrec > 0) && (thisdev.channels.size() > 0)) {
     std::string clientname(get_stagedev_name(thisdev.id) + "_sec");
     xmlpp::Element* mod = e_mods->add_child("route");
     mod->set_attribute("name", clientname);
@@ -255,6 +261,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     }
   }
   if(thisdev.channels.size() > 0) {
+    // create network sender:
     xmlpp::Element* e_sys = e_mods->add_child("system");
     e_sys->set_attribute(
         "command", "zita-j2n --chan " +
