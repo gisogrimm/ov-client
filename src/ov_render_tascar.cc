@@ -275,6 +275,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
       xmlpp::Element* e_port = e_session->add_child("connect");
       e_port->set_attribute("src", ch.sourceport);
       e_port->set_attribute("dest", "sender:in_" + std::to_string(chn));
+      waitports.push_back("sender:in_" + std::to_string(chn));
     }
   }
   xmlpp::Element* e_wait = e_mods->add_child("waitforjackport");
@@ -409,6 +410,7 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
       xmlpp::Element* e_port = e_session->add_child("connect");
       e_port->set_attribute("src", ch.sourceport);
       e_port->set_attribute("dest", "sender:in_" + std::to_string(chn));
+      waitports.push_back("sender:in_" + std::to_string(chn));
     }
   }
   xmlpp::Element* e_wait = e_mods->add_child("waitforjackport");
