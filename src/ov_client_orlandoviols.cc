@@ -144,7 +144,8 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   jsmsg += "\"cpuload\":" + std::to_string(backend.get_load()) + ",";
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
            "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
-  jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\"";
+  jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\",";
+  jsmsg += "\"version\":\"ovclient-" + std::string(OVBOXVERSION) + "\"";
   jsmsg += "}";
   CURLcode res;
   std::string retv;
