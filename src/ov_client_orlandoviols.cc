@@ -235,6 +235,21 @@ stage_device_t get_stage_dev(RSJresource& dev)
   return stagedev;
 }
 
+std::string ovstrrep(std::string s, const std::string& pat,
+                     const std::string& rep)
+{
+  std::string out_string("");
+  std::string::size_type len = pat.size();
+  std::string::size_type pos;
+  while((pos = s.find(pat)) < s.size()) {
+    out_string += s.substr(0, pos);
+    out_string += rep;
+    s.erase(0, pos + len);
+  }
+  s = out_string + s;
+  return s;
+}
+
 void ov_client_orlandoviols_t::service()
 {
   try {
@@ -261,6 +276,7 @@ void ov_client_orlandoviols_t::service()
     std::string stagecfg(device_update(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
       try {
+        report_error(lobby, backend.get_deviceid(), "");
         RSJresource js_stagecfg(stagecfg);
         if(js_stagecfg["firmwareupdate"].as<bool>(false)) {
           std::ofstream ofh("ov-client.firmwareupdate");
@@ -306,6 +322,27 @@ void ov_client_orlandoviols_t::service()
           rendersettings.egogain = js_rendersettings["egogain"].as<double>(1.0);
           rendersettings.peer2peer =
               js_rendersettings["peer2peer"].as<bool>(true);
+          // ambient sound:
+          rendersettings.ambientsound =
+              js_stage["ambientsound"].as<std::string>("");
+          rendersettings.ambientlevel = js_stage["ambientlevel"].as<double>(0);
+          rendersettings.ambientsound =
+              ovstrrep(rendersettings.ambientsound, "\\/", "/");
+          // if not empty then download file to hash code:
+          if(rendersettings.ambientsound.size()) {
+            std::string hashname(
+                url2localfilename(rendersettings.ambientsound));
+            // test if file already exists:
+            std::ifstream ambif(hashname);
+            if(!ambif.good()) {
+              if(!download_file(rendersettings.ambientsound, hashname)) {
+                report_error(lobby, backend.get_deviceid(),
+                             "Unable to download ambient sound file from " +
+                                 rendersettings.ambientsound);
+              }
+            }
+          }
+          //
           rendersettings.xports.clear();
           RSJarray js_xports(js_rendersettings["xport"].as_array());
           for(auto xp : js_xports) {
@@ -339,7 +376,6 @@ void ov_client_orlandoviols_t::service()
             backend.start_audiobackend();
           if(!backend.is_session_active())
             backend.start_session();
-          report_error(lobby, backend.get_deviceid(), "");
         }
       }
       catch(const std::exception& e) {

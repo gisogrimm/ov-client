@@ -13,6 +13,8 @@ struct snddevname_t {
 // audio backend
 std::vector<snddevname_t> list_sound_devices();
 
+std::string url2localfilename(const std::string& url);
+
 #endif
 
 /*

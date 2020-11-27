@@ -61,6 +61,23 @@ std::vector<snddevname_t> list_sound_devices()
   return retv;
 }
 
+std::string url2localfilename(const std::string& url)
+{
+  if(url.empty())
+    return url;
+  std::string extension(url);
+  size_t pos = extension.find(".");
+  if(pos == std::string::npos)
+    extension = "";
+  else {
+    while((pos = extension.find(".")) != std::string::npos)
+      extension.erase(0, pos + 1);
+    if(!extension.empty())
+      extension = "." + extension;
+  }
+  return std::to_string(std::hash<std::string>{}(url)) + extension;
+}
+
 /*
  * Local Variables:
  * compile-command: "make -C .."

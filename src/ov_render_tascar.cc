@@ -171,6 +171,25 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     e_rvb->set_attribute(
         "gain", TASCAR::to_string(20 * log10(stage.rendersettings.reverbgain)));
   }
+  // ambient sounds:
+  if(stage.rendersettings.ambientsound.size()) {
+    std::string hashname(url2localfilename(stage.rendersettings.ambientsound));
+    // test if file exists:
+    std::ifstream ambif(hashname);
+    if(ambif.good()) {
+      xmlpp::Element* e_diff(e_scene->add_child("diffuse"));
+      e_diff->set_attribute("name", "ambient");
+      xmlpp::Element* e_plug(e_diff->add_child("plugins"));
+      xmlpp::Element* e_snd(e_plug->add_child("sndfile"));
+      e_snd->set_attribute("name", hashname);
+      e_snd->set_attribute(
+          "level", TASCAR::to_string(stage.rendersettings.ambientlevel));
+      e_snd->set_attribute("loop", "0");
+      e_snd->set_attribute("transport", "false");
+      e_snd->set_attribute("license", "CC0");
+      e_snd->set_attribute("resample", "true");
+    }
+  }
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
   e_mods->add_child("touchosc");
