@@ -55,7 +55,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
 
 TASCARDMXOBJECTS = 
 
-TASCARRECEIVERS = ortf hrtf itu51 simplefdn
+TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
 
 TASCARMODULS = system touchosc waitforjackport route
 
