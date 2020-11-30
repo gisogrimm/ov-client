@@ -488,6 +488,8 @@ void ov_render_tascar_t::start_session()
         std::string srcport("master_l");
         if(stage.rendersettings.rectype == "itu51")
           srcport = "master.0L";
+        if(stage.rendersettings.rectype == "omni")
+          srcport = "master.0";
         e_con->set_attribute("src",
                              "render." + stage.thisdeviceid + ":" + srcport);
         e_con->set_attribute("dest", stage.rendersettings.outputport1);
@@ -497,6 +499,8 @@ void ov_render_tascar_t::start_session()
         std::string srcport("master_r");
         if(stage.rendersettings.rectype == "itu51")
           srcport = "master.1R";
+        if(stage.rendersettings.rectype == "omni")
+          srcport = "master.0";
         e_con->set_attribute("src",
                              "render." + stage.thisdeviceid + ":" + srcport);
         e_con->set_attribute("dest", stage.rendersettings.outputport2);
