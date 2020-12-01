@@ -68,7 +68,7 @@ std::string url2localfilename(const std::string& url)
   std::string extension(url);
   size_t pos = extension.find("?");
   if(pos != std::string::npos)
-    extension.erase(pos, extension.size()-pos);
+    extension.erase(pos, extension.size() - pos);
   pos = extension.find(".");
   if(pos == std::string::npos)
     extension = "";

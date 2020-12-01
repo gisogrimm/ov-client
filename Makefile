@@ -10,7 +10,8 @@ showver: libov/Makefile
 	echo $(VERSION)
 
 BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
-OBJ = spawn_process ov_client_orlandoviols ov_render_tascar soundcardtools
+OBJ = spawn_process ov_client_orlandoviols ov_client_digitalstage	\
+  ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
 
