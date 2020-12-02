@@ -25,6 +25,7 @@ private:
   std::thread servicethread;
   std::string lobby;
   std::atomic<bool> quitrequest_;
+  bool isovbox;
 };
 
 #endif

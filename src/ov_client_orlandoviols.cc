@@ -1,6 +1,7 @@
 #include "ov_client_orlandoviols.h"
 #include "RSJparser.tcc"
 #include "errmsg.h"
+#include "ov_tools.h"
 #include "soundcardtools.h"
 #include <curl/curl.h>
 #include <fstream>
@@ -41,7 +42,7 @@ namespace webCURL {
 ov_client_orlandoviols_t::ov_client_orlandoviols_t(ov_render_base_t& backend,
                                                    const std::string& lobby)
     : ov_client_base_t(backend), runservice(true), lobby(lobby),
-      quitrequest_(false)
+      quitrequest_(false), isovbox(is_ovbox())
 {
   // curl_global_init(CURL_GLOBAL_DEFAULT);
   curl = curl_easy_init();
@@ -145,7 +146,8 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   jsmsg += "\"bandwidth\":{\"tx\":\"" + std::to_string(txrate) +
            "\",\"rx\":\"" + std::to_string(rxrate) + "\"},";
   jsmsg += "\"localip\":\"" + ep2ipstr(getipaddr()) + "\",";
-  jsmsg += "\"version\":\"ovclient-" + std::string(OVBOXVERSION) + "\"";
+  jsmsg += "\"version\":\"ovclient-" + std::string(OVBOXVERSION) + "\",";
+  jsmsg += "\"isovbox\":" + std::string(isovbox ? "true" : "false");
   jsmsg += "}";
   CURLcode res;
   std::string retv;
