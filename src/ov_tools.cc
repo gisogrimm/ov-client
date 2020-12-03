@@ -41,6 +41,9 @@ bool is_ovbox()
   char name[BUFSIZ];
   char arg[BUFSIZ];
   get_process_name(ppid, name, arg);
+  DEBUG(ppid);
+  DEBUG(name);
+  DEBUG(arg);
   return strcmp(arg, "/home/pi/autorun") == 0;
 #else
   // if not on LINUX this can not be an ovbox:
