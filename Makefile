@@ -54,7 +54,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
-TASCARDMXOBJECTS = 
+TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
 
@@ -84,7 +84,7 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
-		LDFLAGS += -framework IOKit
+		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate
 	endif
 		UNAME_P := $(shell uname -p)
