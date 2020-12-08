@@ -21,17 +21,21 @@ using namespace pplx;
 using namespace concurrency::streams;
 
 boost::filesystem::path ds_config_path;
+std::string email;
+std::string password;
+std::string jwt;
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
     ov_render_base_t& backend, const std::string& frontend_url_, boost::filesystem::path& selfpath)
     : ov_client_base_t(backend), runservice(true), frontend_url(frontend_url_),
       quitrequest_(false)
 {
+  std::cout<<"app path "  << selfpath <<   std::endl;
   selfpath=selfpath.remove_filename();
   selfpath=selfpath.append("ds-config");
   ds_config_path=selfpath;
 
-  std::cout<<"selfpath "  << selfpath <<   std::endl;
+  std::cout<<"ds-config file path "  << selfpath <<   std::endl;
   if (boost::filesystem::exists(selfpath))
   {
    std::cout<<"digital-stage config file found "  << std::endl;
@@ -57,8 +61,7 @@ void ov_client_digitalstage_t::service()
   // start main control loop:
 
 
-  std::string email;
-  std::string password;
+
 
   std::cout<<"CHECK - digital-stage config file "  << std::endl;
 
@@ -77,9 +80,25 @@ if (boost::filesystem::exists("ds-config"))
       //std::cout << email << "   " << password << '\n';
 
       myfile.close();
+      if (email == "email")
+      {
+        std::cout << "Please provide email in ds-config file line 0" << '\n';
+        quitrequest_ = true;
+        return;
+      }
+      if (password == "password")
+      {
+        std::cout << "Please provide password in ds-config file line 1" << '\n';
+        quitrequest_ = true;
+        return;
+      }
     }
 
-    else std::cout << "Unable to open file";
+    else {
+      std::cout << "Unable to open ds-config file";
+      quitrequest_ = true;
+        return;
+      }
 
   }
 
@@ -100,7 +119,8 @@ if (boost::filesystem::exists("ds-config"))
       std::string str = response.extract_json().get().as_string();
 
       str.substr(1,str.length() - 1);
-      std::cout<<"jwt : "<< str << std::endl;
+      jwt=str;
+      std::cout<<"jwt : "<< jwt << std::endl;
 
 
   }).wait();
