@@ -5,7 +5,7 @@
 #include <cpprest/uri.h>
 #include <cpprest/json.h>
 #include <cpprest/filestream.h>
-
+#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 
 
@@ -18,11 +18,22 @@ using namespace web::websockets::client;
 using namespace pplx;
 using namespace concurrency::streams;
 
+boost::filesystem::path ds_config_path;
+
 ov_client_digitalstage_t::ov_client_digitalstage_t(
-    ov_render_base_t& backend, const std::string& frontend_url_)
+    ov_render_base_t& backend, const std::string& frontend_url_, boost::filesystem::path& selfpath)
     : ov_client_base_t(backend), runservice(true), frontend_url(frontend_url_),
       quitrequest_(false)
 {
+  selfpath=selfpath.remove_filename();
+  selfpath=selfpath.append("ds-config");
+  ds_config_path=selfpath;
+
+  std::cout<<"selfpath "  << selfpath <<   std::endl;
+  if (boost::filesystem::exists(selfpath))
+  {
+   std::cout<<"digital-stage config file found "  << std::endl;
+  }
 }
 
 void ov_client_digitalstage_t::start_service()
@@ -42,8 +53,16 @@ void ov_client_digitalstage_t::service()
   // register_device(lobby, backend.get_deviceid());
   // download_file(lobby + "/announce.flac", "announce.flac");
   // start main control loop:
+  std::cout<<"CHECK - digital-stage config file "  << std::endl;
 
-  std::string url_= "https://auth.digital-stage.org/login?email=performerstone%40gmail.com&password=L2eYaTD8dHpnwFe";
+
+if (boost::filesystem::exists("ds-config"))
+  {
+   std::cout<<"OK - digital-stage config file FOUND  " << std::endl;
+  }
+
+
+  std::string url_= "https://auth.digital-stage.org/login?email=performerstone@gmail.com&password=L2eYaTD8dHpnwFe";
   http_client client1(utility::conversions::to_string_t(url_));
   http_request request;
   request.set_method(methods::POST);

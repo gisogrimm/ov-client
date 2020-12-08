@@ -85,7 +85,7 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
-		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lssl -lcrypto
+		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lssl -lcrypto -lboost_filesystem
 		CXXFLAGS += -I/usr/local/opt/openssl@1.1/include/openssl
 		LDFLAGS += -L/usr/local/opt/openssl@1.1/lib
 	endif
