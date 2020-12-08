@@ -1,5 +1,7 @@
 #include "ov_client_digitalstage.h"
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <cpprest/ws_client.h>
 #include <cpprest/http_client.h>
 #include <cpprest/uri.h>
@@ -53,16 +55,35 @@ void ov_client_digitalstage_t::service()
   // register_device(lobby, backend.get_deviceid());
   // download_file(lobby + "/announce.flac", "announce.flac");
   // start main control loop:
+
+
+  std::string email;
+  std::string password;
+
   std::cout<<"CHECK - digital-stage config file "  << std::endl;
 
 
 if (boost::filesystem::exists("ds-config"))
   {
-   std::cout<<"OK - digital-stage config file FOUND  " << std::endl;
+    std::cout<<"OK - digital-stage config file FOUND  " << std::endl;
+
+    std::string line;
+    std::ifstream myfile ("ds-config");
+
+    if (myfile.is_open())
+    {
+      std::getline(myfile, email);
+      std::getline(myfile, password);
+      //std::cout << email << "   " << password << '\n';
+
+      myfile.close();
+    }
+
+    else std::cout << "Unable to open file";
+
   }
 
-
-  std::string url_= "https://auth.digital-stage.org/login?email=performerstone@gmail.com&password=L2eYaTD8dHpnwFe";
+  std::string url_= "https://auth.digital-stage.org/login?email=" + email + "&password=" + password;
   http_client client1(utility::conversions::to_string_t(url_));
   http_request request;
   request.set_method(methods::POST);
