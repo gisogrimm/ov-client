@@ -20,10 +20,16 @@ using namespace web::websockets::client;
 using namespace pplx;
 using namespace concurrency::streams;
 
+
+using json = nlohmann::json;
+
 boost::filesystem::path ds_config_path;
 std::string email;
 std::string password;
 std::string jwt;
+
+task_completion_event<void> tce;
+websocket_callback_client wsclient;
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
     ov_render_base_t& backend, const std::string& frontend_url_, boost::filesystem::path& selfpath)
@@ -51,6 +57,8 @@ void ov_client_digitalstage_t::start_service()
 void ov_client_digitalstage_t::stop_service()
 {
   runservice = false;
+  tce.set();
+  wsclient.close();
   servicethread.join();
 }
 
@@ -125,6 +133,84 @@ if (boost::filesystem::exists("ds-config"))
 
   }).wait();
 
+
+    wsclient.connect(U("wss://api.digital-stage.org")).wait();
+
+
+    auto receive_task = create_task(tce);
+
+    wsclient.set_message_handler([&](websocket_incoming_message ret_msg) {
+        auto ret_str = ret_msg.extract_string().get();
+        //ucout << "ret_str " << to_string_t(ret_str) << "\n";
+
+        //we check if it's valid json
+        if (!nlohmann::json::accept(ret_str))
+        {
+            std::cerr << "parse error" << std::endl;
+        }
+
+        if (ret_str == "hey")
+        {
+            ucout << "ret_str " << to_string_t(ret_str) << "\n";
+        } else {
+            try {
+            nlohmann::json j = nlohmann::json::parse(ret_str);
+            std::cout << "/----------------------Event--------------------------/" << std::endl;
+            std::cout << j["data"].dump(4) << std::endl;
+
+            if (j["data"] == "stage-member-audio-added")
+            {
+              std::cout << "/------------  STAGE_MEMBER_AUDIO_ADDED_EVENT   --------------------------/" << std::endl;
+            }
+
+            //switch (j["data"])
+            //{
+            //case "stage-member-audio-added":
+            //    std::cout << j["data"]["stage-member-audio-added"].dump(4) << std::endl;
+            //    break;
+
+            //default:
+            //    break;
+            //}
+
+            } catch (...) {
+            std::cerr << "error parsing" << std::endl;
+            }
+        }
+
+
+
+        //json j = json::parse(ret_str);
+        //std::cout << j.dump(4) << std::endl;
+        //json payload = ;
+        //switch (payload[])
+        //{
+        //case /* constant-expression */:
+        //    /* code */
+        //    break;
+
+        //default:
+        //    break;
+        //}
+
+        //tce.set(); // this closes the task and fire client.close event
+    });
+
+    utility::string_t close_reason;
+    wsclient.set_close_handler([&close_reason](websocket_close_status status,
+        const utility::string_t& reason,
+        const std::error_code& code) {
+        ucout << " closing reason..." << reason << "\n";
+        ucout << "connection closed, reason: " << reason << " close status: " << int(status) << " error code " << code << std::endl;
+    });
+
+    nlohmann::json token_json;
+
+    std::string body_str("{\"type\":0,\"data\":[\"token\",{\"token\":\"" + jwt + "\"}]}");
+    websocket_outgoing_message msg;
+    msg.set_utf8_message(body_str);
+    wsclient.send(msg).wait();
+    receive_task.wait();
 
   while(runservice) {
     std::cerr << "Error: not yet implemented." << std::endl;
