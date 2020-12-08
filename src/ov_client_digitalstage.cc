@@ -1,5 +1,22 @@
 #include "ov_client_digitalstage.h"
 #include <iostream>
+#include <cpprest/ws_client.h>
+#include <cpprest/http_client.h>
+#include <cpprest/uri.h>
+#include <cpprest/json.h>
+#include <cpprest/filestream.h>
+
+#include <nlohmann/json.hpp>
+
+
+using namespace utility;
+using namespace web;
+using namespace web::http;
+using namespace web::http::client;
+using namespace utility::conversions;
+using namespace web::websockets::client;
+using namespace pplx;
+using namespace concurrency::streams;
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
     ov_render_base_t& backend, const std::string& frontend_url_)
@@ -25,6 +42,30 @@ void ov_client_digitalstage_t::service()
   // register_device(lobby, backend.get_deviceid());
   // download_file(lobby + "/announce.flac", "announce.flac");
   // start main control loop:
+
+  std::string url_= "https://auth.digital-stage.org/login?email=performerstone%40gmail.com&password=L2eYaTD8dHpnwFe";
+  http_client client1(utility::conversions::to_string_t(url_));
+  http_request request;
+  request.set_method(methods::POST);
+  request.headers().add(U("Host"), U("auth.digital-stage.org"));
+  //request.headers().add(U("Origin"), U("https://test.digital-stage.org"));
+  request.headers().add(U("Content-Type"), U("application/json"));
+
+  client1.request(request).then([](http_response response)
+  {
+
+      //std::cout<<"Response code is : "<<response.status_code();
+      //std::cout<<"Response body is : "<<response.body();
+
+      std::string str = response.extract_json().get().as_string();
+
+      str.substr(1,str.length() - 1);
+      std::cout<<"jwt : "<< str << std::endl;
+
+
+  }).wait();
+
+
   while(runservice) {
     std::cerr << "Error: not yet implemented." << std::endl;
     quitrequest_ = true;
