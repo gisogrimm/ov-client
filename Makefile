@@ -37,6 +37,9 @@ LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl
 
+# libcpprest dependencies:
+LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+
 #libov submodule:
 CXXFLAGS += -Ilibov/src
 LDLIBS += -lov
