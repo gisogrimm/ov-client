@@ -3,9 +3,8 @@
 
 #include "ov_types.h"
 #include <atomic>
-#include <thread>
 #include <boost/filesystem.hpp>
-
+#include <thread>
 
 class ov_client_digitalstage_t : public ov_client_base_t {
 public:
