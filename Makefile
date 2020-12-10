@@ -79,7 +79,7 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
-	 	TASCARMODULS += ovheadtracker
+	 	TASCARMODULS += ovheadtracker lightctl
 		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
 	endif
 	ifeq ($(UNAME_S),Darwin)
