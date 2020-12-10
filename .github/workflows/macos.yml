@@ -2,7 +2,7 @@ name: MacOS make
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, digital-stage-client ]
 
 jobs:
   build:

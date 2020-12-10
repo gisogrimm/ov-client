@@ -2,7 +2,7 @@ name: Ubuntu make
 
 on:
   push:
-    branches: [ master, development, build-automation ]
+    branches: [ master, development, build-automation, digital-stage-client ]
 
 jobs:
   build:

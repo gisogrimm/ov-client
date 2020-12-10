@@ -130,9 +130,9 @@ void ov_client_digitalstage_t::service()
     // ucout << "ret_str " << to_string_t(ret_str) << "\n";
 
     // we check if it's valid json
-    if(!nlohmann::json::accept(ret_str)) {
-      std::cerr << "parse error" << std::endl;
-    }
+    //if(!nlohmann::json::accept(ret_str)) {
+    //  std::cerr << "parse error" << std::endl;
+    //}
 
     if(ret_str == "hey") {
       ucout << "ret_str " << to_string_t(ret_str) << "\n";
@@ -158,6 +158,9 @@ void ov_client_digitalstage_t::service()
         // default:
         //    break;
         //}
+      }
+      catch( const std::exception& e) {
+        std::cerr << "std::exception: " << e.what() << std::endl;
       }
       catch(...) {
         std::cerr << "error parsing" << std::endl;
