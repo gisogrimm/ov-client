@@ -179,6 +179,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     if(ambif.good()) {
       xmlpp::Element* e_diff(e_scene->add_child("diffuse"));
       e_diff->set_attribute("name", "ambient");
+      e_diff->set_attribute(
+          "size", TASCAR::to_string(to_tascar(stage.rendersettings.roomsize)));
       xmlpp::Element* e_plug(e_diff->add_child("plugins"));
       xmlpp::Element* e_snd(e_plug->add_child("sndfile"));
       e_snd->set_attribute("name", hashname);
