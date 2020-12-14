@@ -142,6 +142,14 @@ build/ov-client_listsounddevs build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+
+## ZITA stuff:
+zita-resampler-build:
+	$(MAKE) -C zita/zita-resampler-1.6.2/source
+zita-njbridge-build:
+	$(MAKE) -C zita/zita-njbridge-0.4.4/source
+##TODO: @alessandro: Let zita-njbridge build binaries into build dir
+
 ## TASCAR stuff:
 
 tascar: tscver tascar/Makefile
