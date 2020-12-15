@@ -139,12 +139,20 @@ void ov_client_digitalstage_t::service()
     } else {
       try {
         nlohmann::json j = nlohmann::json::parse(ret_str);
-        std::cout << "/----------------------Event--------------------------/"
+        ucout << "/----------------------Event--------------------------/"
                   << std::endl;
-        std::cout << j["data"].dump(4) << std::endl;
+        ucout << j["data"].dump(4) << std::endl;
+
+        if (j["data"][0] == "stage-joined" )
+        {
+          ucout << "\n/------------  STAGE_JOINED "
+                       "--------------------------/\n"
+                    << std::endl;
+        }
+
 
         if(j["data"] == "stage-member-audio-added") {
-          std::cout << "/------------  STAGE_MEMBER_AUDIO_ADDED_EVENT   "
+          ucout << "/------------  STAGE_MEMBER_AUDIO_ADDED_EVENT   "
                        "--------------------------/"
                     << std::endl;
         }
