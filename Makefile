@@ -89,8 +89,8 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
-		#CXXFLAGS += -I/usr/local/opt/openssl@1.1/include/openssl -I/usr/local/opt/openssl/include
-		#LDFLAGS += -L/usr/local/opt/openssl@1.1/lib -L/usr/local/opt/openssl/lib
+		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include
+		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(OPENSSL_ROOT)/lib
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)

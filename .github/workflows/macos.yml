@@ -15,4 +15,4 @@ jobs:
     - name: dependencies
       run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl
     - name: make
-      run: make
+      run: ./build_osx.sh
