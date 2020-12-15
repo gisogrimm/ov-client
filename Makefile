@@ -88,9 +88,9 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
-		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lssl -lcrypto -lboost_filesystem
-		CXXFLAGS += -I/usr/local/opt/openssl@1.1/include/openssl
-		LDFLAGS += -L/usr/local/opt/openssl@1.1/lib
+		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
+		#CXXFLAGS += -I/usr/local/opt/openssl@1.1/include/openssl -I/usr/local/opt/openssl/include
+		#LDFLAGS += -L/usr/local/opt/openssl@1.1/lib -L/usr/local/opt/openssl/lib
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -141,6 +141,14 @@ build/ov-client_listsounddevs build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/
 
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+## ZITA stuff:
+zita-resampler-build:
+	$(MAKE) -C zita/zita-resampler-1.6.2/source
+zita-njbridge-build:
+	$(MAKE) -C zita/zita-njbridge-0.4.4/source
+##TODO: @alessandro: Let zita-njbridge build binaries into build dir
 
 ## TASCAR stuff:
 
