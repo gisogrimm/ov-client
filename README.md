@@ -1,5 +1,8 @@
 # ov-client
 
+![Ubuntu make](https://github.com/gisogrimm/ov-client/workflows/Ubuntu%20make/badge.svg?branch=digital-stage-client)
+![MacOS make](https://github.com/gisogrimm/ov-client/workflows/MacOS%20make/badge.svg?branch=digital-stage-client)
+
 ## Dependencies
 
 This tool requires the TASCAR components libtascar (library),
