@@ -76,11 +76,7 @@ echo $DEP_PATHS
 
 mkdir -p "$LIB"
 # copy each distinct dylib in the dependency tree into our lib folder
-echo "$DEP_PATHS" \
-| xargs -n1 realpath \
-| sort \
-| uniq \
-| xargs -I'{}' cp {} "$LIB/"
+echo "$DEP_PATHS" \ xargs -n1 realpath \ sort \ uniq \ xargs -I'{}' cp {} "$LIB/"
 
 chmod +w "$LIB"/*.dylib
 
