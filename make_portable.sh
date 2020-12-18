@@ -74,7 +74,7 @@ DEP_PATHS=$(get_env_specific_dependencies_recursive "$BINARY")
 
 echo $DEP_PATHS
 
-#mkdir -p "$LIB"
+mkdir -p "$LIB"
 # copy each distinct dylib in the dependency tree into our lib folder
 echo "$DEP_PATHS" \
 | xargs -n1 realpath \

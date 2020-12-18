@@ -17,7 +17,7 @@ jobs:
     - name: make
       run: ./build_osx.sh
     - name: packlibs
-      run: ./make_portable.sh
+      run: ./make_portable.sh ./build/ov-client
     - uses: actions/upload-artifact@v2
       with:
         name: osx-build
