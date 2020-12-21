@@ -22,13 +22,16 @@ using namespace concurrency::streams;
 using json = nlohmann::json;
 
 boost::filesystem::path ds_config_path;
+
+// auth data
 std::string email;
 std::string password;
 std::string jwt;
 
-nlohmann::json user; //jsonObject for user data
+nlohmann::json user;  //jsonObject for user data
+nlohmann::json stage; //jsonObject for joined d-s stage
 
-task_completion_event<void> tce;
+task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
@@ -57,9 +60,9 @@ void ov_client_digitalstage_t::start_service()
 void ov_client_digitalstage_t::stop_service()
 {
   runservice = false;
-  tce.set();
-  wsclient.close();
-  servicethread.join();
+  tce.set(); // task completion event is set closing wss listening task
+  wsclient.close(); // wss client is closed
+  servicethread.join(); // thread is joined
 }
 
 void ov_client_digitalstage_t::service()
@@ -127,6 +130,8 @@ void ov_client_digitalstage_t::service()
 
   auto receive_task = create_task(tce);
 
+
+  // handler for incoming d-s messages
   wsclient.set_message_handler([&](websocket_incoming_message ret_msg) {
 
 // -----------------------------------------------
@@ -206,9 +211,11 @@ void ov_client_digitalstage_t::service()
 
         if (j["data"][0] == "stage-joined" )
         {
-          ucout << "\n/------------  STAGE_JOINED "
-                       "--------------------------/\n"
-                    << std::endl;
+          ucout << "\n/--  STAGE_JOINED --/\n" << std::endl;
+          // put stage data into our stage jsonObject
+          stage = j["data"][1];
+          // print our stage
+          ucout << "STAGE:\n" << stage.dump(4) << std::endl;
         }
 
 // ------------------------------------------
@@ -263,6 +270,9 @@ void ov_client_digitalstage_t::service()
   wsclient.send(msg).wait();
   receive_task.wait();
 
+  // this part is never reached as receive_task.wait() is blocking the thread
+  // until ov_client_digitalstage_t::stop_service() is called
+  // this part is for reference only ! @Giso we can delete the while loop
   while(runservice) {
     std::cerr << "Error: not yet implemented." << std::endl;
     quitrequest_ = true;
