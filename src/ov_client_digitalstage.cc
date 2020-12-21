@@ -26,6 +26,8 @@ std::string email;
 std::string password;
 std::string jwt;
 
+nlohmann::json user; //jsonObject for user data
+
 task_completion_event<void> tce;
 websocket_callback_client wsclient;
 
@@ -66,7 +68,7 @@ void ov_client_digitalstage_t::service()
   // download_file(lobby + "/announce.flac", "announce.flac");
   // start main control loop:
 
-  std::cout << "CHECK - digital-stage config file " << std::endl;
+  ucout << "CHECK - digital-stage config file " << std::endl;
 
   if(boost::filesystem::exists("ds-config")) {
     std::cout << "OK - digital-stage config file FOUND  " << std::endl;
@@ -126,6 +128,21 @@ void ov_client_digitalstage_t::service()
   auto receive_task = create_task(tce);
 
   wsclient.set_message_handler([&](websocket_incoming_message ret_msg) {
+
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----    parse incoming message events    -----
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+// -----------------------------------------------
+
     auto ret_str = ret_msg.extract_string().get();
     // ucout << "ret_str " << to_string_t(ret_str) << "\n";
 
@@ -143,6 +160,50 @@ void ov_client_digitalstage_t::service()
                   << std::endl;
         ucout << j["data"].dump(4) << std::endl;
 
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// -----    user ready    -----
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// ----------------------------
+
+        if (j["data"][0] == "user-ready")
+        {
+          ucout << "\n/--  USER_READY --/\n" << std::endl;
+          ucout << j["data"][1].dump(4)      << std::endl;
+
+          //we get user data from incoming json event message
+          //and put the data into user json object for later use
+          user = j["data"][1];
+          // we can get single json entry fron nlohmann::json like this:
+          ucout << "_id:  " << user["_id"]   << std::endl;
+
+          // or we can dump nlohmann::json objects like this:
+          ucout << "user:  " << user.dump(4) << std::endl;
+
+        }
+
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// -----    stage joined    -----
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+
         if (j["data"][0] == "stage-joined" )
         {
           ucout << "\n/------------  STAGE_JOINED "
@@ -150,6 +211,19 @@ void ov_client_digitalstage_t::service()
                     << std::endl;
         }
 
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// -----    stage member audio added    -----
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
+// ------------------------------------------
 
         if(j["data"] == "stage-member-audio-added") {
           ucout << "/------------  STAGE_MEMBER_AUDIO_ADDED_EVENT   "
@@ -157,15 +231,7 @@ void ov_client_digitalstage_t::service()
                     << std::endl;
         }
 
-        // switch (j["data"])
-        //{
-        // case "stage-member-audio-added":
-        //    std::cout << j["data"]["stage-member-audio-added"].dump(4) <<
-        //    std::endl; break;
 
-        // default:
-        //    break;
-        //}
       }
       catch( const std::exception& e) {
         std::cerr << "std::exception: " << e.what() << std::endl;
@@ -175,20 +241,7 @@ void ov_client_digitalstage_t::service()
       }
     }
 
-    // json j = json::parse(ret_str);
-    // std::cout << j.dump(4) << std::endl;
-    // json payload = ;
-    // switch (payload[])
-    //{
-    // case /* constant-expression */:
-    //    /* code */
-    //    break;
 
-    // default:
-    //    break;
-    //}
-
-    // tce.set(); // this closes the task and fire client.close event
   });
 
   utility::string_t close_reason;
