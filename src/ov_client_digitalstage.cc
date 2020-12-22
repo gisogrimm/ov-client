@@ -237,6 +237,8 @@ if (j["data"][0] == "user-changed")
           stage = j["data"][1];
           // print our stage
           ucout << "STAGE:\n" << stage.dump(4) << std::endl;
+
+          // here we shall probably start a new tascar renderer
         }
 
 
