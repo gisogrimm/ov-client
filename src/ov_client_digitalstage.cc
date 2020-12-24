@@ -239,18 +239,28 @@ if (j["data"][0] == "user-changed")
 
           //print sound_cards jsonObject array
           ucout << "sound_cards:\n" << sound_cards.dump(4) << std::endl;
-
         }
 // ------------------------------
 // -----    device-added    -----
 // ------------------------------
 
 
- if (j["data"][0] == "device-aded")
+        if (j["data"][0] == "device-added")
         {
           ucout << "\n/--  DEVICE_ADDED --/\n" << std::endl;
           ucout << j["data"][1].dump(4)        << std::endl;
+        }
 
+// --------------------------------
+// -----    device-changed    -----
+// --------------------------------
+        if (j["data"][0] == "device-changed")
+        {
+          ucout << "\n/--  DEVICE_CHANGED --/\n" << std::endl;
+          ucout << j["data"][1].dump(4)          << std::endl;
+
+          // TODO:manage device-changed event; perhaps here there is a functions
+          //      events mismatch for sound-card and device ?
 
         }
 
@@ -307,7 +317,7 @@ if (j["data"][0] == "user-changed")
 
 
 // ------------------------------------------
-// -----    stage member audio added    -----
+// -----    stage-member-audio-added    -----
 // ------------------------------------------
 
 
