@@ -31,6 +31,8 @@ std::string jwt;
 nlohmann::json user;        //jsonObject for user data
 nlohmann::json stage;       //jsonObject for joined d-s stage
 nlohmann::json sound_cards; //jsonObject containing sound cards
+nlohmann::json stages;      //jsonObject containing stages
+
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
@@ -236,11 +238,26 @@ if (j["data"][0] == "user-changed")
  if (j["data"][0] == "device-aded")
         {
           ucout << "\n/--  DEVICE_ADDED --/\n" << std::endl;
-          ucout << j["data"][1].dump(4)      << std::endl;
+          ucout << j["data"][1].dump(4)        << std::endl;
 
 
         }
 
+// -----------------------------
+// -----    stage-added    -----
+// -----------------------------
+        if (j["data"][0] == "stage-added")
+        {
+          ucout << "\n/--  STAGE_ADDED --/\n" << std::endl;
+          ucout << j["data"][1].dump(4)       << std::endl;
+
+          // we add the sound-card to sound_cards inMemory array jsonObject
+          stages.push_back(j["data"][1]);
+
+          //print sound_cards jsonObject array
+          ucout << "stages:\n" << stages.dump(4) << std::endl;
+
+        }
 
 // ------------------------------
 // -----    stage joined    -----
