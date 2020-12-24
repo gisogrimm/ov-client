@@ -321,10 +321,18 @@ if (j["data"][0] == "user-changed")
 // ------------------------------------------
 
 
-        if(j["data"] == "stage-member-audio-added") {
-          ucout << "/------------  STAGE_MEMBER_AUDIO_ADDED_EVENT   "
-                       "--------------------------/"
-                    << std::endl;
+        if(j["data"] == "stage-member-audio-added")
+        {
+          ucout << "/-- STAGE_MEMBER_AUDIO_ADDED_EVENT --/" << std::endl;
+        }
+
+// --------------------------------------
+// -----    stage-member-changed    -----
+// --------------------------------------
+
+        if(j["data"] == "stage-member-changed")
+        {
+          ucout << "/-- STAGE_MEMBER_CHANGED --/" << std::endl;
         }
 
 // dP""b8 88""Yb  dP"Yb  88   88 88""Yb
