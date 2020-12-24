@@ -31,8 +31,8 @@ std::string jwt;
 nlohmann::json user;        //jsonObject for user data
 nlohmann::json stage;       //jsonObject for joined d-s stage
 nlohmann::json sound_cards; //jsonObject containing sound cards
-nlohmann::json stages;      //jsonObject containing stages
-
+nlohmann::json stages;      //jsonObject containing d-s stages
+nlohmann::json groups;      //jsonObject containing d-s groups
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
@@ -160,6 +160,11 @@ void ov_client_digitalstage_t::service()
                   << std::endl;
         ucout << j["data"].dump(4) << std::endl;
 
+//##============================================================================
+//##                                                                          ##
+//##                                   USER                                   ##
+//##                                                                          ##
+//##============================================================================
 
 // ----------------------------
 // -----    user ready    -----
@@ -213,6 +218,11 @@ if (j["data"][0] == "user-changed")
 
         }
 
+//##===========================================================================
+//##                                                                         ##
+//##                                 SOUND CARD                              ##
+//##                                                                         ##
+//##===========================================================================
 
 // ----------------------------------
 // -----    sound-card-added    -----
@@ -243,6 +253,12 @@ if (j["data"][0] == "user-changed")
 
         }
 
+//##============================================================================
+//##                                                                          ##
+//##                                   STAGE                                  ##
+//##                                                                          ##
+//##============================================================================
+
 // -----------------------------
 // -----    stage-added    -----
 // -----------------------------
@@ -251,7 +267,7 @@ if (j["data"][0] == "user-changed")
           ucout << "\n/--  STAGE_ADDED --/\n" << std::endl;
           ucout << j["data"][1].dump(4)       << std::endl;
 
-          // we add the sound-card to sound_cards inMemory array jsonObject
+          // we add the stage to the stages inMemory array jsonObject
           stages.push_back(j["data"][1]);
 
           //print sound_cards jsonObject array
@@ -301,7 +317,27 @@ if (j["data"][0] == "user-changed")
                     << std::endl;
         }
 
+//##============================================================================
+//##                                                                          ##
+//##                                   GROUP                                  ##
+//##                                                                          ##
+//##============================================================================
 
+// -----------------------------
+// -----    group-added    -----
+// -----------------------------
+        if (j["data"][0] == "group-added")
+        {
+          ucout << "\n/--  GROUP_ADDED --/\n" << std::endl;
+          ucout << j["data"][1].dump(4)       << std::endl;
+
+          // we add the group to groups inMemory array jsonObject
+          groups.push_back(j["data"][1]);
+
+          //print groups jsonObject array
+          ucout << "groups:\n" << groups.dump(4) << std::endl;
+
+        }
 
 
       }
