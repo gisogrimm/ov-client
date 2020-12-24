@@ -28,11 +28,12 @@ std::string email;
 std::string password;
 std::string jwt;
 
-nlohmann::json user;        //jsonObject for user data
-nlohmann::json stage;       //jsonObject for joined d-s stage
-nlohmann::json sound_cards; //jsonObject containing sound cards
-nlohmann::json stages;      //jsonObject containing d-s stages
-nlohmann::json groups;      //jsonObject containing d-s groups
+nlohmann:: json user;           //jsonObject for user data
+nlohmann:: json stage;          //jsonObject for joined d-s stage
+nlohmann:: json sound_cards;    //jsonObject containing sound cards
+nlohmann:: json stages;         //jsonObject containing d-s stages
+nlohmann:: json groups;         //jsonObject containing d-s groups
+nlohmann:: json track_presets;  //jsonObject containing d-s track presets
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
@@ -160,11 +161,10 @@ void ov_client_digitalstage_t::service()
                   << std::endl;
         ucout << j["data"].dump(4) << std::endl;
 
-//##============================================================================
-//##                                                                          ##
-//##                                   USER                                   ##
-//##                                                                          ##
-//##============================================================================
+//88   88 .dP"Y8 888888 88""Yb
+//88   88 `Ybo." 88__   88__dP
+//Y8   8P o.`Y8b 88""   88"Yb
+//`YbodP' 8bodP' 888888 88  Yb
 
 // ----------------------------
 // -----    user ready    -----
@@ -205,6 +205,11 @@ if (j["data"][0] == "user-changed")
 
         }
 
+//8888b.  888888 Yb    dP 88  dP""b8 888888
+// 8I  Yb 88__    Yb  dP  88 dP   `" 88__
+// 8I  dY 88""     YbdP   88 Yb      88""
+//8888Y"  888888    YP    88  YboodP 888888
+
 
 // ------------------------------------
 // -----    local-device-ready    -----
@@ -218,11 +223,7 @@ if (j["data"][0] == "user-changed")
 
         }
 
-//##===========================================================================
-//##                                                                         ##
-//##                                 SOUND CARD                              ##
-//##                                                                         ##
-//##===========================================================================
+
 
 // ----------------------------------
 // -----    sound-card-added    -----
@@ -253,11 +254,10 @@ if (j["data"][0] == "user-changed")
 
         }
 
-//##============================================================================
-//##                                                                          ##
-//##                                   STAGE                                  ##
-//##                                                                          ##
-//##============================================================================
+//.dP"Y8 888888    db     dP""b8 888888
+//`Ybo."   88     dPYb   dP   `" 88__
+//o.`Y8b   88    dP__Yb  Yb  "88 88""
+//8bodP'   88   dP""""Yb  YboodP 888888
 
 // -----------------------------
 // -----    stage-added    -----
@@ -317,11 +317,10 @@ if (j["data"][0] == "user-changed")
                     << std::endl;
         }
 
-//##============================================================================
-//##                                                                          ##
-//##                                   GROUP                                  ##
-//##                                                                          ##
-//##============================================================================
+// dP""b8 88""Yb  dP"Yb  88   88 88""Yb
+//dP   `" 88__dP dP   Yb 88   88 88__dP
+//Yb  "88 88"Yb  Yb   dP Y8   8P 88"""
+// YboodP 88  Yb  YbodP  `YbodP' 88
 
 // -----------------------------
 // -----    group-added    -----
@@ -339,6 +338,27 @@ if (j["data"][0] == "user-changed")
 
         }
 
+//888888 88""Yb    db     dP""b8 88  dP
+//  88   88__dP   dPYb   dP   `" 88odP
+//  88   88"Yb   dP__Yb  Yb      88"Yb
+//  88   88  Yb dP""""Yb  YboodP 88  Yb
+
+// ------------------------------------
+// -----    track-preset-added    -----
+// ------------------------------------
+        if (j["data"][0] == "track-preset-added")
+        {
+          ucout << "\n/--  TRACK_PRESET_ADDED --/\n" << std::endl;
+          ucout << j["data"][1].dump(4)              << std::endl;
+
+          // we add the group to groups inMemory array jsonObject
+          track_presets.push_back(j["data"][1]);
+
+          //print groups jsonObject array
+          ucout << "track-presets:\n" << track_presets.dump(4) << std::endl;
+
+        }
+
 
       }
       catch( const std::exception& e) {
@@ -348,6 +368,7 @@ if (j["data"][0] == "user-changed")
         std::cerr << "error parsing" << std::endl;
       }
     }
+
 
 
 
