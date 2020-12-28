@@ -33,10 +33,6 @@ pipeline {
                     agent {label              "bionic && x86_64 && tascardev"}
                     steps {tascar_build_steps("bionic && x86_64 && tascardev")}
                 }
-                stage(                        "xenial && x86_64 && tascardev") {
-                    agent {label              "xenial && x86_64 && tascardev"}
-                    steps {tascar_build_steps("xenial && x86_64 && tascardev")}
-                }
 		stage(                        "bionic && armv7 && tascardev") {
                     agent {label              "bionic && armv7 && tascardev"}
                     steps {tascar_build_steps("bionic && armv7 && tascardev")}
@@ -51,7 +47,6 @@ pipeline {
                 // receive all deb packages from tascarpro build
                 unstash "x86_64_focal"
                 unstash "x86_64_bionic"
-                unstash "x86_64_xenial"
                 unstash "armv7_bionic"
 	
                 // Copies the new debs to the stash of existing debs,
