@@ -9,6 +9,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <udpsocket.h>
 
 using namespace utility;
 using namespace web;
@@ -22,6 +23,7 @@ using namespace concurrency::streams;
 using json = nlohmann::json;
 
 boost::filesystem::path ds_config_path;
+
 
 // auth data
 std::string email;
@@ -107,6 +109,10 @@ void ov_client_digitalstage_t::service()
       return;
     }
   }
+
+  std::string macaddress(getmacaddr());
+
+  std::cout << "MAC Address: " << macaddress << '\n';
 
   std::string url_ = "https://auth.digital-stage.org/login?email=" + email +
                      "&password=" + password;
