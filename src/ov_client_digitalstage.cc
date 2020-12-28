@@ -37,7 +37,7 @@ nlohmann:: json stage_members;  //jsonObject containing joined d-s stage-members
 nlohmann:: json stages;         //jsonObject containing d-s stages
 nlohmann:: json groups;         //jsonObject containing d-s groups
 nlohmann:: json track_presets;  //jsonObject containing d-s track presets
-nlhomann:: json sound_cards;    //jsonObject array with sound_cards
+nlohmann:: json sound_cards;    //jsonObject array with sound_cards
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
