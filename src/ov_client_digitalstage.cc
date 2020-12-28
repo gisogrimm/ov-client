@@ -112,9 +112,7 @@ void ov_client_digitalstage_t::service()
     }
   }
 
-  std::string macaddress(getmacaddr());
 
-  std::cout << "MAC Address: " << macaddress << '\n';
 
   std::string url_ = "https://auth.digital-stage.org/login?email=" + email +
                      "&password=" + password;
@@ -165,9 +163,9 @@ void ov_client_digitalstage_t::service()
     } else {
       try {
         nlohmann::json j = nlohmann::json::parse(ret_str);
-        ucout << "/----------------------Event--------------------------/"
-                  << std::endl;
-        ucout << j["data"].dump(4) << std::endl;
+        //ucout << "/----------------------Event--------------------------/"
+        //          << std::endl;
+        //ucout << j["data"].dump(4) << std::endl;
 
 //88   88 .dP"Y8 888888 88""Yb
 //88   88 `Ybo." 88__   88__dP
@@ -435,10 +433,38 @@ if (j["data"][0] == "user-changed")
           << std::endl;
   });
 
+
+  std::string macaddress(getmacaddr());
+
+  std::cout << "MAC Address: " << macaddress << '\n';
+
+
   nlohmann::json token_json;
+
+  nlohmann::json deviceJson;
+
+  deviceJson["mac"] = macaddress;
+  deviceJson["canVideo"] = false;
+  deviceJson["canAudio"] = true;
+  deviceJson["canOv"]    = true;
+  deviceJson["sendAudio"]= true;
+  deviceJson["sendVideo"]= false;
+  deviceJson["receiveAudio"] = true;
+  deviceJson["receiveVideo"] = false;
+  deviceJson["inputVideoDevices"] = nlohmann::json::array();
+  deviceJson["inputAudioDevices"] = nlohmann::json::array();
+  deviceJson["outputAudioDevices"] = nlohmann::json::array();
+  deviceJson["soundCardIds"] = nlohmann::json::array();
+
+  ucout << "Print device json string: \n" + deviceJson.dump() << std::endl;
+  ucout << "PrettyPrint device json: \n" + deviceJson.dump(4) << std::endl;
+
 
   std::string body_str("{\"type\":0,\"data\":[\"token\",{\"token\":\"" + jwt +
                        "\"}]}");
+
+
+  ucout << "token / device msg: " << body_str << std::endl;
   websocket_outgoing_message msg;
   msg.set_utf8_message(body_str);
   wsclient.send(msg).wait();
