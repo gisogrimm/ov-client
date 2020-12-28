@@ -439,7 +439,7 @@ if (j["data"][0] == "user-changed")
   std::cout << "MAC Address: " << macaddress << '\n';
 
 
-  nlohmann::json token_json;
+  nlohmann::json tokenJson;
 
   nlohmann::json deviceJson;
 
@@ -459,6 +459,10 @@ if (j["data"][0] == "user-changed")
   ucout << "Print device json string: \n" + deviceJson.dump() << std::endl;
   ucout << "PrettyPrint device json: \n" + deviceJson.dump(4) << std::endl;
 
+  tokenJson["token"] = jwt;
+  tokenJson["device"] = deviceJson;
+
+  ucout << "PrettyPrint tokenJson: \n" + tokenJson.dump(4) << std::endl;
 
   std::string body_str("{\"type\":0,\"data\":[\"token\",{\"token\":\"" + jwt +
                        "\"}]}");
