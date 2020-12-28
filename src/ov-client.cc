@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
+#include <boost/filesystem.hpp>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -20,6 +21,10 @@ int main(int argc, char** argv)
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
+
+  boost::filesystem::path selfpath=argv[0];
+
+
   try {
     std::string deviceid(getmacaddr());
     std::string lobby("http://oldbox.orlandoviols.com/");
@@ -96,7 +101,7 @@ int main(int argc, char** argv)
       ovclient = new ov_client_orlandoviols_t(render, lobby);
       break;
     case FRONTEND_DS:
-      ovclient = new ov_client_digitalstage_t(render, lobby);
+      ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
       break;
     }
     if(verbose)

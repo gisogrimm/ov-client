@@ -2,7 +2,7 @@ name: MacOS make
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, digital-stage-client ]
 
 jobs:
   build:
@@ -13,6 +13,12 @@ jobs:
     - name: fetchtags
       run: git fetch --unshallow --tags
     - name: dependencies
-      run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate
+      run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils
     - name: make
-      run: make
+      run: ./build_osx.sh
+    #- name: packlibs
+    #  run: USE_RPATH=1 ./make_portable.sh ./build/ov-client
+    - uses: actions/upload-artifact@v2
+      with:
+        name: osx-build
+        path: build/*

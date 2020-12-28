@@ -37,6 +37,9 @@ LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl
 
+# libcpprest dependencies:
+LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+
 #libov submodule:
 CXXFLAGS += -Ilibov/src
 LDLIBS += -lov
@@ -54,7 +57,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
   jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
   speakerarray.o spectrum.o fft.o stft.o ola.o
 
-TASCARDMXOBJECTS = 
+TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
 
@@ -84,8 +87,10 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
-		LDFLAGS += -framework IOKit
-		LDLIBS += -lfftw3f -lsamplerate
+		LDFLAGS += -framework IOKit -framework CoreFoundation
+		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
+		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include
+		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(OPENSSL_ROOT)/lib
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -136,6 +141,14 @@ build/ov-client_listsounddevs build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/
 
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+## ZITA stuff:
+zita-resampler-build:
+	$(MAKE) -C zita/zita-resampler-1.6.2/source
+zita-njbridge-build:
+	$(MAKE) -C zita/zita-njbridge-0.4.4/source
+##TODO: @alessandro: Let zita-njbridge build binaries into build dir
 
 ## TASCAR stuff:
 

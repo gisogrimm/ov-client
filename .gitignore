@@ -42,3 +42,5 @@ build
 announce.flac
 *debugsession.tsc
 *.firmwareupdate
+
+ds-config
