@@ -31,11 +31,13 @@ std::string password;
 std::string jwt;
 
 nlohmann:: json user;           //jsonObject for user data
+
 nlohmann:: json stage;          //jsonObject for joined d-s stage
-nlohmann:: json sound_cards;    //jsonObject containing sound cards
+nlohmann:: json stage_members;  //jsonObject containing joined d-s stage-members
 nlohmann:: json stages;         //jsonObject containing d-s stages
 nlohmann:: json groups;         //jsonObject containing d-s groups
 nlohmann:: json track_presets;  //jsonObject containing d-s track presets
+nlhomann:: json sound_cards;    //jsonObject array with sound_cards
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
@@ -286,7 +288,7 @@ if (j["data"][0] == "user-changed")
           // we add the stage to the stages inMemory array jsonObject
           stages.push_back(j["data"][1]);
 
-          //print sound_cards jsonObject array
+          //print stages jsonObject array
           ucout << "stages:\n" << stages.dump(4) << std::endl;
 
         }
@@ -321,6 +323,22 @@ if (j["data"][0] == "user-changed")
           ucout << "STAGE:\n" << stage.dump(4) << std::endl;
         }
 
+//8b    d8 888888 8b    d8 88""Yb 888888 88""Yb .dP"Y8
+//88b  d88 88__   88b  d88 88__dP 88__   88__dP `Ybo."
+//88YbdP88 88""   88YbdP88 88""Yb 88""   88"Yb  o.`Y8b
+//88 YY 88 888888 88 YY 88 88oodP 888888 88  Yb 8bodP'
+
+// -------------------------------
+// -----  stage-member-added -----
+// -------------------------------
+        if(j["data"] == "stage-member-added")
+        {
+          ucout << "/-- STAGE_MEMBER_ADDED_EVENT --/" << std::endl;
+          stage_members.push_back(j["data"][1]);
+
+          //print stage_members jsonObject array
+          ucout << "stage-members:\n" << stage_members.dump(4) << std::endl;
+        }
 
 // ------------------------------------------
 // -----    stage-member-audio-added    -----
@@ -329,7 +347,7 @@ if (j["data"][0] == "user-changed")
 
         if(j["data"] == "stage-member-audio-added")
         {
-          ucout << "/-- STAGE_MEMBER_AUDIO_ADDED_EVENT --/" << std::endl;
+          ucout << "/-- STAGE_MEMBER_AUDIO_ADDED --/" << std::endl;
         }
 
 // --------------------------------------
@@ -340,6 +358,15 @@ if (j["data"][0] == "user-changed")
         {
           ucout << "/-- STAGE_MEMBER_CHANGED --/" << std::endl;
         }
+
+// --------------------------------------
+// -----    stage-member-removed    -----
+// --------------------------------------
+        if(j["data"] == "stage-member-removed")
+        {
+          ucout << "/-- STAGE_MEMBER_REMOVED --/" << std::endl;
+        }
+
 
 // dP""b8 88""Yb  dP"Yb  88   88 88""Yb
 //dP   `" 88__dP dP   Yb 88   88 88__dP
