@@ -84,7 +84,7 @@ std::string url2localfilename(const std::string& url)
   return std::to_string(std::hash<std::string>{}(url)) + extension;
 }
 
-
+//grab the output of a command in string format
 std::string GetStdoutFromCommand(std::string cmd) {
 
   std::string data;

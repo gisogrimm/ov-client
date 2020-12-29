@@ -465,10 +465,12 @@ if (j["data"][0] == "user-changed")
   ucout << "Print device json string: \n" + deviceJson.dump() << std::endl;
   ucout << "PrettyPrint device json: \n" + deviceJson.dump(4) << std::endl;
 
-
+#ifdef __APPLE__
+  //get string from jackd coreaudio list of devices
   std::string jackDevices = GetStdoutFromCommand("jackd -d coreaudio --list-devices");
-
+  //print list
   ucout << "Jack Devices : " << jackDevices << std::endl;
+#endif // __APPLE__
 
   tokenJson["token"] = jwt;
   tokenJson["device"] = deviceJson;
