@@ -1,4 +1,5 @@
 #include "ov_client_digitalstage.h"
+#include "soundcardtools.h"
 #include <boost/filesystem.hpp>
 #include <cpprest/filestream.h>
 #include <cpprest/http_client.h>
@@ -10,6 +11,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <udpsocket.h>
+
 
 using namespace utility;
 using namespace web;
@@ -41,6 +43,10 @@ nlohmann:: json sound_cards;    //jsonObject array with sound_cards
 
 task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
+
+
+
+
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
     ov_render_base_t& backend, const std::string& frontend_url_,
@@ -458,6 +464,11 @@ if (j["data"][0] == "user-changed")
 
   ucout << "Print device json string: \n" + deviceJson.dump() << std::endl;
   ucout << "PrettyPrint device json: \n" + deviceJson.dump(4) << std::endl;
+
+
+  std::string jackDevices = GetStdoutFromCommand("jackd -d coreaudio --list-devices");
+
+  ucout << "Jack Devices : " << jackDevices << std::endl;
 
   tokenJson["token"] = jwt;
   tokenJson["device"] = deviceJson;
