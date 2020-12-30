@@ -61,7 +61,7 @@ TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
 
-TASCARMODULS = system touchosc waitforjackport route
+TASCARMODULS = system touchosc waitforjackport route jackrec
 
 TASCARAUDIOPLUGS = sndfile delay
 

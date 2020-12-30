@@ -3,6 +3,7 @@ build/ov-client,usr/bin
 build/ov-client_hostname,usr/bin
 build/ov-client_listsounddevs,usr/bin
 build/ov-headtracker,usr/bin
+jackrec.html,usr/share/ovclient
 node_modules,usr/share/ovclient
 ovclient.css,usr/share/ovclient
 ovclient.js,usr/share/ovclient

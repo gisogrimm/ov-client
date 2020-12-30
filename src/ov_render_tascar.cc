@@ -194,6 +194,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   }
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+  e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
   e_mods->add_child("touchosc");
   // create zita-n2j receivers:
   for(auto stagemember : stage.stage) {
@@ -332,6 +334,8 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
   std::vector<std::string> waitports;
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+  e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
   e_mods->add_child("touchosc");
   //
   uint32_t chcnt(0);
@@ -526,6 +530,8 @@ void ov_render_tascar_t::start_session()
         e_sndfile->set_attribute("resample", "true");
         e_sndfile->set_attribute("loop", "0");
         xmlpp::Element* e_mods(e_session->add_child("modules"));
+        xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+        e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
         e_mods->add_child("touchosc");
       }
     } else {

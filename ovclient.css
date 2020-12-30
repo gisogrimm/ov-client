@@ -85,4 +85,41 @@ button {
     background-color: #383838;
     padding: 20px;
 }
-
+.jackrec {
+    background-color: #a0a0a0;
+    margin: 30px;
+    padding: 10px;
+}
+.jackrecctl {
+    padding: 10px;
+    margin: 10px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #000000;
+}
+.jackrecerr {
+    color: #800000;
+    font-weight: bold;
+}
+.filelist {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #000000;
+    margin: 10px;
+    padding: 10px;
+}
+.portlist {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #000000;
+    margin: 10px;
+    padding: 10px;
+}
+.listhead {
+    color: #000;
+    margin: 10px;
+    padding: 10px;
+}
+.ctlbutton {
+    font-size: 28px;
+}

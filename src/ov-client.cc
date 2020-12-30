@@ -1,11 +1,11 @@
 #include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
+#include <boost/filesystem.hpp>
 #include <errmsg.h>
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
-#include <boost/filesystem.hpp>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -22,8 +22,7 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
 
-  boost::filesystem::path selfpath=argv[0];
-
+  boost::filesystem::path selfpath = argv[0];
 
   try {
     std::string deviceid(getmacaddr());

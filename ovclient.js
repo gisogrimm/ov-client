@@ -75,8 +75,73 @@ socket.on("updatefader", function(fader,val){
 	fadt.value=val.toFixed(1);
     }
 });
+
+function str_pad_left(string,pad,length) {
+    return (new Array(length+1).join(pad)+string).slice(-length);
+}
+
+function sec2minsec( t ){
+    var minutes = Math.floor(t / 60);
+    var seconds = Math.floor(t-60*minutes);
+    var sec10 = Math.floor(10*(t-Math.floor(t)));
+    return str_pad_left(minutes,'0',2) + ':' + str_pad_left(seconds,'0',2) + '.' + sec10;
+}
+
+function recerror( e ){
+    let el=document.getElementById("recerr");
+    if( el.childNodes.length > 0 )
+	el.replaceChild(document.createTextNode(e),el.childNodes[0]);
+    else
+	el.appendChild(document.createTextNode(e));
+}
+
+socket.on("jackrecerr", function(e){recerror(e)} );
+
+socket.on("jackrectime", function(t){
+    let el=document.getElementById("rectime");
+    el.setAttribute("value",sec2minsec(t));
+    //el.set_attribute("value",t);
+});
+
+socket.on("jackrecportlist", function(t){
+    let el=document.getElementById("portlist");
+    while (el.firstChild) {el.removeChild(el.firstChild);}
+});
+
+socket.on('jackrecaddport', function(p){
+    let el=document.getElementById("portlist");
+    let div=el.appendChild(document.createElement('div'));
+    let inp=div.appendChild(document.createElement('input'));
+    inp.setAttribute('type','checkbox');
+    inp.setAttribute('value',p);
+    //inp.setAttribute('name',p);
+    inp.setAttribute('class','jackport');
+    let lab=div.appendChild(document.createElement('label'));
+    //lab.setAttribute('for',p);
+    lab.appendChild(document.createTextNode(p));
+});
+
+socket.on("jackrecfilelist", function(t){
+    let el=document.getElementById("filelist");
+    while (el.firstChild) {el.removeChild(el.firstChild);}
+});
+
+socket.on('jackrecaddfile', function(p){
+    let el=document.getElementById("filelist");
+    let div=el.appendChild(document.createElement('div'));
+    let inp=div.appendChild(document.createElement('input'));
+    inp.setAttribute('type','checkbox');
+    inp.setAttribute('value',p);
+    inp.setAttribute('class','filename');
+    let lab=div.appendChild(document.createElement('a'));
+    lab.setAttribute('href',p);
+    lab.appendChild(document.createTextNode(p));
+});
+
 let form = document.getElementById("mixer");
+
 form.oninput = handleChange;
+
 function handleChange(e) {
     if( e.target.id.substr(0,3)=="txt" ){
 	socket.emit("msg", { path: e.target.id.substr(3), value: e.target.valueAsNumber } );
@@ -91,4 +156,34 @@ function handleChange(e) {
 	    fadt.value=val.toFixed(1);
 	}
     }
+}
+
+function jackrec_start() {
+    socket.emit("msg", {path: '/jackrec/clear',value: null});
+    let el=document.getElementById("portlist");
+    let ports=el.getElementsByClassName('jackport');
+    for( var k=0;k<ports.length;k++){
+	if( ports[k].checked ){
+	    socket.emit("msg", {path: '/jackrec/addport',value: ports[k].getAttribute('value')});
+	}
+    }
+    recerror('');
+    socket.emit("msg", {path: '/jackrec/start', value: null} );
+}
+
+function jackrec_delete() {
+    let el=document.getElementById("filelist");
+    let ports=el.getElementsByClassName('filename');
+    for( var k=0;k<ports.length;k++){
+	if( ports[k].checked ){
+	    socket.emit("msg", {path: '/jackrec/rmfile',value: ports[k].getAttribute('value')});
+	}
+    }
+    socket.emit('msg', {path: '/jackrec/listfiles', value: null});
+}
+
+function jackrec_stop() {
+    recerror('');
+    socket.emit("msg", {path: '/jackrec/stop', value: null} );
+    socket.emit('msg', {path: '/jackrec/listfiles', value: null});
 }
