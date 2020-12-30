@@ -114,10 +114,10 @@ socket.on('jackrecaddport', function(p){
     let inp=div.appendChild(document.createElement('input'));
     inp.setAttribute('type','checkbox');
     inp.setAttribute('value',p);
-    //inp.setAttribute('name',p);
-    inp.setAttribute('class','jackport');
+    inp.setAttribute('id',p);
+    inp.setAttribute('class','jackport checkbox');
     let lab=div.appendChild(document.createElement('label'));
-    //lab.setAttribute('for',p);
+    lab.setAttribute('for',p);
     lab.appendChild(document.createTextNode(p));
 });
 
@@ -136,6 +136,16 @@ socket.on('jackrecaddfile', function(p){
     let lab=div.appendChild(document.createElement('a'));
     lab.setAttribute('href',p);
     lab.appendChild(document.createTextNode(p));
+});
+
+socket.on('jackrecstart', function(p){
+    let el=document.getElementById("recindicator");
+    el.style = 'display: inline-block;';
+});
+
+socket.on('jackrecstop', function(p){
+    let el=document.getElementById("recindicator");
+    el.style = 'display: none;';
 });
 
 let form = document.getElementById("mixer");
@@ -180,10 +190,20 @@ function jackrec_delete() {
 	}
     }
     socket.emit('msg', {path: '/jackrec/listfiles', value: null});
+    document.getElementById("selectallfiles").checked = false;
 }
 
 function jackrec_stop() {
     recerror('');
     socket.emit("msg", {path: '/jackrec/stop', value: null} );
     socket.emit('msg', {path: '/jackrec/listfiles', value: null});
+}
+
+function jackrec_selectallfiles() {
+    let ischecked=document.getElementById("selectallfiles").checked;
+    let el=document.getElementById("filelist");
+    let ports=el.getElementsByClassName('filename');
+    for( var k=0;k<ports.length;k++){
+	ports[k].checked = ischecked;
+    }
 }

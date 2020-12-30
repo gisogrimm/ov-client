@@ -105,6 +105,7 @@ button {
     border-width: 2px;
     border-style: solid;
     border-color: #000000;
+    color: #000000;
     margin: 10px;
     padding: 10px;
 }
@@ -112,6 +113,7 @@ button {
     border-width: 2px;
     border-style: solid;
     border-color: #000000;
+    color: #000000;
     margin: 10px;
     padding: 10px;
 }
@@ -122,4 +124,22 @@ button {
 }
 .ctlbutton {
     font-size: 28px;
+}
+.jackport {
+    padding: 10px;
+}
+.rectime {
+    background-color: #003000;
+    color: #30aa30;
+    font-size: 36px;
+    text-align: center;
+    width: 180px;
+}
+.recindicator {
+    display: none;
+    width: 36px;
+    height: 36px;
+    margin: 0px;
+    background-color: #b00000;
+    border-radius: 18px;
 }
