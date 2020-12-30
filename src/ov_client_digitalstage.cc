@@ -45,7 +45,13 @@ task_completion_event<void> tce; // used to terminate async PPLX listening task
 websocket_callback_client wsclient;
 
 
-
+std::string between(std::string const &in,
+                    std::string const &before, std::string const &after) {
+  size_t beg = in.find(before);
+  beg += before.size();
+  size_t end = in.find(after, beg);
+  return in.substr(beg, end-beg);
+}
 
 
 ov_client_digitalstage_t::ov_client_digitalstage_t(
@@ -469,7 +475,37 @@ if (j["data"][0] == "user-changed")
   //get string from jackd coreaudio list of devices
   std::string jackDevices = GetStdoutFromCommand("jackd -d coreaudio --list-devices");
   //print list
-  ucout << "Jack Devices : " << jackDevices << std::endl;
+  //ucout << "\n --- Jack Devices --- \n" << jackDevices << std::endl;
+
+  //define strings used to parse --list-devices
+  std::string jack_device_id_start    = "Device ID = '";
+  std::string jack_device_name_split  = "' name = '";
+  std::string jack_device_internal_name_split = "', internal name = '";
+  std::string jack_device_closing_string = "' (to be used as -C, -P, or -d parameter)";
+
+  size_t pos = 0;
+  std::string token;
+  while ((pos = jackDevices.find(jack_device_closing_string)) != std::string::npos) {
+      //token = between(jackDevices,jack_device_id_start,jack_device_closing_string);
+      //ucout << "TOKEN: " << token << std::endl;
+      ucout << "ID: " << between(jackDevices,jack_device_id_start,jack_device_name_split) << std::endl;
+      ucout << "NAME: " << between(jackDevices,jack_device_name_split,jack_device_internal_name_split) << std::endl;
+      ucout << "INTERNAL NAME: " << between(jackDevices,jack_device_internal_name_split,jack_device_closing_string) << std::endl;
+      //ucout << "pos: " << pos << " token: " << token << std::endl;
+      jackDevices.erase(0, jackDevices.find(jack_device_closing_string) + 1 );
+  }
+
+  //std::string token = between(jackDevices,jack_device_id_start,jack_device_closing_string);
+
+  //size_t pos = 0;
+  //std::string token;
+  //while ((pos = jackDevices.find("'")) != std::string::npos) {
+  //    token = jackDevices.substr(jackDevices.find("'"), jackDevices.find("'"));
+  //    ucout << "pos: " << pos << " token: " << token << std::endl;
+  //    jackDevices.erase(0, pos + 1);
+  //    //ucout << "\n --- Jack Devices --- \n" << jackDevices << std::endl;
+  //}
+
 #endif // __APPLE__
 
   tokenJson["token"] = jwt;
