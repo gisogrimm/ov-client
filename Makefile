@@ -39,7 +39,7 @@ LDLIBS += -ldl
 
 # libcpprest dependencies:
 #LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
-LDLIBS += -lcrypto -lcpprest
+#LDLIBS += -lcrypto -lcpprest
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
