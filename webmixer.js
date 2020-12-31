@@ -4,37 +4,50 @@ var fs = require('fs');
 var iolib = require('socket.io');
 var osc = require('node-osc');
 
-oscClient2 = new osc.Client( 'localhost', 9872 );
+const homedir = require('os').homedir();
+
+//oscClient2 = new osc.Client( 'localhost', 9872 );
 
 httpserver = http.createServer(function (req, res) {
-    if( (req.url != '/') && fs.existsSync('.'+req.url) ){
-	var data = fs.readFileSync('.'+req.url);
-	res.writeHead(200);
-	res.end(data);
-    }else{
-	var hosjs = fs.readFileSync('ovclient.js');
-	var hoscss = fs.readFileSync('ovclient.css');
-	var jackrec = fs.readFileSync('jackrec.html');
-	var devname = os.hostname();
-	try{
-	    devname = fs.readFileSync('devicename');
+    // check if file is in local directory:
+    if( req.url.startsWith('/rec') & req.url.endsWith('.wav') ){
+	// download from local directory:
+	if( fs.existsSync('.'+req.url) ){
+	    var data = fs.readFileSync('.'+req.url);
+	    res.writeHead(200);
+	    res.end(data);
+	    return;
 	}
-	catch(ee){
+	// check in home directory:
+	if( fs.existsSync(homedir+req.url) ){
+	    var data = fs.readFileSync(homedir+req.url);
+	    res.writeHead(200);
+	    res.end(data);
+	    return;
 	}
-	res.writeHead(200, {'Content-Type': 'text/html'});
-	res.write('<!DOCTYPE HTML>\n');
-	res.write('<html><head><style>');
-	res.write(hoscss);
-	res.write('</style><title>ov-client web mixer</title>\n</head><body>\n');
-	res.write('<h1>ov-client ('+devname+')</h1>\n<div id="mixer">mixer</div>\n');
-	res.write('<script src="http://'+os.hostname()+':8080/socket.io/socket.io.js"></script>\n');
-	res.write('<script>\n');
-	res.write('var socket = io("http://'+os.hostname()+':8080");\n');
-	res.write(hosjs);
-	res.write('</script>\n');
-	res.write(jackrec);
-	res.end('</body></html>');
     }
+    var hosjs = fs.readFileSync('ovclient.js');
+    var hoscss = fs.readFileSync('ovclient.css');
+    var jackrec = fs.readFileSync('jackrec.html');
+    var devname = os.hostname();
+    try{
+	devname = fs.readFileSync('devicename');
+    }
+    catch(ee){
+    }
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<!DOCTYPE HTML>\n');
+    res.write('<html><head><style>');
+    res.write(hoscss);
+    res.write('</style><title>ov-client web mixer</title>\n</head><body>\n');
+    res.write('<h1>ov-client ('+devname+')</h1>\n<div id="mixer">mixer</div>\n');
+    res.write('<script src="http://'+os.hostname()+':8080/socket.io/socket.io.js"></script>\n');
+    res.write('<script>\n');
+    res.write('var socket = io("http://'+os.hostname()+':8080");\n');
+    res.write(hosjs);
+    res.write('</script>\n');
+    res.write(jackrec);
+    res.end('</body></html>');
 });
 
 httpserver.listen(8080);
