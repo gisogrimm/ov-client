@@ -99,9 +99,9 @@ int main(int argc, char** argv)
     case FRONTEND_OV:
       ovclient = new ov_client_orlandoviols_t(render, lobby);
       break;
-    case FRONTEND_DS:
-      ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
-      break;
+    //case FRONTEND_DS:
+    //  ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
+    //  break;
     }
     if(verbose)
       std::cout << "starting services\n";

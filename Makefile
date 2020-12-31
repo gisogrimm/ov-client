@@ -10,7 +10,7 @@ showver: libov/Makefile
 	echo $(VERSION)
 
 BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
-OBJ = ov_tools spawn_process ov_client_orlandoviols ov_client_digitalstage	\
+OBJ = ov_tools spawn_process ov_client_orlandoviols 	\
   ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
@@ -38,7 +38,8 @@ CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl
 
 # libcpprest dependencies:
-LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+#LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+LDLIBS += -lcrypto -lcpprest
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
