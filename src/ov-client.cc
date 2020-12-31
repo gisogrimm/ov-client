@@ -1,7 +1,7 @@
 #include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 #include <errmsg.h>
 #include <stdint.h>
 #include <string>
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
 
-  boost::filesystem::path selfpath = argv[0];
+  //boost::filesystem::path selfpath = argv[0];
 
   try {
     std::string deviceid(getmacaddr());
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
                                     {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
-    frontend_t frontend(FRONTEND_OV);
+    //frontend_t frontend(FRONTEND_OV);
     while((opt = getopt_long(argc, argv, options, long_options,
                              &option_index)) != -1) {
       switch(opt) {
@@ -66,14 +66,14 @@ int main(int argc, char** argv)
       case 'n':
         showdevname = true;
         break;
-      case 'f':
-        if(strcmp(optarg, "ov") == 0)
-          frontend = FRONTEND_OV;
-        else if(strcmp(optarg, "ds") == 0)
-          frontend = FRONTEND_DS;
-        else
-          throw ErrMsg("Invalid front end \"" + std::string(optarg) + "\".");
-        break;
+      //case 'f':
+      //  if(strcmp(optarg, "ov") == 0)
+      //    frontend = FRONTEND_OV;
+      //  else if(strcmp(optarg, "ds") == 0)
+      //    frontend = FRONTEND_DS;
+      //  else
+      //    throw ErrMsg("Invalid front end \"" + std::string(optarg) + "\".");
+      //  break;
       }
     }
     if(showdevname) {
@@ -95,14 +95,14 @@ int main(int argc, char** argv)
     if(verbose)
       std::cout << "creating frontend interface for " << lobby << std::endl;
     ov_client_base_t* ovclient(NULL);
-    switch(frontend) {
-    case FRONTEND_OV:
-      ovclient = new ov_client_orlandoviols_t(render, lobby);
-      break;
+    //switch(frontend) {
+    //case FRONTEND_OV:
+    ovclient = new ov_client_orlandoviols_t(render, lobby);
+    //break;
     //case FRONTEND_DS:
     //  ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
     //  break;
-    }
+    //}
     if(verbose)
       std::cout << "starting services\n";
     ovclient->start_service();
