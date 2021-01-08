@@ -10,9 +10,22 @@
     (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
 
     # install dependencies:
-    sudo -E apt update || (sleep 20; sudo -E apt update || (sleep 20; sudo -E apt update) )
-    sudo -E apt upgrade --assume-yes || (sleep 20; sudo -E apt upgrade --assume-yes || (sleep 20; sudo -E apt upgrade --assume-yes) )
-    sudo -E apt install --no-install-recommends --assume-yes ov-client || (sleep 20; sudo -E apt install --no-install-recommends --assume-yes ov-client || (sleep 20; sudo -E apt install --no-install-recommends --assume-yes ov-client) )
+    # retry 10 times because the raspios servers are not very stable:
+    cnt=10
+    while test $cnt -gt 0; do
+	sudo -E apt update && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+    done
+    sync
+    cnt=10
+    while test $cnt -gt 0; do
+	sudo -E apt upgrade --assume-yes && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+    done
+    sync
+    cnt=10
+    while test $cnt -gt 0; do
+	sudo -E apt install --no-install-recommends --assume-yes ov-client libnss-mdns && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+    done
+    sync
 
     # install user to run the scripts - do not provide root priviledges:
     sudo useradd -m -G audio,dialout ov || echo "user already exists."
@@ -39,9 +52,11 @@
 
     # configure country code and prepare WiFi config:
     sudo touch /boot/ovclient-wifi.txt
+    sync
 
     # activate overlay image to avoid damage of the SD card upon power off:
     sudo raspi-config nonint enable_overlayfs
+    sync
 
     # ready, reboot:
     sudo shutdown -r now
