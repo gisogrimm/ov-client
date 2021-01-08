@@ -565,11 +565,14 @@ void ov_render_tascar_t::start_session()
     tascar->start();
     // add web mixer tools (node-js server and touchosc interface):
     std::string command;
+    std::string ipaddr(ep2ipstr(getipaddr()));
+    ipaddr += " '";
+    ipaddr += stage.thisdeviceid + " ("+stage.thisdevice.label+")'";
     if(file_exists("/usr/share/ovclient/webmixer.js")) {
-      command = "(cd /usr/share/ovclient/ && node webmixer.js)";
+      command = "(cd /usr/share/ovclient/ && node webmixer.js "+ipaddr+")";
     }
     if(file_exists("webmixer.js")) {
-      command = "node webmixer.js";
+      command = "node webmixer.js "+ipaddr;
     }
     if(!command.empty())
       h_webmixer = new spawn_process_t(command);

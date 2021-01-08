@@ -29,7 +29,12 @@ httpserver = http.createServer(function (req, res) {
     var hosjs = fs.readFileSync('ovclient.js');
     var hoscss = fs.readFileSync('ovclient.css');
     var jackrec = fs.readFileSync('jackrec.html');
+    var ipaddr = os.hostname();
+    if( process.argv.length > 2 )
+	ipaddr = process.argv[2];
     var devname = os.hostname();
+    if( process.argv.length > 3 )
+	devname = process.argv[3];
     try{
 	devname = fs.readFileSync('devicename');
     }
@@ -40,10 +45,10 @@ httpserver = http.createServer(function (req, res) {
     res.write('<html><head><style>');
     res.write(hoscss);
     res.write('</style><title>ov-client web mixer</title>\n</head><body>\n');
-    res.write('<h1>ov-client ('+devname+')</h1>\n<div id="mixer">mixer</div>\n');
-    res.write('<script src="http://'+os.hostname()+':8080/socket.io/socket.io.js"></script>\n');
+    res.write('<h1>'+devname+'</h1>\n<div id="mixer">mixer</div>\n');
+    res.write('<script src="http://'+ipaddr+':8080/socket.io/socket.io.js"></script>\n');
     res.write('<script>\n');
-    res.write('var socket = io("http://'+os.hostname()+':8080");\n');
+    res.write('var socket = io("http://'+ipaddr+':8080");\n');
     res.write(hosjs);
     res.write('</script>\n');
     res.write(jackrec);

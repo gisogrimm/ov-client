@@ -284,6 +284,7 @@ void ov_client_orlandoviols_t::service()
           std::ofstream ofh("ov-client.firmwareupdate");
           quitrequest_ = true;
         } else {
+	  DEBUG(stagecfg);
           RSJresource js_audio(js_stagecfg["audiocfg"]);
           audio_device_t audio;
           backend.clear_stage();
@@ -294,6 +295,7 @@ void ov_client_orlandoviols_t::service()
           audio.numperiods = js_audio["numperiods"].as<int>(2);
           backend.configure_audio_backend(audio);
           RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
+	  backend.set_thisdev(get_stage_dev(js_rendersettings));
           RSJresource js_stage(js_stagecfg["room"]);
           std::string stagehost(js_stage["host"].as<std::string>(""));
           port_t stageport(js_stage["port"].as<int>(0));
