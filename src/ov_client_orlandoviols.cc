@@ -294,6 +294,10 @@ void ov_client_orlandoviols_t::service()
           audio.periodsize = js_audio["periodsize"].as<int>(96);
           audio.numperiods = js_audio["numperiods"].as<int>(2);
           backend.configure_audio_backend(audio);
+	  if( js_audio["restart"].as<bool>(false) ){
+	    backend.stop_audiobackend();
+	    backend.start_audiobackend();
+	  }
           RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
 	  backend.set_thisdev(get_stage_dev(js_rendersettings));
           RSJresource js_stage(js_stagecfg["room"]);

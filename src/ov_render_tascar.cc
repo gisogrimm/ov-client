@@ -621,6 +621,14 @@ void ov_render_tascar_t::start_audiobackend()
       if(!devs.empty())
         devname = devs.rbegin()->dev;
     }
+    if(audiodevice.devicename == "plughighest") {
+      // the device name is not set, use the last one of available
+      // devices because this is most likely the one to use (e.g.,
+      // external sound card):
+      auto devs(list_sound_devices());
+      if(!devs.empty())
+        devname = std::string("plug")+devs.rbegin()->dev;
+    }
     char cmd[1024];
 #ifdef __APPLE__
     sprintf(cmd,
