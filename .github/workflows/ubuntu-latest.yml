@@ -13,7 +13,7 @@ jobs:
     - name: fetchtags
       run: git fetch --unshallow --tags
     - name: tascar
-      run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7D6CDF547DA4ABD &&
+      run: wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add - &&
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
     - name: dependencies
       run: sudo apt update &&
