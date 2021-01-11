@@ -116,7 +116,9 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                                get_stagedev_name(stagemember.second.id));
         }
         e_src->set_attribute("dlocation", to_string(pos));
-        e_src->set_attribute("dorientation", to_string(rot));
+	xmlpp::Element* e_rot = e_src->add_child("orientation");
+        e_rot->add_child_text("0 " + TASCAR::to_string(rot));
+        // e_src->set_attribute("dorientation", to_string(rot));
         uint32_t kch(0);
         for(auto ch : stagemember.second.channels) {
           // create a sound for each channel:
