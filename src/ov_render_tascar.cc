@@ -323,7 +323,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
       actor.push_back("/*/ego");
       e_head->set_attribute("roturl", "osc.udp://localhost:9870/");
       e_head->set_attribute("rotpath",
-                            "/*/" + get_stagedev_name(thisdev.id) + "/rot");
+                            "/*/" + get_stagedev_name(thisdev.id) + "/zyxeuler");
     }
     e_head->set_attribute("actor", TASCAR::vecstr2str(actor));
     e_head->set_attribute("autoref", "0.001");
