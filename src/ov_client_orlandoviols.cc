@@ -284,7 +284,6 @@ void ov_client_orlandoviols_t::service()
           std::ofstream ofh("ov-client.firmwareupdate");
           quitrequest_ = true;
         } else {
-	  DEBUG(stagecfg);
           RSJresource js_audio(js_stagecfg["audiocfg"]);
           audio_device_t audio;
           backend.clear_stage();
@@ -294,12 +293,12 @@ void ov_client_orlandoviols_t::service()
           audio.periodsize = js_audio["periodsize"].as<int>(96);
           audio.numperiods = js_audio["numperiods"].as<int>(2);
           backend.configure_audio_backend(audio);
-	  if( js_audio["restart"].as<bool>(false) ){
-	    backend.stop_audiobackend();
-	    backend.start_audiobackend();
-	  }
+          if(js_audio["restart"].as<bool>(false)) {
+            backend.stop_audiobackend();
+            backend.start_audiobackend();
+          }
           RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
-	  backend.set_thisdev(get_stage_dev(js_rendersettings));
+          backend.set_thisdev(get_stage_dev(js_rendersettings));
           RSJresource js_stage(js_stagecfg["room"]);
           std::string stagehost(js_stage["host"].as<std::string>(""));
           port_t stageport(js_stage["port"].as<int>(0));
@@ -370,8 +369,10 @@ void ov_client_orlandoviols_t::service()
           }
           rendersettings.headtracking =
               js_rendersettings["headtracking"].as<bool>(false);
-          rendersettings.headtrackingrot =
+          rendersettings.headtrackingrotrec =
               js_rendersettings["headtrackingrot"].as<bool>(true);
+          rendersettings.headtrackingrotsrc =
+              js_rendersettings["headtrackingrotsrc"].as<bool>(true);
           rendersettings.headtrackingport =
               js_rendersettings["headtrackingport"].as<int>(0);
           backend.set_render_settings(
