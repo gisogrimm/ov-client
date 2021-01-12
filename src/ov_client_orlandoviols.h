@@ -28,6 +28,9 @@ private:
   bool isovbox;
 };
 
+std::string ovstrrep(std::string s, const std::string& pat,
+                     const std::string& rep);
+
 #endif
 
 /*

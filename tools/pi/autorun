@@ -72,6 +72,10 @@ fi
 while true; do
     
     sudo su -l ov -c "ov-client" || sudo touch ~ov/ov-client.firmwareupdate
+    # test for modified configuration:
+    if test -e ~ov/ov-client.cfg; then
+	sudo mv ~ov/ov-client.cfg /boot/
+    fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
 	# firmware update requested: disable overlayfs and restart

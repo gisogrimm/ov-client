@@ -3,9 +3,13 @@
 #include "ov_render_tascar.h"
 //#include <boost/filesystem.hpp>
 #include <errmsg.h>
+#include <fstream>
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
+namespace ovmainrsj {
+#include "RSJparser.tcc"
+}
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -14,6 +18,14 @@ static bool quit_app(false);
 static void sighandler(int sig)
 {
   quit_app = true;
+}
+
+std::string get_file_contents(const std::string& fname)
+{
+  std::ifstream t(fname);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                  std::istreambuf_iterator<char>());
+  return str;
 }
 
 int main(int argc, char** argv)
@@ -25,8 +37,22 @@ int main(int argc, char** argv)
   // boost::filesystem::path selfpath = argv[0];
 
   try {
-    std::string deviceid(getmacaddr());
-    std::string lobby("http://oldbox.orlandoviols.com/");
+    // test for config file on raspi:
+    std::string config(get_file_contents("/boot/ov-client.cfg"));
+    if(config.empty() && std::getenv("HOME"))
+      // we are not on a raspi, or no file was created, thus check in home
+      // directory
+      config = get_file_contents(std::string(std::getenv("HOME")) +
+                                 std::string("/.ov-client.cfg"));
+    if(config.empty())
+      // we are not on a raspi, or no file was created, thus check in local
+      // directory
+      config = get_file_contents("ov-client.cfg");
+    ovmainrsj::RSJresource js_cfg(config);
+    std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
+    std::string lobby(ovstrrep(
+        js_cfg["url"].as<std::string>("http://oldbox.orlandoviols.com/"), "\\/",
+        "/"));
     bool showdevname(false);
     int pinglogport(0);
     const char* options = "s:hqvd:p:nf:";
