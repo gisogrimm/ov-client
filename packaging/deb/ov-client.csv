@@ -22,4 +22,5 @@ tascar/plugins/build/ovclienttascarreceiver_omni.so,usr/lib
 tascar/plugins/build/ovclienttascarreceiver_ortf.so,usr/lib
 tascar/plugins/build/ovclienttascarreceiver_simplefdn.so,usr/lib
 tascar/plugins/build/ovclienttascarsource_omni.so,usr/lib
+tascar/plugins/build/ovclienttascarsource_cardioidmod.so,usr/lib
 webmixer.js,usr/share/ovclient

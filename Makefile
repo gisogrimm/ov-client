@@ -7,7 +7,10 @@ export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modi
 export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 
 showver: libov/Makefile
-	echo $(VERSION)
+	$(MAKE) ver
+
+ver:
+	echo $(FULLVERSION)
 
 BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
 OBJ = ov_tools spawn_process ov_client_orlandoviols 	\
@@ -61,6 +64,8 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
 TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
+
+TASCARSOURCE = omni cardioidmod
 
 TASCARMODULS = system touchosc waitforjackport route jackrec
 
@@ -167,7 +172,7 @@ tscobj: tscver
 	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))  $(patsubst %,build/%,$(TASCARDMXOBJECTS))
 
 tscplug: tscver tscobj
-	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
+	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES="$(TASCARSOURCE)" TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)

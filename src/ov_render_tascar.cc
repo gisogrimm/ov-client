@@ -116,7 +116,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                                get_stagedev_name(stagemember.second.id));
         }
         e_src->set_attribute("dlocation", to_string(pos));
-	xmlpp::Element* e_rot = e_src->add_child("orientation");
+        xmlpp::Element* e_rot = e_src->add_child("orientation");
         e_rot->add_child_text("0 " + TASCAR::to_string(rot));
         // e_src->set_attribute("dorientation", to_string(rot));
         uint32_t kch(0);
@@ -141,6 +141,10 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
           e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
           e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
           e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+          if(ch.directivity == "omni")
+            e_snd->set_attribute("type", "omni");
+          if(ch.directivity == "cardioid")
+            e_snd->set_attribute("type", "cardioidmod");
         }
       }
     }
@@ -322,8 +326,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     if(stage.rendersettings.headtrackingrotsrc) {
       actor.push_back("/*/ego");
       e_head->set_attribute("roturl", "osc.udp://localhost:9870/");
-      e_head->set_attribute("rotpath",
-                            "/*/" + get_stagedev_name(thisdev.id) + "/zyxeuler");
+      e_head->set_attribute("rotpath", "/*/" + get_stagedev_name(thisdev.id) +
+                                           "/zyxeuler");
     }
     e_head->set_attribute("actor", TASCAR::vecstr2str(actor));
     e_head->set_attribute("autoref", "0.001");

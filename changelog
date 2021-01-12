@@ -1,0 +1,5 @@
+	0.5.17	support source directivity
+	0.5.16	headtracking can rotate sources at all members
+	0.5.14	allow restarting of audio backend from webinterface
+	0.5.10	improve resolving of webmixer IP,  audio recorder, low-delay bandwidth settings
+	0.5.0	first version in 2021

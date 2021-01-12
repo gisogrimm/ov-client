@@ -216,6 +216,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
     devchannel.position.x = ch["position"]["x"].as<double>(0);
     devchannel.position.y = ch["position"]["y"].as<double>(0);
     devchannel.position.z = ch["position"]["z"].as<double>(0);
+    devchannel.directivity = ch["directivity"].as<std::string>("omni");
     stagedev.channels.push_back(devchannel);
   }
   /// Position of the stage device in the virtual space:
