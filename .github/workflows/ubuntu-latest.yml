@@ -12,6 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: fetchtags
       run: git fetch --unshallow --tags
+    - name: submods
+      run: git submodule init && git submodule update
     - name: tascar
       run: wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add - &&
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
