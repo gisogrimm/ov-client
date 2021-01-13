@@ -281,8 +281,6 @@ void ov_client_orlandoviols_t::service()
       try {
         report_error(lobby, backend.get_deviceid(), "");
         RSJresource js_stagecfg(stagecfg);
-        DEBUG(js_stagecfg["frontendconfig"].exists());
-        DEBUG(js_stagecfg["frontendconfig"].raw_data());
         if(js_stagecfg["frontendconfig"].exists()) {
           std::ofstream ofh("ov-client.cfg");
           ofh << js_stagecfg["frontendconfig"].raw_data();

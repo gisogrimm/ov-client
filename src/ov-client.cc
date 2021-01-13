@@ -53,6 +53,7 @@ int main(int argc, char** argv)
     std::string lobby(ovstrrep(
         js_cfg["url"].as<std::string>("http://oldbox.orlandoviols.com/"), "\\/",
         "/"));
+    std::string protocol(js_cfg["protocol"].as<std::string>("ov"));
     bool showdevname(false);
     int pinglogport(0);
     const char* options = "s:hqvd:p:nf:";
@@ -67,7 +68,6 @@ int main(int argc, char** argv)
                                     {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
-    // frontend_t frontend(FRONTEND_OV);
     while((opt = getopt_long(argc, argv, options, long_options,
                              &option_index)) != -1) {
       switch(opt) {
@@ -92,17 +92,18 @@ int main(int argc, char** argv)
       case 'n':
         showdevname = true;
         break;
-        // case 'f':
-        //  if(strcmp(optarg, "ov") == 0)
-        //    frontend = FRONTEND_OV;
-        //  else if(strcmp(optarg, "ds") == 0)
-        //    frontend = FRONTEND_DS;
-        //  else
-        //    throw ErrMsg("Invalid front end \"" + std::string(optarg) +
-        //    "\".");
-        //  break;
+      case 'f':
+        protocol = optarg;
+        break;
       }
     }
+    frontend_t frontend(FRONTEND_OV);
+    if(protocol == "ov")
+      frontend = FRONTEND_OV;
+    else if(protocol == "ds")
+      frontend = FRONTEND_DS;
+    else
+      throw ErrMsg("Invalid front end protocol \"" + protocol + "\".");
     if(showdevname) {
       std::string devname(getmacaddr());
       if(devname.size() > 6)
@@ -120,16 +121,17 @@ int main(int argc, char** argv)
                 << "\" and pinglogport " << pinglogport << ".\n";
     ov_render_tascar_t render(deviceid, pinglogport);
     if(verbose)
-      std::cout << "creating frontend interface for " << lobby << std::endl;
+      std::cout << "creating frontend interface for " << lobby
+                << " using protocol \"" << protocol << "\"." << std::endl;
     ov_client_base_t* ovclient(NULL);
-    // switch(frontend) {
-    // case FRONTEND_OV:
-    ovclient = new ov_client_orlandoviols_t(render, lobby);
-    // break;
-    // case FRONTEND_DS:
-    //  ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
-    //  break;
-    //}
+    switch(frontend) {
+    case FRONTEND_OV:
+      ovclient = new ov_client_orlandoviols_t(render, lobby);
+      break;
+    case FRONTEND_DS:
+      throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
+      break;
+    }
     if(verbose)
       std::cout << "starting services\n";
     ovclient->start_service();
