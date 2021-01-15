@@ -63,7 +63,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
 
 TASCARDMXOBJECTS =
 
-TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
+TASCARRECEIVERS = ortf hrtf simplefdn omni
 
 TASCARSOURCE = omni cardioidmod
 
@@ -90,6 +90,7 @@ else
 		LDLIBS += -lasound
 	 	TASCARMODULS += ovheadtracker lightctl
 		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
+		TASCARRECEIVERS += itu51
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
