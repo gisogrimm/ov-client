@@ -75,6 +75,7 @@ while true; do
     # test for modified configuration:
     if test -e ~ov/ov-client.cfg; then
 	sudo mv ~ov/ov-client.cfg /boot/
+	sync
     fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
@@ -83,5 +84,5 @@ while true; do
 	sudo raspi-config nonint disable_overlayfs
 	sudo shutdown -r now
     fi
-    sleep 20
+    sleep 7
 done
