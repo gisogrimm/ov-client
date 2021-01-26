@@ -322,9 +322,9 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                      "/");
     std::vector<std::string> actor;
     if(stage.rendersettings.headtrackingrotrec)
-      actor.push_back("/*/master");
+      actor.push_back("/"+stage.thisdeviceid+"/master");
     if(stage.rendersettings.headtrackingrotsrc) {
-      actor.push_back("/*/ego");
+      actor.push_back("/"+stage.thisdeviceid+"/ego");
       e_head->set_attribute("roturl", "osc.udp://localhost:9870/");
       e_head->set_attribute("rotpath", "/*/" + get_stagedev_name(thisdev.id) +
                                            "/zyxeuler");
