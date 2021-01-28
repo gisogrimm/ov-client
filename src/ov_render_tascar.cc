@@ -322,9 +322,9 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                      "/");
     std::vector<std::string> actor;
     if(stage.rendersettings.headtrackingrotrec)
-      actor.push_back("/"+stage.thisdeviceid+"/master");
+      actor.push_back("/" + stage.thisdeviceid + "/master");
     if(stage.rendersettings.headtrackingrotsrc) {
-      actor.push_back("/"+stage.thisdeviceid+"/ego");
+      actor.push_back("/" + stage.thisdeviceid + "/ego");
       e_head->set_attribute("roturl", "osc.udp://localhost:9870/");
       e_head->set_attribute("rotpath", "/*/" + get_stagedev_name(thisdev.id) +
                                            "/zyxeuler");
@@ -629,7 +629,6 @@ void ov_render_tascar_t::start_audiobackend()
     if(h_jack)
       delete h_jack;
     std::string devname(audiodevice.devicename);
-    DEBUG(audiodevice.devicename);
     if(audiodevice.devicename == "highest") {
       // the device name is not set, use the last one of available
       // devices because this is most likely the one to use (e.g.,
@@ -660,7 +659,6 @@ void ov_render_tascar_t::start_audiobackend()
             devname.c_str(), audiodevice.srate, audiodevice.periodsize,
             audiodevice.numperiods);
 #endif
-    DEBUG(cmd);
     h_jack = new spawn_process_t(cmd);
     // replace sleep by testing for jack presence with timeout:
     sleep(7);

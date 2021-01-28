@@ -1,15 +1,11 @@
 //#include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
-//#include <boost/filesystem.hpp>
 #include <errmsg.h>
 #include <fstream>
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
-namespace ovmainrsj {
-#include "RSJparser.tcc"
-}
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -48,12 +44,16 @@ int main(int argc, char** argv)
       // we are not on a raspi, or no file was created, thus check in local
       // directory
       config = get_file_contents("ov-client.cfg");
-    ovmainrsj::RSJresource js_cfg(config);
-    std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
+    nlohmann::json js_cfg({{"deviceid", getmacaddr()},
+                           {"url", "http://oldbox.orlandoviols.com/"},
+                           {"protocol", "ov"}});
+    if(!config.empty())
+      js_cfg = nlohmann::json::parse(config);
+    std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
     std::string lobby(ovstrrep(
-        js_cfg["url"].as<std::string>("http://oldbox.orlandoviols.com/"), "\\/",
-        "/"));
-    std::string protocol(js_cfg["protocol"].as<std::string>("ov"));
+        js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
+    std::string protocol(js_cfg.value("protocol", "ov"));
+    // std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
     bool showdevname(false);
     int pinglogport(0);
     const char* options = "s:hqvd:p:nf:";

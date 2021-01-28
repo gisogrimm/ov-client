@@ -3,6 +3,7 @@
 
 #include "ov_types.h"
 #include <atomic>
+#include <nlohmann/json.hpp>
 #include <thread>
 
 class ov_client_orlandoviols_t : public ov_client_base_t {
