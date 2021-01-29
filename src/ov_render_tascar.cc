@@ -1,6 +1,7 @@
 #include "ov_render_tascar.h"
 #include "soundcardtools.h"
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <unistd.h>
 
 bool file_exists(const std::string& fname)
@@ -40,7 +41,8 @@ ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid,
                                        port_t pinglogport_)
     : ov_render_base_t(deviceid), h_jack(NULL), h_webmixer(NULL), tascar(NULL),
       ovboxclient(NULL), pinglogport(pinglogport_), pinglogaddr(nullptr),
-      inputports({"system:capture_1", "system:capture_2"})
+      inputports({"system:capture_1", "system:capture_2"}),
+      headtrack_tauref(33.315)
 
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
@@ -330,7 +332,9 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                                            "/zyxeuler");
     }
     e_head->set_attribute("actor", TASCAR::vecstr2str(actor));
-    e_head->set_attribute("autoref", "0.001");
+    DEBUG(std::to_string(1.0 - exp(-1.0 / (30.0 * headtrack_tauref))));
+    e_head->set_attribute(
+        "autoref", std::to_string(1.0 - exp(-1.0 / (30.0 * headtrack_tauref))));
     e_head->set_attribute("levelpattern", "/*/ego/*");
     e_head->set_attribute("name", stage.thisdeviceid);
     e_head->set_attribute("send_only_quaternion", "true");
@@ -781,6 +785,15 @@ double ov_render_tascar_t::get_load() const
     return 0.01 * tascar->get_cpu_load();
   }
   return 0;
+}
+
+void ov_render_tascar_t::set_extra_config(const std::string& js)
+{
+  if(!js.empty()) {
+    nlohmann::json xcfg(nlohmann::json::parse(js));
+    if(xcfg["headtrack"].is_object() && !xcfg["headtrack"]["tauref"].is_null())
+      headtrack_tauref = xcfg["headtrack"].value("tauref", 33.315);
+  }
 }
 
 /*

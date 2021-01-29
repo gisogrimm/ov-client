@@ -417,6 +417,8 @@ void ov_client_orlandoviols_t::service()
               js_rendersettings.value("headtrackingport", 0);
           backend.set_render_settings(rendersettings,
                                       js_rendersettings.value("stagedevid", 0));
+          if(!js_rendersettings["extracfg"].is_null())
+            backend.set_extra_config(js_rendersettings["extracfg"].dump());
           nlohmann::json js_stagedevs(js_stagecfg["roomdev"]);
           if(js_stagedevs.is_array())
             for(auto dev : js_stagedevs) {

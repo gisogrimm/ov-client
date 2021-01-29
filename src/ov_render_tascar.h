@@ -25,6 +25,7 @@ public:
   void getbitrate(double& txrate, double& rxrate);
   std::vector<std::string> get_input_channel_ids() const;
   double get_load() const;
+  void set_extra_config(const std::string&);
 
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
@@ -43,6 +44,7 @@ private:
   port_t pinglogport;
   lo_address pinglogaddr;
   std::vector<std::string> inputports;
+  double headtrack_tauref;
 };
 
 #endif
