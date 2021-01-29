@@ -56,3 +56,5 @@ target_link_directories( zita-n2j PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../zita-res
 
 target_link_libraries(zita-j2n PUBLIC zita-j2n-lib ${JACK_LIBRARIES} pthread m)
 target_link_libraries(zita-n2j PUBLIC zita-n2j-lib zita-resampler ${JACK_LIBRARIES} pthread m)
+
+install(TARGETS zita-j2n zita-n2j DESTINATION bin)
