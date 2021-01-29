@@ -63,7 +63,7 @@ TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
 
 TASCARDMXOBJECTS =
 
-TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
+TASCARRECEIVERS = ortf hrtf simplefdn omni
 
 TASCARSOURCE = omni cardioidmod
 
@@ -90,13 +90,14 @@ else
 		LDLIBS += -lasound
 	 	TASCARMODULS += ovheadtracker lightctl
 		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
+		TASCARRECEIVERS += itu51
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
-		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include
-		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(OPENSSL_ROOT)/lib
+		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include
+		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
