@@ -116,7 +116,9 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                                get_stagedev_name(stagemember.second.id));
         }
         e_src->set_attribute("dlocation", to_string(pos));
-        e_src->set_attribute("dorientation", to_string(rot));
+        xmlpp::Element* e_rot = e_src->add_child("orientation");
+        e_rot->add_child_text("0 " + TASCAR::to_string(rot));
+        // e_src->set_attribute("dorientation", to_string(rot));
         uint32_t kch(0);
         for(auto ch : stagemember.second.channels) {
           // create a sound for each channel:
@@ -139,6 +141,10 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
           e_snd->set_attribute("x", TASCAR::to_string(chpos.x));
           e_snd->set_attribute("y", TASCAR::to_string(chpos.y));
           e_snd->set_attribute("z", TASCAR::to_string(chpos.z));
+          if(ch.directivity == "omni")
+            e_snd->set_attribute("type", "omni");
+          if(ch.directivity == "cardioid")
+            e_snd->set_attribute("type", "cardioidmod");
         }
       }
     }
@@ -179,6 +185,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     if(ambif.good()) {
       xmlpp::Element* e_diff(e_scene->add_child("diffuse"));
       e_diff->set_attribute("name", "ambient");
+      e_diff->set_attribute(
+          "size", TASCAR::to_string(to_tascar(stage.rendersettings.roomsize)));
       xmlpp::Element* e_plug(e_diff->add_child("plugins"));
       xmlpp::Element* e_snd(e_plug->add_child("sndfile"));
       e_snd->set_attribute("name", hashname);
@@ -192,6 +200,8 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
   }
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+  e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
   e_mods->add_child("touchosc");
   // create zita-n2j receivers:
   for(auto stagemember : stage.stage) {
@@ -310,12 +320,22 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
           "url", "osc.udp://localhost:" +
                      std::to_string(stage.rendersettings.headtrackingport) +
                      "/");
-    e_head->set_attribute("actor", "/*/master");
+    std::vector<std::string> actor;
+    if(stage.rendersettings.headtrackingrotrec)
+      actor.push_back("/*/master");
+    if(stage.rendersettings.headtrackingrotsrc) {
+      actor.push_back("/*/ego");
+      e_head->set_attribute("roturl", "osc.udp://localhost:9870/");
+      e_head->set_attribute("rotpath", "/*/" + get_stagedev_name(thisdev.id) +
+                                           "/zyxeuler");
+    }
+    e_head->set_attribute("actor", TASCAR::vecstr2str(actor));
     e_head->set_attribute("autoref", "0.001");
     e_head->set_attribute("levelpattern", "/*/ego/*");
     e_head->set_attribute("name", stage.thisdeviceid);
     e_head->set_attribute("send_only_quaternion", "true");
-    if(stage.rendersettings.headtrackingrot)
+    if(stage.rendersettings.headtrackingrotrec ||
+       stage.rendersettings.headtrackingrotsrc)
       e_head->set_attribute("apply_rot", "true");
     else
       e_head->set_attribute("apply_rot", "false");
@@ -330,6 +350,8 @@ void ov_render_tascar_t::create_raw_dev(xmlpp::Element* e_session)
   std::vector<std::string> waitports;
   // configure extra modules:
   xmlpp::Element* e_mods(e_session->add_child("modules"));
+  xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+  e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
   e_mods->add_child("touchosc");
   //
   uint32_t chcnt(0);
@@ -524,6 +546,8 @@ void ov_render_tascar_t::start_session()
         e_sndfile->set_attribute("resample", "true");
         e_sndfile->set_attribute("loop", "0");
         xmlpp::Element* e_mods(e_session->add_child("modules"));
+        xmlpp::Element* e_jackrec = e_mods->add_child("jackrec");
+        e_jackrec->set_attribute("url", "osc.udp://localhost:9000/");
         e_mods->add_child("touchosc");
       }
     } else {
@@ -547,7 +571,8 @@ void ov_render_tascar_t::start_session()
       if(stage.rendersettings.secrec > 0)
         ovboxclient->add_extraport(100);
       for(auto p : stage.rendersettings.xrecport)
-        ovboxclient->add_receiverport(p);
+        ovboxclient->add_receiverport(p, p);
+      ovboxclient->add_receiverport(9870, 9871);
       if(pinglogaddr)
         ovboxclient->set_ping_callback(sendpinglog, pinglogaddr);
     }
@@ -557,11 +582,14 @@ void ov_render_tascar_t::start_session()
     tascar->start();
     // add web mixer tools (node-js server and touchosc interface):
     std::string command;
+    std::string ipaddr(ep2ipstr(getipaddr()));
+    ipaddr += " '";
+    ipaddr += stage.thisdeviceid + " (" + stage.thisdevice.label + ")'";
     if(file_exists("/usr/share/ovclient/webmixer.js")) {
-      command = "(cd /usr/share/ovclient/ && node webmixer.js)";
+      command = "(cd /usr/share/ovclient/ && node webmixer.js " + ipaddr + ")";
     }
     if(file_exists("webmixer.js")) {
-      command = "node webmixer.js";
+      command = "node webmixer.js " + ipaddr;
     }
     if(!command.empty())
       h_webmixer = new spawn_process_t(command);
@@ -609,6 +637,14 @@ void ov_render_tascar_t::start_audiobackend()
       auto devs(list_sound_devices());
       if(!devs.empty())
         devname = devs.rbegin()->dev;
+    }
+    if(audiodevice.devicename == "plughighest") {
+      // the device name is not set, use the last one of available
+      // devices because this is most likely the one to use (e.g.,
+      // external sound card):
+      auto devs(list_sound_devices());
+      if(!devs.empty())
+        devname = std::string("plug") + devs.rbegin()->dev;
     }
     char cmd[1024];
 #ifdef __APPLE__

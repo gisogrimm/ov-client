@@ -1,16 +1,19 @@
 all: showver lib tscver tscobj build binaries tscplug
 
 export VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
-export MINORVERSION:=$(shell git rev-list --count release_0_4..HEAD)
+export MINORVERSION:=$(shell git rev-list --count release_0_5..HEAD)
 export COMMIT:=$(shell git rev-parse --short HEAD)
 export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
 export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
 
 showver: libov/Makefile
-	echo $(VERSION)
+	$(MAKE) ver
+
+ver:
+	echo $(FULLVERSION)
 
 BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
-OBJ = ov_tools spawn_process ov_client_orlandoviols ov_client_digitalstage	\
+OBJ = ov_tools spawn_process ov_client_orlandoviols 	\
   ov_render_tascar soundcardtools
 
 EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
@@ -38,7 +41,8 @@ CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
 LDLIBS += -ldl
 
 # libcpprest dependencies:
-LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+#LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
+#LDLIBS += -lcrypto -lcpprest
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
@@ -61,7 +65,9 @@ TASCARDMXOBJECTS =
 
 TASCARRECEIVERS = ortf hrtf itu51 simplefdn omni
 
-TASCARMODULS = system touchosc waitforjackport route
+TASCARSOURCE = omni cardioidmod
+
+TASCARMODULS = system touchosc waitforjackport route jackrec
 
 TASCARAUDIOPLUGS = sndfile delay
 
@@ -82,7 +88,7 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
-	 	TASCARMODULS += ovheadtracker
+	 	TASCARMODULS += ovheadtracker lightctl
 		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
 	endif
 	ifeq ($(UNAME_S),Darwin)
@@ -166,7 +172,7 @@ tscobj: tscver
 	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))  $(patsubst %,build/%,$(TASCARDMXOBJECTS))
 
 tscplug: tscver tscobj
-	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES=omni TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
+	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES="$(TASCARSOURCE)" TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
 
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)

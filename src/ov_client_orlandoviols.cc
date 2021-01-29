@@ -216,6 +216,7 @@ stage_device_t get_stage_dev(RSJresource& dev)
     devchannel.position.x = ch["position"]["x"].as<double>(0);
     devchannel.position.y = ch["position"]["y"].as<double>(0);
     devchannel.position.z = ch["position"]["z"].as<double>(0);
+    devchannel.directivity = ch["directivity"].as<std::string>("omni");
     stagedev.channels.push_back(devchannel);
   }
   /// Position of the stage device in the virtual space:
@@ -280,10 +281,16 @@ void ov_client_orlandoviols_t::service()
       try {
         report_error(lobby, backend.get_deviceid(), "");
         RSJresource js_stagecfg(stagecfg);
+        if(js_stagecfg["frontendconfig"].exists()) {
+          std::ofstream ofh("ov-client.cfg");
+          ofh << js_stagecfg["frontendconfig"].raw_data();
+          quitrequest_ = true;
+        }
         if(js_stagecfg["firmwareupdate"].as<bool>(false)) {
           std::ofstream ofh("ov-client.firmwareupdate");
           quitrequest_ = true;
-        } else {
+        }
+        if(!quitrequest_) {
           RSJresource js_audio(js_stagecfg["audiocfg"]);
           audio_device_t audio;
           backend.clear_stage();
@@ -293,7 +300,12 @@ void ov_client_orlandoviols_t::service()
           audio.periodsize = js_audio["periodsize"].as<int>(96);
           audio.numperiods = js_audio["numperiods"].as<int>(2);
           backend.configure_audio_backend(audio);
+          if(js_audio["restart"].as<bool>(false)) {
+            backend.stop_audiobackend();
+            backend.start_audiobackend();
+          }
           RSJresource js_rendersettings(js_stagecfg["rendersettings"]);
+          backend.set_thisdev(get_stage_dev(js_rendersettings));
           RSJresource js_stage(js_stagecfg["room"]);
           std::string stagehost(js_stage["host"].as<std::string>(""));
           port_t stageport(js_stage["port"].as<int>(0));
@@ -364,8 +376,10 @@ void ov_client_orlandoviols_t::service()
           }
           rendersettings.headtracking =
               js_rendersettings["headtracking"].as<bool>(false);
-          rendersettings.headtrackingrot =
+          rendersettings.headtrackingrotrec =
               js_rendersettings["headtrackingrot"].as<bool>(true);
+          rendersettings.headtrackingrotsrc =
+              js_rendersettings["headtrackingrotsrc"].as<bool>(true);
           rendersettings.headtrackingport =
               js_rendersettings["headtrackingport"].as<int>(0);
           backend.set_render_settings(

@@ -1,0 +1,21 @@
+<div id="jackrec" class="jackrec">
+  <p class="listhead">audio recorder</p>
+  <div class="jackrecctl">
+    <input class="recbutton ctlbutton" type="button" value="rec" onclick="jackrec_start();">
+    <input class="stopbutton ctlbutton" type="button" value="stop" onclick="jackrec_stop();">
+    <input class="rectime ctlbutton" type="label" id="rectime" value="00:00.0">
+    <span id="recindicator" class="recindicator"></span>
+    <span id="recerr" class="jackrecerr"></span>
+  </div>
+  <div class="portlist">
+    <p class="listhead">sources:</p>
+    <div id="portlist"></div>
+  </div>
+  <div class="filelist">
+    <p class="listhead">recordings:</p>
+    <input class="ctlbutton" type="checkbox" onclick="jackrec_selectallfiles();" id="selectallfiles">
+    <label for="selectallfiles">select all</label>
+    <div id="filelist"></div>
+    <input class="ctlbutton" type="button" value="delete selected" onclick="jackrec_delete();">
+  </div>
+</div>

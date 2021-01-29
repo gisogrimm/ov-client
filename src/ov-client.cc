@@ -1,11 +1,15 @@
-#include "ov_client_digitalstage.h"
+//#include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
+//#include <boost/filesystem.hpp>
 #include <errmsg.h>
+#include <fstream>
 #include <stdint.h>
 #include <string>
 #include <udpsocket.h>
-#include <boost/filesystem.hpp>
+namespace ovmainrsj {
+#include "RSJparser.tcc"
+}
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -16,18 +20,40 @@ static void sighandler(int sig)
   quit_app = true;
 }
 
+std::string get_file_contents(const std::string& fname)
+{
+  std::ifstream t(fname);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                  std::istreambuf_iterator<char>());
+  return str;
+}
+
 int main(int argc, char** argv)
 {
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
 
-  boost::filesystem::path selfpath=argv[0];
-
+  // boost::filesystem::path selfpath = argv[0];
 
   try {
-    std::string deviceid(getmacaddr());
-    std::string lobby("http://oldbox.orlandoviols.com/");
+    // test for config file on raspi:
+    std::string config(get_file_contents("/boot/ov-client.cfg"));
+    if(config.empty() && std::getenv("HOME"))
+      // we are not on a raspi, or no file was created, thus check in home
+      // directory
+      config = get_file_contents(std::string(std::getenv("HOME")) +
+                                 std::string("/.ov-client.cfg"));
+    if(config.empty())
+      // we are not on a raspi, or no file was created, thus check in local
+      // directory
+      config = get_file_contents("ov-client.cfg");
+    ovmainrsj::RSJresource js_cfg(config);
+    std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
+    std::string lobby(ovstrrep(
+        js_cfg["url"].as<std::string>("http://oldbox.orlandoviols.com/"), "\\/",
+        "/"));
+    std::string protocol(js_cfg["protocol"].as<std::string>("ov"));
     bool showdevname(false);
     int pinglogport(0);
     const char* options = "s:hqvd:p:nf:";
@@ -42,7 +68,6 @@ int main(int argc, char** argv)
                                     {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
-    frontend_t frontend(FRONTEND_OV);
     while((opt = getopt_long(argc, argv, options, long_options,
                              &option_index)) != -1) {
       switch(opt) {
@@ -68,15 +93,17 @@ int main(int argc, char** argv)
         showdevname = true;
         break;
       case 'f':
-        if(strcmp(optarg, "ov") == 0)
-          frontend = FRONTEND_OV;
-        else if(strcmp(optarg, "ds") == 0)
-          frontend = FRONTEND_DS;
-        else
-          throw ErrMsg("Invalid front end \"" + std::string(optarg) + "\".");
+        protocol = optarg;
         break;
       }
     }
+    frontend_t frontend(FRONTEND_OV);
+    if(protocol == "ov")
+      frontend = FRONTEND_OV;
+    else if(protocol == "ds")
+      frontend = FRONTEND_DS;
+    else
+      throw ErrMsg("Invalid front end protocol \"" + protocol + "\".");
     if(showdevname) {
       std::string devname(getmacaddr());
       if(devname.size() > 6)
@@ -94,14 +121,15 @@ int main(int argc, char** argv)
                 << "\" and pinglogport " << pinglogport << ".\n";
     ov_render_tascar_t render(deviceid, pinglogport);
     if(verbose)
-      std::cout << "creating frontend interface for " << lobby << std::endl;
+      std::cout << "creating frontend interface for " << lobby
+                << " using protocol \"" << protocol << "\"." << std::endl;
     ov_client_base_t* ovclient(NULL);
     switch(frontend) {
     case FRONTEND_OV:
       ovclient = new ov_client_orlandoviols_t(render, lobby);
       break;
     case FRONTEND_DS:
-      ovclient = new ov_client_digitalstage_t(render, lobby, selfpath);
+      throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
       break;
     }
     if(verbose)

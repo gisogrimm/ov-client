@@ -3,11 +3,14 @@ build/ov-client,usr/bin
 build/ov-client_hostname,usr/bin
 build/ov-client_listsounddevs,usr/bin
 build/ov-headtracker,usr/bin
+jackrec.html,usr/share/ovclient
 node_modules,usr/share/ovclient
 ovclient.css,usr/share/ovclient
 ovclient.js,usr/share/ovclient
 tascar/plugins/build/ovclienttascar_ap_delay.so,usr/lib
 tascar/plugins/build/ovclienttascar_ap_sndfile.so,usr/lib
+tascar/plugins/build/ovclienttascar_jackrec.so,usr/lib
+tascar/plugins/build/ovclienttascar_lightctl.so,usr/lib
 tascar/plugins/build/ovclienttascar_ovheadtracker.so,usr/lib
 tascar/plugins/build/ovclienttascar_route.so,usr/lib
 tascar/plugins/build/ovclienttascar_system.so,usr/lib
@@ -19,4 +22,5 @@ tascar/plugins/build/ovclienttascarreceiver_omni.so,usr/lib
 tascar/plugins/build/ovclienttascarreceiver_ortf.so,usr/lib
 tascar/plugins/build/ovclienttascarreceiver_simplefdn.so,usr/lib
 tascar/plugins/build/ovclienttascarsource_omni.so,usr/lib
+tascar/plugins/build/ovclienttascarsource_cardioidmod.so,usr/lib
 webmixer.js,usr/share/ovclient

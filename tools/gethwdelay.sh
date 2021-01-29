@@ -7,14 +7,14 @@ OUTPUTPORT="$5"
 if [ "$#" -ne 5 ]; then
     echo "Usage: ./gethwdelay.sh CARD SRATE PERIODSIZE INPUTPORT OUTPUTPORT"
     echo ""
-    echo " - CARD : ALSA sound card name, e.g., USB"
+    echo " - CARD : ALSA sound card name, e.g., hw:USB"
     echo " - SRATE : Sampling rate in Hz, e.g. 48000"
     echo " - PERIODSIZE : Jack period size, e.g., 96"
     echo " - INPUTPORT : Hardware input channel to which the cable is connected"
     echo " - OUTPUTPORT : Hardware output channel to which the cable is connected"
     echo ""
     echo "Example:"
-    echo "./gethwdelay.sh USB 48000 96 2 2"
+    echo "./gethwdelay.sh hw:USB 48000 96 2 2"
     echo ""
     echo "Measures delay of the USB sound card at 48 kHz and 96 samples per period."
     echo "An analog cable is connected from second output to second input."
@@ -24,7 +24,7 @@ if [ "$#" -ne 5 ]; then
     exit
 fi
 killall jackd jack_delay 2>/dev/null
-jackd --sync -P 90 -d alsa -d hw:$CARD -r $RATE -p $PERIODSIZE >/dev/null 2>/dev/null &
+jackd --sync -P 90 -d alsa -d $CARD -r $RATE -p $PERIODSIZE >/dev/null 2>/dev/null &
 JACKPID=$!
 sleep 2
 

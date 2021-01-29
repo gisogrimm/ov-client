@@ -5,7 +5,7 @@ for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
 | sudo tee $cpu/cpufreq/scaling_governor; done
 
 ## Stop the ntp service
-sudo service ntp stop
+#sudo service ntp stop
 
 ## Stop the triggerhappy service
 sudo service triggerhappy stop
@@ -31,20 +31,22 @@ killall dbus-launch
 ## Stop all wifi/bluetooth devices
 rfkill block all
 
-# if not on overlayfs then update/reinstall:
-if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
-    echo "overlay fs, not updating"
-else
-    # remove old installer scripts:
-    rm -f installovclient.sh
-    # get the latest installer script:
-    wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
-    # run installer to update to latest version:
-    . installovclient.sh
-    # activate overlay image in case the installation script failed, and try the best we can:
-    sudo raspi-config nonint enable_overlayfs
-    # ready, reboot:
-    sudo shutdown -r now
+if test ! -e /boot/ovclient-noupdate; then
+    # if not on overlayfs then update/reinstall:
+    if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
+	echo "overlay fs, not updating"
+    else
+	# remove old installer scripts:
+	rm -f installovclient.sh
+	# get the latest installer script:
+	wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
+	# run installer to update to latest version:
+	. installovclient.sh
+	# activate overlay image in case the installation script failed, and try the best we can:
+	sudo raspi-config nonint enable_overlayfs
+	# ready, reboot:
+	sudo shutdown -r now
+    fi
 fi
 
 # activate WiFi if required:
@@ -69,7 +71,11 @@ fi
 # start client:
 while true; do
     
-    sudo su -l ov -c "ov-client"
+    sudo su -l ov -c "ov-client" || sudo touch ~ov/ov-client.firmwareupdate
+    # test for modified configuration:
+    if test -e ~ov/ov-client.cfg; then
+	sudo mv ~ov/ov-client.cfg /boot/
+    fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
 	# firmware update requested: disable overlayfs and restart
