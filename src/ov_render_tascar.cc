@@ -795,12 +795,18 @@ double ov_render_tascar_t::get_load() const
 
 void ov_render_tascar_t::set_extra_config(const std::string& js)
 {
-  if(!js.empty()) {
-    nlohmann::json xcfg(nlohmann::json::parse(js));
-    if(xcfg["headtrack"].is_object() && !xcfg["headtrack"]["tauref"].is_null())
-      headtrack_tauref = xcfg["headtrack"].value("tauref", 33.315);
-    if(xcfg["monitor"].is_object() && !xcfg["monitor"]["delay"].is_null())
-      selfmonitor_delay = xcfg["monitor"].value("delay", 0.0);
+  try {
+    if(!js.empty()) {
+      nlohmann::json xcfg(nlohmann::json::parse(js));
+      if(xcfg["headtrack"].is_object() &&
+         !xcfg["headtrack"]["tauref"].is_null())
+        headtrack_tauref = xcfg["headtrack"].value("tauref", 33.315);
+      if(xcfg["monitor"].is_object() && !xcfg["monitor"]["delay"].is_null())
+        selfmonitor_delay = xcfg["monitor"].value("delay", 0.0);
+    }
+  }
+  catch(const std::exception& e) {
+    throw TASCAR::ErrMsg(std::string("set_extra_config: ") + e.what());
   }
 }
 

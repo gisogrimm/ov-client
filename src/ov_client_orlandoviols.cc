@@ -1,4 +1,5 @@
 #include "ov_client_orlandoviols.h"
+#include "../tascar/libtascar/src/session.h"
 #include "errmsg.h"
 #include "ov_tools.h"
 #include "soundcardtools.h"
@@ -37,6 +38,14 @@ namespace webCURL {
   }
 
 } // namespace webCURL
+
+template <class T>
+T my_js_value(nlohmann::json& obj, const std::string& key, const T& defval)
+{
+  if(obj.is_object())
+    return obj.value(key, defval);
+  return defval;
+}
 
 ov_client_orlandoviols_t::ov_client_orlandoviols_t(ov_render_base_t& backend,
                                                    const std::string& lobby)
@@ -205,66 +214,48 @@ void ov_client_orlandoviols_t::register_device(std::string url,
 
 stage_device_t get_stage_dev(nlohmann::json& dev)
 {
-  stage_device_t stagedev;
-  stagedev.id = dev.value("id", -1);
-  stagedev.label = dev.value("label", "");
-  nlohmann::json channels(dev["channels"]);
-  if(channels.is_array())
-    for(auto ch : channels) {
-      device_channel_t devchannel;
-      devchannel.sourceport = ch.value("sourceport", "");
-      devchannel.gain = ch.value("gain", 1.0);
-      nlohmann::json chpos(ch["position"]);
-      if(chpos.is_object()) {
-        devchannel.position.x = chpos.value("x", 0.0);
-        devchannel.position.y = chpos.value("y", 0.0);
-        devchannel.position.z = chpos.value("z", 0.0);
-      } else {
-        devchannel.position.x = 0.0;
-        devchannel.position.y = 0.0;
-        devchannel.position.z = 0.0;
+  try {
+    stage_device_t stagedev;
+    stagedev.id = my_js_value(dev, "id", -1);
+    stagedev.label = my_js_value(dev, "label", std::string(""));
+    nlohmann::json channels(dev["channels"]);
+    if(channels.is_array())
+      for(auto ch : channels) {
+        device_channel_t devchannel;
+        devchannel.sourceport = my_js_value(ch, "sourceport", std::string(""));
+        devchannel.gain = my_js_value(ch, "gain", 1.0);
+        nlohmann::json chpos(ch["position"]);
+        devchannel.position.x = my_js_value(chpos, "x", 0.0);
+        devchannel.position.y = my_js_value(chpos, "y", 0.0);
+        devchannel.position.z = my_js_value(chpos, "z", 0.0);
+        devchannel.directivity = my_js_value(ch, "directivity", std::string("omni"));
+        stagedev.channels.push_back(devchannel);
       }
-      devchannel.directivity = ch.value("directivity", "omni");
-      stagedev.channels.push_back(devchannel);
-    }
-  /// Position of the stage device in the virtual space:
-  nlohmann::json devpos(dev["position"]);
-  if(devpos.is_object()) {
-    stagedev.position.x = devpos.value("x", 0.0);
-    stagedev.position.y = devpos.value("y", 0.0);
-    stagedev.position.z = devpos.value("z", 0.0);
-  } else {
-    stagedev.position.x = 0.0;
-    stagedev.position.y = 0.0;
-    stagedev.position.z = 0.0;
+    /// Position of the stage device in the virtual space:
+    nlohmann::json devpos(dev["position"]);
+    stagedev.position.x = my_js_value(devpos, "x", 0.0);
+    stagedev.position.y = my_js_value(devpos, "y", 0.0);
+    stagedev.position.z = my_js_value(devpos, "z", 0.0);
+    /// Orientation of the stage device in the virtual space, ZYX Euler angles:
+    nlohmann::json devorient(dev["orientation"]);
+    stagedev.orientation.z = my_js_value(devorient, "z", 0.0);
+    stagedev.orientation.y = my_js_value(devorient, "y", 0.0);
+    stagedev.orientation.x = my_js_value(devorient, "x", 0.0);
+    /// Linear gain of the stage device:
+    stagedev.gain = my_js_value(dev, "gain", 1.0);
+    /// Mute flag:
+    stagedev.mute = my_js_value(dev, "mute", false);
+    // jitter buffer length:
+    nlohmann::json jitter(dev["jitter"]);
+    stagedev.receiverjitter = my_js_value(jitter, "receive", 5.0);
+    stagedev.senderjitter = my_js_value(jitter, "send", 5.0);
+    /// send to local IP address if in same network?
+    stagedev.sendlocal = my_js_value(dev, "sendlocal", true);
+    return stagedev;
   }
-  /// Orientation of the stage device in the virtual space, ZYX Euler angles:
-  nlohmann::json devorient(dev["orientation"]);
-  if(devorient.is_object()) {
-    stagedev.orientation.z = devorient.value("z", 0.0);
-    stagedev.orientation.y = devorient.value("y", 0.0);
-    stagedev.orientation.x = devorient.value("x", 0.0);
-  } else {
-    stagedev.orientation.z = 0.0;
-    stagedev.orientation.y = 0.0;
-    stagedev.orientation.x = 0.0;
+  catch(const std::exception& e) {
+    throw TASCAR::ErrMsg(std::string("get_stage_dev: ") + e.what());
   }
-  /// Linear gain of the stage device:
-  stagedev.gain = dev.value("gain", 1.0);
-  /// Mute flag:
-  stagedev.mute = dev.value("mute", false);
-  // jitter buffer length:
-  nlohmann::json jitter(dev["jitter"]);
-  if(jitter.is_object()) {
-    stagedev.receiverjitter = jitter.value("receive", 5.0);
-    stagedev.senderjitter = jitter.value("send", 5.0);
-  } else {
-    stagedev.receiverjitter = 5.0;
-    stagedev.senderjitter = 5.0;
-  }
-  /// send to local IP address if in same network?
-  stagedev.sendlocal = dev.value("sendlocal", true);
-  return stagedev;
 }
 
 std::string ovstrrep(std::string s, const std::string& pat,
@@ -315,7 +306,7 @@ void ov_client_orlandoviols_t::service()
           ofh << js_stagecfg["frontendconfig"].dump();
           quitrequest_ = true;
         }
-        if(js_stagecfg.value("firmwareupdate", false)) {
+        if(my_js_value(js_stagecfg, "firmwareupdate", false)) {
           std::ofstream ofh("ov-client.firmwareupdate");
           quitrequest_ = true;
         }
@@ -324,13 +315,15 @@ void ov_client_orlandoviols_t::service()
           if(!js_audio.is_null()) {
             audio_device_t audio;
             backend.clear_stage();
-            audio.drivername = js_audio.value("driver", "jack");
-            audio.devicename = js_audio.value("device", "hw:1");
-            audio.srate = js_audio.value("srate", 48000.0);
-            audio.periodsize = js_audio.value("periodsize", 96);
-            audio.numperiods = js_audio.value("numperiods", 2);
+            audio.drivername =
+                my_js_value(js_audio, "driver", std::string("jack"));
+            audio.devicename =
+                my_js_value(js_audio, "device", std::string("hw:1"));
+            audio.srate = my_js_value(js_audio, "srate", 48000.0);
+            audio.periodsize = my_js_value(js_audio, "periodsize", 96);
+            audio.numperiods = my_js_value(js_audio, "numperiods", 2);
             backend.configure_audio_backend(audio);
-            if(js_audio.value("restart", false)) {
+            if(my_js_value(js_audio, "restart", false)) {
               backend.stop_audiobackend();
               backend.start_audiobackend();
             }
@@ -339,91 +332,104 @@ void ov_client_orlandoviols_t::service()
           if(!js_rendersettings.is_null())
             backend.set_thisdev(get_stage_dev(js_rendersettings));
           nlohmann::json js_stage(js_stagecfg["room"]);
-          std::string stagehost(js_stage.value("host", ""));
-          port_t stageport(js_stage.value("port", 0));
-          secret_t stagepin(js_stage.value("pin", 0u));
-          backend.set_relay_server(stagehost, stageport, stagepin);
-          nlohmann::json js_roomsize(js_stage["size"]);
-          nlohmann::json js_reverb(js_stage["reverb"]);
-          render_settings_t rendersettings;
-          rendersettings.id = js_rendersettings.value("id", -1);
-          rendersettings.roomsize.x = js_roomsize.value("x", 0.0);
-          rendersettings.roomsize.y = js_roomsize.value("y", 0.0);
-          rendersettings.roomsize.z = js_roomsize.value("z", 0.0);
-          rendersettings.absorption = js_reverb.value("absorption", 0.6);
-          rendersettings.damping = js_reverb.value("damping", 0.7);
-          rendersettings.reverbgain = js_reverb.value("gain", 0.4);
-          rendersettings.renderreverb =
-              js_rendersettings.value("renderreverb", true);
-          rendersettings.renderism =
-              js_rendersettings.value("renderism", false);
-          rendersettings.outputport1 =
-              js_rendersettings.value("outputport1", "");
-          rendersettings.outputport2 =
-              js_rendersettings.value("outputport2", "");
-          rendersettings.rawmode = js_rendersettings.value("rawmode", false);
-          rendersettings.rectype = js_rendersettings.value("rectype", "ortf");
-          rendersettings.secrec = js_rendersettings.value("secrec", 0.0);
-          rendersettings.egogain = js_rendersettings.value("egogain", 1.0);
-          rendersettings.peer2peer = js_rendersettings.value("peer2peer", true);
-          // ambient sound:
-          rendersettings.ambientsound = js_stage.value("ambientsound", "");
-          rendersettings.ambientlevel = js_stage.value("ambientlevel", 0.0);
-          rendersettings.ambientsound =
-              ovstrrep(rendersettings.ambientsound, "\\/", "/");
-          // if not empty then download file to hash code:
-          if(rendersettings.ambientsound.size()) {
-            std::string hashname(
-                url2localfilename(rendersettings.ambientsound));
-            // test if file already exists:
-            std::ifstream ambif(hashname);
-            if(!ambif.good()) {
-              if(!download_file(rendersettings.ambientsound, hashname)) {
-                report_error(lobby, backend.get_deviceid(),
-                             "Unable to download ambient sound file from " +
-                                 rendersettings.ambientsound);
-              }
-            }
-          }
-          //
-          rendersettings.xports.clear();
-          nlohmann::json js_xports(js_rendersettings["xport"]);
-          if(js_xports.is_array())
-            for(auto xp : js_xports) {
-              if(xp.is_array())
-                if((xp.size() == 2) && xp[0].is_string() && xp[1].is_string()) {
-                  std::string key(xp[0].get<std::string>());
-                  if(key.size())
-                    rendersettings.xports[key] = xp[1].get<std::string>();
+          if(js_stage.is_object()) {
+            std::string stagehost(
+                my_js_value(js_stage, "host", std::string("")));
+            port_t stageport(my_js_value(js_stage, "port", 0));
+            secret_t stagepin(my_js_value(js_stage, "pin", 0u));
+            backend.set_relay_server(stagehost, stageport, stagepin);
+            nlohmann::json js_roomsize(js_stage["size"]);
+            nlohmann::json js_reverb(js_stage["reverb"]);
+            render_settings_t rendersettings;
+            rendersettings.id = my_js_value(js_rendersettings, "id", -1);
+            rendersettings.roomsize.x = my_js_value(js_roomsize, "x", 25.0);
+            rendersettings.roomsize.y = my_js_value(js_roomsize, "y", 13.0);
+            rendersettings.roomsize.z = my_js_value(js_roomsize, "z", 7.5);
+            rendersettings.absorption =
+                my_js_value(js_reverb, "absorption", 0.6);
+            rendersettings.damping = my_js_value(js_reverb, "damping", 0.7);
+            rendersettings.reverbgain = my_js_value(js_reverb, "gain", 0.4);
+            rendersettings.renderreverb =
+                my_js_value(js_rendersettings, "renderreverb", true);
+            rendersettings.renderism =
+                my_js_value(js_rendersettings, "renderism", false);
+            rendersettings.outputport1 =
+                my_js_value(js_rendersettings, "outputport1", std::string(""));
+            rendersettings.outputport2 =
+                my_js_value(js_rendersettings, "outputport2", std::string(""));
+            rendersettings.rawmode =
+                my_js_value(js_rendersettings, "rawmode", false);
+            rendersettings.rectype =
+                my_js_value(js_rendersettings, "rectype", std::string("ortf"));
+            rendersettings.secrec =
+                my_js_value(js_rendersettings, "secrec", 0.0);
+            rendersettings.egogain =
+                my_js_value(js_rendersettings, "egogain", 1.0);
+            rendersettings.peer2peer =
+                my_js_value(js_rendersettings, "peer2peer", true);
+            // ambient sound:
+            rendersettings.ambientsound =
+                my_js_value(js_stage, "ambientsound", std::string(""));
+            rendersettings.ambientlevel =
+                my_js_value(js_stage, "ambientlevel", 0.0);
+            rendersettings.ambientsound =
+                ovstrrep(rendersettings.ambientsound, "\\/", "/");
+            // if not empty then download file to hash code:
+            if(rendersettings.ambientsound.size()) {
+              std::string hashname(
+                  url2localfilename(rendersettings.ambientsound));
+              // test if file already exists:
+              std::ifstream ambif(hashname);
+              if(!ambif.good()) {
+                if(!download_file(rendersettings.ambientsound, hashname)) {
+                  report_error(lobby, backend.get_deviceid(),
+                               "Unable to download ambient sound file from " +
+                                   rendersettings.ambientsound);
                 }
-            }
-          rendersettings.xrecport.clear();
-          nlohmann::json js_xrecports(js_rendersettings["xrecport"]);
-          if(js_xrecports.is_array())
-            for(auto xrp : js_xrecports) {
-              if(xrp.is_number()) {
-                int p(xrp.get<int>());
-                if(p > 0)
-                  rendersettings.xrecport.push_back(p);
               }
             }
-          rendersettings.headtracking =
-              js_rendersettings.value("headtracking", false);
-          rendersettings.headtrackingrotrec =
-              js_rendersettings.value("headtrackingrot", true);
-          rendersettings.headtrackingrotsrc =
-              js_rendersettings.value("headtrackingrotsrc", true);
-          rendersettings.headtrackingport =
-              js_rendersettings.value("headtrackingport", 0);
-          backend.set_render_settings(rendersettings,
-                                      js_rendersettings.value("stagedevid", 0));
-          if(!js_rendersettings["extracfg"].is_null())
-            backend.set_extra_config(js_rendersettings["extracfg"].dump());
-          nlohmann::json js_stagedevs(js_stagecfg["roomdev"]);
-          if(js_stagedevs.is_array())
-            for(auto dev : js_stagedevs) {
-              backend.add_stage_device(get_stage_dev(dev));
-            }
+            //
+            rendersettings.xports.clear();
+            nlohmann::json js_xports(js_rendersettings["xport"]);
+            if(js_xports.is_array())
+              for(auto xp : js_xports) {
+                if(xp.is_array())
+                  if((xp.size() == 2) && xp[0].is_string() &&
+                     xp[1].is_string()) {
+                    std::string key(xp[0].get<std::string>());
+                    if(key.size())
+                      rendersettings.xports[key] = xp[1].get<std::string>();
+                  }
+              }
+            rendersettings.xrecport.clear();
+            nlohmann::json js_xrecports(js_rendersettings["xrecport"]);
+            if(js_xrecports.is_array())
+              for(auto xrp : js_xrecports) {
+                if(xrp.is_number()) {
+                  int p(xrp.get<int>());
+                  if(p > 0)
+                    rendersettings.xrecport.push_back(p);
+                }
+              }
+            rendersettings.headtracking =
+                my_js_value(js_rendersettings, "headtracking", false);
+            rendersettings.headtrackingrotrec =
+                my_js_value(js_rendersettings, "headtrackingrot", true);
+            rendersettings.headtrackingrotsrc =
+                my_js_value(js_rendersettings, "headtrackingrotsrc", true);
+            rendersettings.headtrackingport =
+                my_js_value(js_rendersettings, "headtrackingport", 0);
+            backend.set_render_settings(
+                rendersettings,
+                my_js_value(js_rendersettings, "stagedevid", 0));
+            if(!js_rendersettings["extracfg"].is_null())
+              backend.set_extra_config(js_rendersettings["extracfg"].dump());
+            nlohmann::json js_stagedevs(js_stagecfg["roomdev"]);
+            if(js_stagedevs.is_array())
+              for(auto dev : js_stagedevs) {
+                backend.add_stage_device(get_stage_dev(dev));
+              }
+          }
           if(!backend.is_audio_active())
             backend.start_audiobackend();
           if(!backend.is_session_active())
