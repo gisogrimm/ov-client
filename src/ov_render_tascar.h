@@ -45,6 +45,8 @@ private:
   lo_address pinglogaddr;
   std::vector<std::string> inputports;
   double headtrack_tauref;
+  // self-monitor delay in milliseconds:
+  double selfmonitor_delay;
 };
 
 #endif

@@ -42,8 +42,7 @@ ov_render_tascar_t::ov_render_tascar_t(const std::string& deviceid,
     : ov_render_base_t(deviceid), h_jack(NULL), h_webmixer(NULL), tascar(NULL),
       ovboxclient(NULL), pinglogport(pinglogport_), pinglogaddr(nullptr),
       inputports({"system:capture_1", "system:capture_2"}),
-      headtrack_tauref(33.315)
-
+      headtrack_tauref(33.315), selfmonitor_delay(0.0)
 {
   audiodevice = {"jack", "hw:1", 48000, 96, 2};
   if(pinglogport)
@@ -147,6 +146,13 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
             e_snd->set_attribute("type", "omni");
           if(ch.directivity == "cardioid")
             e_snd->set_attribute("type", "cardioidmod");
+          if((stagemember.second.id == thisdev.id) &&
+             (selfmonitor_delay > 0.0)) {
+            xmlpp::Element* e_plugs(e_snd->add_child("plugins"));
+            xmlpp::Element* e_delay(e_plugs->add_child("delay"));
+            e_delay->set_attribute(
+                "delay", TASCAR::to_string(selfmonitor_delay * 0.001));
+          }
         }
       }
     }
@@ -793,6 +799,8 @@ void ov_render_tascar_t::set_extra_config(const std::string& js)
     nlohmann::json xcfg(nlohmann::json::parse(js));
     if(xcfg["headtrack"].is_object() && !xcfg["headtrack"]["tauref"].is_null())
       headtrack_tauref = xcfg["headtrack"].value("tauref", 33.315);
+    if(xcfg["monitor"].is_object() && !xcfg["monitor"]["delay"].is_null())
+      selfmonitor_delay = xcfg["monitor"].value("delay", 0.0);
   }
 }
 
