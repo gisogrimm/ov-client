@@ -228,7 +228,8 @@ stage_device_t get_stage_dev(nlohmann::json& dev)
         devchannel.position.x = my_js_value(chpos, "x", 0.0);
         devchannel.position.y = my_js_value(chpos, "y", 0.0);
         devchannel.position.z = my_js_value(chpos, "z", 0.0);
-        devchannel.directivity = my_js_value(ch, "directivity", std::string("omni"));
+        devchannel.directivity =
+            my_js_value(ch, "directivity", std::string("omni"));
         stagedev.channels.push_back(devchannel);
       }
     /// Position of the stage device in the virtual space:
@@ -439,6 +440,7 @@ void ov_client_orlandoviols_t::service()
       catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         report_error(lobby, backend.get_deviceid(), e.what());
+        DEBUG(stagecfg);
       }
     }
     double t(0);
