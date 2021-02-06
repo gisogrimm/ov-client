@@ -64,14 +64,26 @@ bool is_ovbox()
   char name[BUFSIZ];
   char arg[BUFSIZ];
   get_process_name(ppid, name, arg);
-  DEBUG(ppid);
-  DEBUG(name);
-  DEBUG(arg);
   return strcmp(arg, "/home/pi/autorun") == 0;
 #else
   // if not on LINUX this can not be an ovbox:
   return false;
 #endif
+}
+
+std::string ovstrrep(std::string s, const std::string& pat,
+                     const std::string& rep)
+{
+  std::string out_string("");
+  std::string::size_type len = pat.size();
+  std::string::size_type pos;
+  while((pos = s.find(pat)) < s.size()) {
+    out_string += s.substr(0, pos);
+    out_string += rep;
+    s.erase(0, pos + len);
+  }
+  s = out_string + s;
+  return s;
 }
 
 /*

@@ -3,7 +3,6 @@
 
 #include "ov_types.h"
 #include <atomic>
-#include <nlohmann/json.hpp>
 #include <thread>
 
 class ov_client_orlandoviols_t : public ov_client_base_t {
@@ -19,7 +18,7 @@ private:
   void register_device(std::string url, const std::string& device);
   std::string device_update(std::string url, const std::string& device,
                             std::string& hash);
-  void report_error(std::string url, const std::string& device,
+  bool report_error(std::string url, const std::string& device,
                     const std::string& msg);
 
   bool runservice;
@@ -28,9 +27,6 @@ private:
   std::atomic<bool> quitrequest_;
   bool isovbox;
 };
-
-std::string ovstrrep(std::string s, const std::string& pat,
-                     const std::string& rep);
 
 #endif
 

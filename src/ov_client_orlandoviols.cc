@@ -39,14 +39,6 @@ namespace webCURL {
 
 } // namespace webCURL
 
-template <class T>
-T my_js_value(nlohmann::json& obj, const std::string& key, const T& defval)
-{
-  if(obj.is_object())
-    return obj.value(key, defval);
-  return defval;
-}
-
 ov_client_orlandoviols_t::ov_client_orlandoviols_t(ov_render_base_t& backend,
                                                    const std::string& lobby)
     : ov_client_base_t(backend), runservice(true), lobby(lobby),
@@ -70,7 +62,7 @@ void ov_client_orlandoviols_t::stop_service()
   servicethread.join();
 }
 
-void ov_client_orlandoviols_t::report_error(std::string url,
+bool ov_client_orlandoviols_t::report_error(std::string url,
                                             const std::string& device,
                                             const std::string& msg)
 {
@@ -88,15 +80,18 @@ void ov_client_orlandoviols_t::report_error(std::string url,
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, msg.c_str());
-  curl_easy_perform(curl);
+  if(curl_easy_perform(curl) != CURLE_OK) {
+    free(chunk.memory);
+    return false;
+  }
   free(chunk.memory);
+  return true;
 }
 
 bool ov_client_orlandoviols_t::download_file(const std::string& url,
                                              const std::string& dest)
 {
   CURLcode res;
-  std::string retv;
   struct webCURL::MemoryStruct chunk;
   chunk.memory =
       (char*)malloc(1); /* will be grown as needed by the realloc above */
@@ -118,6 +113,13 @@ bool ov_client_orlandoviols_t::download_file(const std::string& url,
   return false;
 }
 
+/**
+   \brief Pull device configuration.
+   \param url Server URL for device REST API, e.g.,
+   http://oldbox.orlandoviols.com/ \param device Device ID (typically MAC
+   address) \retval hash Hash string of previous device configuration, or empty
+   string \return Empty string, or string containing json device configuration
+ */
 std::string ov_client_orlandoviols_t::device_update(std::string url,
                                                     const std::string& device,
                                                     std::string& hash)
@@ -208,8 +210,15 @@ void ov_client_orlandoviols_t::register_device(std::string url,
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, webCURL::WriteMemoryCallback);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-  curl_easy_perform(curl);
+  if(curl_easy_perform(curl) != CURLE_OK) {
+    free(chunk.memory);
+    throw TASCAR::ErrMsg("Unable to register device with url \"" + url + "\".");
+  }
+  std::string result;
+  result.insert(0, chunk.memory, chunk.size);
   free(chunk.memory);
+  if(result != "OK")
+    throw TASCAR::ErrMsg("The front end did not respond \"OK\".");
 }
 
 stage_device_t get_stage_dev(nlohmann::json& dev)
@@ -259,40 +268,21 @@ stage_device_t get_stage_dev(nlohmann::json& dev)
   }
 }
 
-std::string ovstrrep(std::string s, const std::string& pat,
-                     const std::string& rep)
-{
-  std::string out_string("");
-  std::string::size_type len = pat.size();
-  std::string::size_type pos;
-  while((pos = s.find(pat)) < s.size()) {
-    out_string += s.substr(0, pos);
-    out_string += rep;
-    s.erase(0, pos + len);
-  }
-  s = out_string + s;
-  return s;
-}
-
+// main frontend interface function:
 void ov_client_orlandoviols_t::service()
 {
   try {
     register_device(lobby, backend.get_deviceid());
+    if(!report_error(lobby, backend.get_deviceid(), ""))
+      throw TASCAR::ErrMsg("Unable to reset error message.");
+    if(!download_file(lobby + "/announce.flac", "announce.flac"))
+      throw TASCAR::ErrMsg("Unable to download announcement file from server.");
   }
   catch(const std::exception& e) {
+    quitrequest_ = true;
     std::cerr << "Error: " << e.what() << std::endl;
-  }
-  try {
-    report_error(lobby, backend.get_deviceid(), "");
-  }
-  catch(const std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-  }
-  try {
-    download_file(lobby + "/announce.flac", "announce.flac");
-  }
-  catch(const std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    std::cerr << "Invalid URL or server may be down." << std::endl;
+    return;
   }
   std::string hash;
   double gracetime(9.0);
@@ -300,7 +290,6 @@ void ov_client_orlandoviols_t::service()
     std::string stagecfg(device_update(lobby, backend.get_deviceid(), hash));
     if(!stagecfg.empty()) {
       try {
-        report_error(lobby, backend.get_deviceid(), "");
         nlohmann::json js_stagecfg(nlohmann::json::parse(stagecfg));
         if(!js_stagecfg["frontendconfig"].is_null()) {
           std::ofstream ofh("ov-client.cfg");
@@ -436,6 +425,7 @@ void ov_client_orlandoviols_t::service()
           if(!backend.is_session_active())
             backend.start_session();
         }
+        report_error(lobby, backend.get_deviceid(), "");
       }
       catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
