@@ -4,6 +4,62 @@
 #include <nlohmann/json.hpp>
 #include <unistd.h>
 
+bool ov_render_tascar_t::metronome_t::operator!=(const metronome_t& a)
+{
+  return (a.bpb != bpb) || (a.bpm != bpm) || (a.bypass != bypass) ||
+         (a.delay != delay) || (a.level != level);
+}
+
+ov_render_tascar_t::metronome_t::metronome_t()
+    : bpb(4), bpm(120.0), bypass(true), delay(40.0), level(65)
+{
+}
+
+ov_render_tascar_t::metronome_t::metronome_t(nlohmann::json js)
+    : bpb(my_js_value(js, "bpb", 4)), bpm(my_js_value(js, "bpm", 120.0)),
+      bypass(!my_js_value(js, "active", false)),
+      delay(my_js_value(js, "delay", 40.0)),
+      level(my_js_value(js, "level", 65.0))
+{
+}
+
+void ov_render_tascar_t::metronome_t::set_xmlattr(xmlpp::Element* em,
+                                                  xmlpp::Element* ed) const
+{
+  em->set_attribute("bpm", std::to_string(bpm));
+  em->set_attribute("bpb", std::to_string(bpb));
+  em->set_attribute("bypass", (bypass ? "true" : "false"));
+  ed->set_attribute("delay", "0 " + std::to_string(0.001 * delay));
+  em->set_attribute("a1", std::to_string(level));
+  em->set_attribute("ao", std::to_string(level));
+}
+
+void ov_render_tascar_t::metronome_t::update_osc(TASCAR::osc_server_t* srv,
+                                                 const std::string& dev) const
+{
+  if(srv) {
+    lo_message msg(lo_message_new());
+    lo_message_add_float(msg, 1);
+    lo_arg** loarg(lo_message_get_argv(msg));
+    loarg[0]->f = bpm;
+    srv->dispatch_data_message(
+        (std::string("/") + dev + ".metronome/ap1/metronome/bpm").c_str(), msg);
+    loarg[0]->f = bypass;
+    srv->dispatch_data_message(
+        (std::string("/") + dev + ".metronome/ap1/metronome/bypass").c_str(),
+        msg);
+    loarg[0]->f = bpb;
+    srv->dispatch_data_message(
+        (std::string("/") + dev + ".metronome/ap1/metronome/bpb").c_str(), msg);
+    DEBUG(std::string("/") + dev + ".metronome/ap1/metronome/bpb");
+    DEBUG(bypass);
+    // em->set_attribute("bpb", std::to_string(bpb));
+    // em->set_attribute("bypass", std::to_string(bypass));
+    // ed->set_attribute("delay", "0 " + std::to_string(0.001 * delay));
+    lo_message_free(msg);
+  }
+}
+
 bool file_exists(const std::string& fname)
 {
   try {
@@ -299,6 +355,13 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
     }
   }
   if(thisdev.channels.size() > 0) {
+    // create metronome:
+    xmlpp::Element* e_routemetro = e_mods->add_child("route");
+    e_routemetro->set_attribute("name", stage.thisdeviceid + ".metronome");
+    e_routemetro->set_attribute("channels", "2");
+    xmlpp::Element* e_mplug(e_routemetro->add_child("plugins"));
+    metronome.set_xmlattr(e_mplug->add_child("metronome"),
+                          e_mplug->add_child("delay"));
     // create network sender:
     xmlpp::Element* e_sys = e_mods->add_child("system");
     e_sys->set_attribute(
@@ -314,6 +377,15 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
       e_port->set_attribute("src", ch.sourceport);
       e_port->set_attribute("dest", stage.thisdeviceid + "_sender:in_" +
                                         std::to_string(chn));
+      xmlpp::Element* e_port_m2s = e_session->add_child("connect");
+      e_port_m2s->set_attribute("src", stage.thisdeviceid + ".metronome:out.0");
+      e_port_m2s->set_attribute("dest", stage.thisdeviceid + "_sender:in_" +
+                                            std::to_string(chn));
+      xmlpp::Element* e_port_m2e = e_session->add_child("connect");
+      e_port_m2e->set_attribute("src", stage.thisdeviceid + ".metronome:out.1");
+      e_port_m2e->set_attribute("dest", "render." + stage.thisdeviceid +
+                                            ":ego." + std::to_string(chn - 1) +
+                                            ".0");
       waitports.push_back(stage.thisdeviceid + "_sender:in_" +
                           std::to_string(chn));
     }
@@ -810,6 +882,13 @@ void ov_render_tascar_t::set_extra_config(const std::string& js)
         headtrack_tauref = xcfg["headtrack"].value("tauref", 33.315);
       if(xcfg["monitor"].is_object() && !xcfg["monitor"]["delay"].is_null())
         selfmonitor_delay = xcfg["monitor"].value("delay", 0.0);
+      if(xcfg["metronome"].is_object()) {
+        metronome_t newmetro(xcfg["metronome"]);
+        if(newmetro != metronome) {
+          metronome = newmetro;
+          metronome.update_osc(tascar, stage.thisdeviceid);
+        }
+      }
     }
   }
   catch(const std::exception& e) {

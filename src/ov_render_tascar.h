@@ -2,6 +2,7 @@
 #define OV_RENDER_TASCAR
 
 #include "../tascar/libtascar/src/session.h"
+#include "ov_tools.h"
 #include "ov_types.h"
 #include "ovboxclient.h"
 #include "spawn_process.h"
@@ -26,6 +27,20 @@ public:
   std::vector<std::string> get_input_channel_ids() const;
   double get_load() const;
   void set_extra_config(const std::string&);
+  class metronome_t {
+  public:
+    metronome_t();
+    metronome_t(nlohmann::json js);
+    bool operator!=(const metronome_t& a);
+    void set_xmlattr(xmlpp::Element* em, xmlpp::Element* ed) const;
+    void update_osc(TASCAR::osc_server_t* srv, const std::string& dev) const;
+
+    uint32_t bpb;
+    double bpm;
+    bool bypass;
+    double delay;
+    double level;
+  };
 
 private:
   void create_virtual_acoustics(xmlpp::Element* session, xmlpp::Element* e_rec,
@@ -47,6 +62,8 @@ private:
   double headtrack_tauref;
   // self-monitor delay in milliseconds:
   double selfmonitor_delay;
+  // metronome settings:
+  metronome_t metronome;
 };
 
 #endif

@@ -69,7 +69,7 @@ TASCARSOURCE = omni cardioidmod
 
 TASCARMODULS = system touchosc waitforjackport route jackrec
 
-TASCARAUDIOPLUGS = sndfile delay
+TASCARAUDIOPLUGS = sndfile delay metronome
 
 #viewport.o sampler.o cli.o irrender.o async_file.o vbap3d.o hoa.o
 
