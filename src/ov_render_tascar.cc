@@ -43,19 +43,19 @@ void ov_render_tascar_t::metronome_t::update_osc(TASCAR::osc_server_t* srv,
     lo_arg** loarg(lo_message_get_argv(msg));
     loarg[0]->f = bpm;
     srv->dispatch_data_message(
-        (std::string("/") + dev + ".metronome/ap1/metronome/bpm").c_str(), msg);
+        (std::string("/") + dev + ".metronome/ap*/metronome/bpm").c_str(), msg);
     loarg[0]->f = bypass;
     srv->dispatch_data_message(
-        (std::string("/") + dev + ".metronome/ap1/metronome/bypass").c_str(),
+        (std::string("/") + dev + ".metronome/ap*/metronome/bypass").c_str(),
         msg);
     loarg[0]->f = bpb;
     srv->dispatch_data_message(
-        (std::string("/") + dev + ".metronome/ap1/metronome/bpb").c_str(), msg);
+        (std::string("/") + dev + ".metronome/ap*/metronome/bpb").c_str(), msg);
     loarg[0]->f = level;
     srv->dispatch_data_message(
-        (std::string("/") + dev + ".metronome/ap1/metronome/a1").c_str(), msg);
+        (std::string("/") + dev + ".metronome/ap*/metronome/a1").c_str(), msg);
     srv->dispatch_data_message(
-        (std::string("/") + dev + ".metronome/ap1/metronome/ao").c_str(), msg);
+        (std::string("/") + dev + ".metronome/ap*/metronome/ao").c_str(), msg);
     lo_message_free(msg);
   }
 }
