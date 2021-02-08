@@ -84,5 +84,13 @@ while true; do
 	sudo raspi-config nonint disable_overlayfs
 	sudo shutdown -r now
     fi
+    # check for development version:
+    if test -e ~ov/ov-client.devversion; then
+	# switch to development version:
+	sudo rm -f ~ov/ov-client.devversion
+	(echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
+	sudo apt update --assume-yes
+	sudo apt install --no-install-recommends --assume-yes ov-client
+    fi
     sleep 7
 done

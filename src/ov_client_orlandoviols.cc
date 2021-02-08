@@ -300,6 +300,10 @@ void ov_client_orlandoviols_t::service()
           std::ofstream ofh("ov-client.firmwareupdate");
           quitrequest_ = true;
         }
+        if(my_js_value(js_stagecfg, "usedevversion", false)) {
+          std::ofstream ofh("ov-client.devversion");
+          quitrequest_ = true;
+        }
         if(!quitrequest_) {
           nlohmann::json js_audio(js_stagecfg["audiocfg"]);
           if(!js_audio.is_null()) {
