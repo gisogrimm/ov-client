@@ -318,8 +318,13 @@ void ov_client_orlandoviols_t::service()
             audio.numperiods = my_js_value(js_audio, "numperiods", 2);
             backend.configure_audio_backend(audio);
             if(my_js_value(js_audio, "restart", false)) {
+              bool session_was_active(backend.is_session_active());
+              if(session_was_active)
+                backend.end_session();
               backend.stop_audiobackend();
               backend.start_audiobackend();
+              if(session_was_active)
+                backend.start_session();
             }
           }
           nlohmann::json js_rendersettings(js_stagecfg["rendersettings"]);
