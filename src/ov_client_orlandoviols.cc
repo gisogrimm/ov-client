@@ -304,7 +304,7 @@ void ov_client_orlandoviols_t::service()
           nlohmann::json js_audio(js_stagecfg["audiocfg"]);
           if(!js_audio.is_null()) {
             audio_device_t audio;
-            backend.clear_stage();
+            // backend.clear_stage();
             audio.drivername =
                 my_js_value(js_audio, "driver", std::string("jack"));
             audio.devicename =
@@ -415,10 +415,14 @@ void ov_client_orlandoviols_t::service()
             if(!js_rendersettings["extracfg"].is_null())
               backend.set_extra_config(js_rendersettings["extracfg"].dump());
             nlohmann::json js_stagedevs(js_stagecfg["roomdev"]);
-            if(js_stagedevs.is_array())
+            std::map<stage_device_id_t, stage_device_t> newstage;
+            if(js_stagedevs.is_array()) {
               for(auto dev : js_stagedevs) {
-                backend.add_stage_device(get_stage_dev(dev));
+                auto sdev(get_stage_dev(dev));
+                newstage[sdev.id] = sdev;
               }
+              backend.set_stage(newstage);
+            }
           }
           if(!backend.is_audio_active())
             backend.start_audiobackend();

@@ -51,11 +51,11 @@ void ov_render_tascar_t::metronome_t::update_osc(TASCAR::osc_server_t* srv,
     loarg[0]->f = bpb;
     srv->dispatch_data_message(
         (std::string("/") + dev + ".metronome/ap1/metronome/bpb").c_str(), msg);
-    DEBUG(std::string("/") + dev + ".metronome/ap1/metronome/bpb");
-    DEBUG(bypass);
-    // em->set_attribute("bpb", std::to_string(bpb));
-    // em->set_attribute("bypass", std::to_string(bypass));
-    // ed->set_attribute("delay", "0 " + std::to_string(0.001 * delay));
+    loarg[0]->f = level;
+    srv->dispatch_data_message(
+        (std::string("/") + dev + ".metronome/ap1/metronome/a1").c_str(), msg);
+    srv->dispatch_data_message(
+        (std::string("/") + dev + ".metronome/ap1/metronome/ao").c_str(), msg);
     lo_message_free(msg);
   }
 }
@@ -413,7 +413,6 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
                                            "/zyxeuler");
     }
     e_head->set_attribute("actor", TASCAR::vecstr2str(actor));
-    DEBUG(std::to_string(1.0 - exp(-1.0 / (30.0 * headtrack_tauref))));
     e_head->set_attribute(
         "autoref", std::to_string(1.0 - exp(-1.0 / (30.0 * headtrack_tauref))));
     e_head->set_attribute("levelpattern", "/*/ego/*");
@@ -789,8 +788,10 @@ void ov_render_tascar_t::stop_audiobackend()
 
 void ov_render_tascar_t::add_stage_device(const stage_device_t& stagedevice)
 {
+  // compare with current stage:
+  auto p_stage(stage.stage);
   ov_render_base_t::add_stage_device(stagedevice);
-  if(is_session_active()) {
+  if((p_stage != stage.stage) && is_session_active()) {
     end_session();
     start_session();
   }
@@ -798,8 +799,22 @@ void ov_render_tascar_t::add_stage_device(const stage_device_t& stagedevice)
 
 void ov_render_tascar_t::rm_stage_device(stage_device_id_t stagedeviceid)
 {
+  // compare with current stage:
+  auto p_stage(stage.stage);
   ov_render_base_t::rm_stage_device(stagedeviceid);
-  if(is_session_active()) {
+  if((p_stage != stage.stage) && is_session_active()) {
+    end_session();
+    start_session();
+  }
+}
+
+void ov_render_tascar_t::set_stage(
+    const std::map<stage_device_id_t, stage_device_t>& s)
+{
+  // compare with current stage:
+  auto p_stage(stage.stage);
+  ov_render_base_t::set_stage(s);
+  if((p_stage != stage.stage) && is_session_active()) {
     end_session();
     start_session();
   }
@@ -885,8 +900,17 @@ void ov_render_tascar_t::set_extra_config(const std::string& js)
       if(xcfg["metronome"].is_object()) {
         metronome_t newmetro(xcfg["metronome"]);
         if(newmetro != metronome) {
+          bool delaychanged(metronome.delay != newmetro.delay);
           metronome = newmetro;
-          metronome.update_osc(tascar, stage.thisdeviceid);
+          if(is_session_active()) {
+            if(delaychanged) {
+              // workaround, no OSC control of delay yet:
+              end_session();
+              start_session();
+            } else {
+              metronome.update_osc(tascar, stage.thisdeviceid);
+            }
+          }
         }
       }
     }
