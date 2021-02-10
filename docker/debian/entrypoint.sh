@@ -11,7 +11,7 @@ test -e tascar || git clone https://github.com/gisogrimm/tascar
     make install
 )
 # update / clone ov-client:
-test -e ov-clientr || git clone https://github.com/gisogrimm/ov-client
+test -e ov-client || git clone https://github.com/gisogrimm/ov-client
 (
     cd ov-client
     git pull
