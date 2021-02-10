@@ -187,3 +187,8 @@ clean:
 
 packaging:
 	$(MAKE) -C packaging/deb pack
+
+.PHONY : doc
+
+doc:
+	(cd doc && doxygen doxygen.cfg)

@@ -3,7 +3,6 @@
 
 #include "../tascar/libtascar/src/session.h"
 #include "ov_tools.h"
-#include "ov_types.h"
 #include "ovboxclient.h"
 #include "spawn_process.h"
 #include <lo/lo.h>

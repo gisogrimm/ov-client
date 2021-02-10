@@ -6,7 +6,6 @@
 #include <fstream>
 #include <stdint.h>
 #include <string>
-#include <udpsocket.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
