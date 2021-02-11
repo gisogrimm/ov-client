@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18.0)
 
 ## GLOBAL CONFIGURATION
-project(ov-client 
+project(ov-client
     LANGUAGES CXX 
     VERSION 0.5 
     DESCRIPTION "Headless clients to share and receive spatial realtime audio on Linux, MacOS and Windows hosts using JACK, zita-njbridge and TASCAR"
@@ -38,20 +38,18 @@ pkg_check_modules (EIGEN3 REQUIRED eigen3)
 pkg_check_modules (GSL REQUIRED gsl)
 pkg_check_modules (FFTW REQUIRED fftw3f)
 add_subdirectory(libov)
+#add_subdirectory(tascar)
 add_subdirectory(tascar/libtascar)
-
 
 # COMPILER ADDONS
 add_compile_definitions(OVBOXVERSION="${OVBOXVERSION}")
 
 
 # TARGET
-add_library(ov-client-lib STATIC ${SOURCE_FILES})
-target_include_directories(ov-client-lib PRIVATE 
+add_library(ov-client STATIC ${SOURCE_FILES})
+target_include_directories(ov-client PUBLIC
     libov/src
     tascar/libtascar/build
-)
-target_include_directories(ov-client-lib PUBLIC
     ${OPENSSL_INCLUDE_DIRS}
     ${JACK_INCLUDE_DIRS}
 	${LIBXML++_INCLUDE_DIRS}
@@ -64,11 +62,11 @@ target_include_directories(ov-client-lib PUBLIC
 	${FFTW_INCLUDE_DIRS}
 	#${LIBCURL_INCLUDE_DIRS}
 )
-target_link_libraries(ov-client-lib PRIVATE 
-    libov
-    tascar/libtascar
-)
-target_link_libraries(ov-client-lib PUBLIC
+target_link_libraries(ov-client
+	PRIVATE
+    ov
+	tascar
+	PUBLIC
     nlohmann_json::nlohmann_json
     cpprestsdk::cpprest
     ${JACK_LINK_LIBRARIES}
@@ -83,5 +81,5 @@ target_link_libraries(ov-client-lib PUBLIC
 	#${EIGEN3_LINK_LIBRARIES}
 )
 
-add_executable(ov-client src/ov-client.cc)
-target_link_libraries(ov-client PRIVATE ov-client-lib)
+#add_executable(run-ov-client src/ov-client.cc)
+#target_link_libraries(run-ov-client STATIC run-ov-client)
