@@ -26,7 +26,7 @@ list(REMOVE_ITEM SOURCE_FILES src/ov-client.cc)
 # DEPENDENCIES
 find_package(CURL REQUIRED)
 find_package(cpprestsdk REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
@@ -65,7 +65,7 @@ target_link_libraries(ov-client
     ${JACK_LINK_LIBRARIES}
 	OpenSSL::Crypto
 	${CURL_LIBRARIES}
-    #nlohmann_json::nlohmann_json
+    nlohmann_json::nlohmann_json
     #cpprestsdk::cpprest
 )
 
