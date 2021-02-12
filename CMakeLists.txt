@@ -24,62 +24,56 @@ list(REMOVE_ITEM SOURCE_FILES src/ov-client.cc)
 
 
 # DEPENDENCIES
-find_package (PkgConfig REQUIRED)
+find_package(CURL REQUIRED)
 find_package(cpprestsdk REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-pkg_check_modules(OPENSSL REQUIRED openssl)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
 pkg_check_modules(LIBSAMPLERATE REQUIRED samplerate)
 pkg_check_modules(LIBXML++ REQUIRED libxml++-2.6)
-pkg_check_modules (JACK REQUIRED jack)
-pkg_check_modules (LIBLO REQUIRED liblo)
-pkg_check_modules (GTKMM REQUIRED gtkmm-3.0)
-pkg_check_modules (EIGEN3 REQUIRED eigen3)
-pkg_check_modules (GSL REQUIRED gsl)
-pkg_check_modules (FFTW REQUIRED fftw3f)
+pkg_check_modules(JACK REQUIRED jack)
+pkg_check_modules(LIBLO REQUIRED liblo)
+pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
+pkg_check_modules(EIGEN3 REQUIRED eigen3)
+pkg_check_modules(GSL REQUIRED gsl)
+pkg_check_modules(FFTW REQUIRED fftw3f)
 add_subdirectory(libov)
-#add_subdirectory(tascar)
 add_subdirectory(tascar/libtascar)
+
 
 # COMPILER ADDONS
 add_compile_definitions(OVBOXVERSION="${OVBOXVERSION}")
-
+if(APPLE)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework IOKit -framework CoreFoundation")
+endif()
 
 # TARGET
 add_library(ov-client STATIC ${SOURCE_FILES})
-target_include_directories(ov-client PUBLIC
+target_include_directories(ov-client 
+	PUBLIC
     libov/src
     tascar/libtascar/build
-    ${OPENSSL_INCLUDE_DIRS}
     ${JACK_INCLUDE_DIRS}
 	${LIBXML++_INCLUDE_DIRS}
-	${LIBLO_INCLUDE_DIRS}
-	${LIBSNDFILE_INCLUDE_DIRS}
-	#${LIBSAMPLERATE_INCLUDE_DIRS}
-	#${GSL_INCLUDE_DIRS}
-	#${GTKMM_INCLUDE_DIRS}
-	#${EIGEN3_INCLUDE_DIRS}
-	${FFTW_INCLUDE_DIRS}
-	#${LIBCURL_INCLUDE_DIRS}
+	${CURL_INCLUDE_DIRS}
 )
 target_link_libraries(ov-client
-	PRIVATE
+	PUBLIC
     ov
 	tascar
-	PUBLIC
-    nlohmann_json::nlohmann_json
-    cpprestsdk::cpprest
     ${JACK_LINK_LIBRARIES}
-	${LIBXML++_LINK_LIBRARIES}
-	${LIBLO_LINK_LIBRARIES}
-	#${LIBSNDFILE_LINK_LIBRARIES}
-	#${LIBSAMPLERATE_LINK_LIBRARIES}
-	#${GTEST_LINK_LIBRARIES}
-	#${GTKMM_LINK_LIBRARIES}
-	#${FFTW_LINK_LIBRARIES}
-	#${GSL_LINK_LIBRARIES}
-	#${EIGEN3_LINK_LIBRARIES}
+	OpenSSL::Crypto
+	${CURL_LIBRARIES}
+    #nlohmann_json::nlohmann_json
+    #cpprestsdk::cpprest
 )
 
-#add_executable(run-ov-client src/ov-client.cc)
-#target_link_libraries(run-ov-client STATIC run-ov-client)
+add_executable(ov-client-exec src/ov-client.cc)
+#target_include_directories(ov-client-exec 
+#	PUBLIC
+#)
+target_link_libraries(ov-client-exec
+	PUBLIC
+	ov-client
+)
