@@ -3,7 +3,7 @@
 set -e
 mkdir -p build
 cd build
-OPENSSL_ROOT=$(brew --prefix openssl) CPPREST_ROOT=$(brew --prefix cpprestsdk) BOOST_ROOT=$(brew --prefix boost) NLOHMANN_JSON_ROOT=$(brew --prefix nlohmann-json) cmake ./..
+OPENSSL_ROOT_DIR=$(brew --prefix openssl) CPPREST_ROOT=$(brew --prefix cpprestsdk) BOOST_ROOT=$(brew --prefix boost) NLOHMANN_JSON_ROOT=$(brew --prefix nlohmann-json) cmake ./..
 make
 # OPENSSL_ROOT=$(brew --prefix openssl) CPPREST_ROOT=$(brew --prefix cpprestsdk) BOOST_ROOT=$(brew --prefix boost) NLOHMANN_JSON_ROOT=$(brew --prefix nlohmann-json) make
 # (cd zita/zita-resampler-1.6.2 && cmake . && make)
