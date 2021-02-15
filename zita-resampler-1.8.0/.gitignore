@@ -1,12 +1,10 @@
-zita-njbridge-0.4.4/zita-nj2
-zita-njbridge-0.4.4/zita-j2n
-zita-njbridge-0.4.4/Makefile
-zita-resampler-1.6.2/Makefile
+build
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
+Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json

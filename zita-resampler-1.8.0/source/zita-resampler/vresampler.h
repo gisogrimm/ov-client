@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 //
-//  Copyright (C) 2006-2012 Fons Adriaensen <fons@linuxaudio.org>
+//  Copyright (C) 2006-2020 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,27 +18,25 @@
 // ----------------------------------------------------------------------------
 
 
-#ifndef __RESAMPLER_H
-#define __RESAMPLER_H
+#ifndef __VRESAMPLER_H
+#define __VRESAMPLER_H
 
 
-#include <zita-resampler/resampler-table.h>
+#include "zita-resampler/resampler-table.h"
 
 
-class Resampler
+class VResampler
 {
 public:
 
-    Resampler (void);
-    ~Resampler (void);
+    VResampler (void);
+    ~VResampler (void);
 
-    int  setup (unsigned int fs_inp,
-                unsigned int fs_out,
+    int  setup (double       ratio,
                 unsigned int nchan,
                 unsigned int hlen);
 
-    int  setup (unsigned int fs_inp,
-                unsigned int fs_out,
+    int  setup (double       ratio,
                 unsigned int nchan,
                 unsigned int hlen,
                 double       frel);
@@ -46,10 +44,13 @@ public:
     void   clear (void);
     int    reset (void);
     int    nchan (void) const { return _nchan; }
-    int    filtlen (void) const { return inpsize (); } // Deprecated
     int    inpsize (void) const;
-    double inpdist (void) const; 
+    double inpdist (void) const;
     int    process (void);
+    
+    void set_phase (double p);
+    void set_rrfilt (double t);
+    void set_rratio (double r);    
 
     unsigned int         inp_count;
     unsigned int         out_count;
@@ -60,15 +61,22 @@ public:
 
 private:
 
+    enum { NPHASE = 120 };
+
     Resampler_table     *_table;
     unsigned int         _nchan;
     unsigned int         _inmax;
     unsigned int         _index;
     unsigned int         _nread;
     unsigned int         _nzero;
-    unsigned int         _phase;
-    unsigned int         _pstep;
+    double               _ratio;
+    double               _phase;
+    double               _pstep;
+    double               _qstep;
+    double               _wstep;
     float               *_buff;
+    float               *_c1;
+    float               *_c2;
     void                *_dummy [8];
 };
 

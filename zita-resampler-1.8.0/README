@@ -3,6 +3,14 @@ audio signals. Full documentation is available in HTML format,
 see the 'docs' directory.
 
 
+Release 1.8.0  (30/12/2020)
+---------------------------
+
+* Added SSE2 support for Resampler and VResampler.
+  This is enabled by default in the Makefile.
+* Cleanup and some minor bug fixes.
+
+
 Release 1.6.2  (25/08/2018)
 ---------------------------
 

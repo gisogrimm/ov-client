@@ -28,6 +28,11 @@ to be used within a real-time processing context, to be fast, and to provide
 high-quality sample rate conversion.
 </p>
 <p>
+From version 1.8.0, libzita-resampler can be compiled to use SSE2 instructions.
+This will reduce CPU load by a factor of at least 2. An ARM NEON option will be
+provided in some future release.
+</p>
+<p>
 The library operates on signals represented in single-precision floating point
 format. For multichannel operation both the input and output signals are
 assumed to be stored as interleaved samples.
@@ -54,14 +59,14 @@ Libzita-resampler provides two classes:
 </p>
 <p>
 The <b>Resampler</b> class performs resampling at a fixed ratio <b>F_out / F_in</b>
-which is required to be <b>&ge; 1/16</b>  and be reducible to the form <b> b / a</b>
+which is required to be <b>&ge; 1/64</b>  and be reducible to the form <b> b / a</b>
 with <b>a, b</b> integer and <b>b &le; 1000</b>. This includes all the 'standard'
 ratios, e.g. 96000 / 44100 = 320 / 147. These restrictions allow for a more efficient
 implementation.
 </p>
 <p>
 The <b>VResampler</b> class provides an arbitrary ratio <b>r</b> in the range
-<b>1/16 &le; r &le; 64</b> and which can variable within a range of <b>0.95 to
+<b>1/64 &le; r &le; 64</b> and which can variable within a range of <b>0.95 to
 16.0</b> w.r.t. the originally configured one. The lower limit here is necessary
 because this class still uses a fixed multiphase filter, with only the phase step
 being variable. This class was developed for converting between two nominally fixed
@@ -225,16 +230,16 @@ When for example <b>inp_count</b> is zero, you have to fill the input buffer
 again, or provide a new one, and re-initialise the input count and pointer.
 If at that time <b>out_count</b> is not zero, you can either leave the output
 parameters as they are for the next call to <b>process ()</b>, or you could
-empty the part of the output buffer that has been filled and re-use it from
-the start, or provide a completely different one.
+read the part of the output buffer that has been filled and then re-use it
+from the start, or provide a completely different one.
 </p>
 <p>
 The same applies to the input buffer when it is not empty on return of
-<b>process ()</b>: it can be left alone or be replaced. A number of input
+<b>process ()</b>: it can be left alone, re-used or replaced. A number of input
 samples is stored internally between <b>process ()</b> calls as part of the
-resampler state, but this never includes samples that have not yet been used.
-So you can 'revise' the input data, starting from the frame pointed to by the
-returned <b>inp_data</b>, up to the last moment.
+resampler state, but this never includes samples that have not yet been used
+to compute an output sample. So you can 'revise' the input data, starting from
+the frame pointed to by the returned <b>inp_data</b>, up to the last moment.
 </p>
 <p>
 All this means that both classes will interface easily with fixed input and
@@ -272,9 +277,9 @@ Similar considerations apply at the end of the input data:
 <ul>
 <li>inserting <b>k / 2</b> zero-valued samples at the end will ensure
 that the last output sample produced will correspond to a position as close
-as possible but not past the last real input sample,</li>
+as possible but not past the last input sample,</li>
 <li>inserting <b>k - 1</b> zero valued samples will ensure that the output
-includes the full filter response for the last real input sample.</li>
+includes the full filter response for the last input sample.</li>
 </ul>
 <p>
 <a name = "inpdist"></a>
@@ -301,9 +306,9 @@ means that the first output sample corresponds to some point past the start of t
 input data.
 </p>
 <p>
-The 'resample' application supplied with the library sources provides
-an example of how to use the <b>Resampler</b> class. For an example 
-using <b>VResampler</b> you can have a look at zita_a2j and zita_ja2.
+The test programs supplied with the library sources provide some
+examples of how to use both classes. For an another example using
+<b>VResampler</b> you can have a look at zita_ajbridge or zita_njbridge.
 </p>
 
 <br>
@@ -371,7 +376,7 @@ or re-uses existing ones, allocates some internal resources, and returns via <a 
 </p>
 <p class="indent">
 <b>fs_inp, fs_out:</b> The input and output sample rates. The ratio <b>fs_out
-/ fs_inp</b> must be <b> &ge; 1/16</b> and reducible to the form <b>b / a</b>
+/ fs_inp</b> must be <b> &ge; 1/64</b> and reducible to the form <b>b / a</b>
 with <b>a, b</b> integer and <b>b &le; 1000</b>.
 <br><br>
 <b>nchan:</b> Number of channels, must not be zero.
@@ -404,7 +409,7 @@ existing ones, allocates some internal resources, and returns via <a href="#rese
 <b>Parameters:</b>
 </p>
 <p class="indent">
-<b>ratio:</b> The resampling ratio wich must be between <b>1/16</b> and <b>64</b>.
+<b>ratio:</b> The resampling ratio wich must be between <b>1/64</b> and <b>64</b>.
 <br><br>
 <b>nchan:</b> Number of channels, must not be zero.
 <br><br>
