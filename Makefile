@@ -16,7 +16,7 @@ BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
 OBJ = ov_tools spawn_process ov_client_orlandoviols 	\
   ov_render_tascar soundcardtools
 
-EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f nlohmann_json
+EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
