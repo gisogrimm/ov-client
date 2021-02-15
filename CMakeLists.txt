@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18.0)
 
 ## GLOBAL CONFIGURATION
-project(ov-client
+project(ovclient
     LANGUAGES CXX 
     VERSION 0.5 
     DESCRIPTION "Headless clients to share and receive spatial realtime audio on Linux, MacOS and Windows hosts using JACK, zita-njbridge and TASCAR"
@@ -14,13 +14,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 ## SOURCE FILES
-file(GLOB
-    SOURCE_FILES
-    src/*.h
-    src/*.cc
+set(HEADERS
+    ${HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_digitalstage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_orlandoviols.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_render_tascar.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_tools.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/soundcardtools.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/spawn_process.h
 )
-# Remove main entry for library
-list(REMOVE_ITEM SOURCE_FILES src/ov-client.cc)
+set(SOURCE
+    ${SOURCE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_digitalstage.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_orlandoviols.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_render_tascar.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_tools.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/soundcardtools.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/spawn_process.cc
+)
 
 
 # DEPENDENCIES
@@ -39,8 +50,12 @@ pkg_check_modules(EIGEN3 REQUIRED eigen3)
 pkg_check_modules(GSL REQUIRED gsl)
 pkg_check_modules(FFTW REQUIRED fftw3f)
 add_subdirectory(libov)
-add_subdirectory(tascar/libtascar)
+# set(PLUGINPREFIX "ovclient")
+add_subdirectory(tascar/libtascar ${CMAKE_BINARY_DIR}/libtascar)
+add_subdirectory(tascar/plugins ${CMAKE_BINARY_DIR}/plugins)
+add_subdirectory(zita/zita-njbridge-0.4.4 ${CMAKE_BINARY_DIR}/zita)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # COMPILER ADDONS
 add_compile_definitions(OVBOXVERSION="${OVBOXVERSION}")
@@ -49,8 +64,8 @@ if(APPLE)
 endif()
 
 # TARGET
-add_library(ov-client STATIC ${SOURCE_FILES})
-target_include_directories(ov-client 
+add_library(ovclient STATIC ${HEADERS} ${SOURCE})
+target_include_directories(ovclient
 	PUBLIC
     libov/src
     tascar/libtascar/build
@@ -58,7 +73,7 @@ target_include_directories(ov-client
 	${LIBXML++_INCLUDE_DIRS}
 	${CURL_INCLUDE_DIRS}
 )
-target_link_libraries(ov-client
+target_link_libraries(ovclient
 	PUBLIC
     ov
 	tascar
@@ -66,14 +81,26 @@ target_link_libraries(ov-client
 	OpenSSL::Crypto
 	${CURL_LIBRARIES}
     nlohmann_json::nlohmann_json
-    #cpprestsdk::cpprest
+    cpprestsdk::cpprest
 )
+## INSTALL
+install(FILES ${HEADERS} DESTINATION include/libov-client)
 
-add_executable(ov-client-exec src/ov-client.cc)
-#target_include_directories(ov-client-exec 
-#	PUBLIC
-#)
-target_link_libraries(ov-client-exec
-	PUBLIC
-	ov-client
-)
+add_executable(ov-client src/ov-client.cc)
+target_link_libraries(ov-client PUBLIC ovclient)
+add_executable(ov-headtracker src/ov-headtracker.cc)
+target_link_libraries(ov-headtracker PUBLIC ovclient ${LIBLO_LINK_LIBRARIES})
+add_executable(ov-client_hostname src/ov-client_hostname.cc)
+target_link_libraries(ov-client_hostname PUBLIC ovclient)
+
+
+add_custom_command(
+        TARGET ov-client POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_BINARY_DIR}/zita/zita-j2n
+                ${CMAKE_BINARY_DIR}/zita-j2n)
+add_custom_command(
+    TARGET ov-client POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_BINARY_DIR}/zita/zita-n2j
+            ${CMAKE_BINARY_DIR}/zita-n2j)

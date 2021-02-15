@@ -3,14 +3,13 @@
 
 #include "ov_types.h"
 #include <atomic>
-#include <boost/filesystem.hpp>
 #include <thread>
 
 class ov_client_digitalstage_t : public ov_client_base_t {
 public:
   ov_client_digitalstage_t(ov_render_base_t& backend,
-                           const std::string& frontend_url,
-                           boost::filesystem::path& selfpath);
+                           const std::string& api_url,
+                           const std::string& token);
   void start_service();
   void stop_service();
   bool download_file(const std::string& url, const std::string& dest);
@@ -19,9 +18,10 @@ public:
 private:
   void service();
 
-  bool runservice;
-  std::thread servicethread;
-  std::string frontend_url;
+  bool runservice_;
+  std::thread servicethread_;
+  std::string api_url_;
+  std::string token_;
   std::atomic<bool> quitrequest_;
 };
 
