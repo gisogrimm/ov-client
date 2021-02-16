@@ -12,6 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: fetchtags
       run: git fetch --unshallow --tags
+    - name: submods
+      run: git submodule init && git submodule update && (cd libov && git submodule update --init)
     - name: dependencies
       run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils
     - name: make
