@@ -1,15 +1,22 @@
 cmake_minimum_required(VERSION 3.8)
-project (njbridge)
+project (zita-njbridge VERSION 0.4.4)
 
+add_definitions( -DVERSION="${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" )
+#set(CMAKE_CPPFLAGS_FLAGS "${CMAKE_CPPFLAGS_FLAGS} -I. -MMD -MP")
+#set(CMAKE_CXXFLAGS_FLAGS "${CMAKE_CXXFLAGS_FLAGS} -O2 -Wall")
+include(GNUInstallDirs)
+
+
+# Dependencies
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JACK REQUIRED jack)
-add_subdirectory(zita-resampler)
+if(TARGET zita-resampler)
+    add_library(zita-resampler::zita-resampler ALIAS zita-resampler)
+else()
+    find_package(zita-resampler CONFIG REQUIRED)
+endif()
 
-add_definitions( -DVERSION="0.4.4" )
-
-set(CMAKE_CPPFLAGS_FLAGS "${CMAKE_CPPFLAGS_FLAGS} -I. -MMD -MP")
-set(CMAKE_CXXFLAGS_FLAGS "${CMAKE_CXXFLAGS_FLAGS} -O2 -Wall")
-
+# Source control
 set(J2N_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/source/netdata.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/source/jacktx.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/source/nettx.cc
