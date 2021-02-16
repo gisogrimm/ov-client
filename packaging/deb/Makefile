@@ -1,14 +1,18 @@
 all:
 
+VERSION=$(shell cat ../../libov/.ov_version)
+MINORVERSION=$(shell cat ../../libov/.ov_minor_version)
+FULLVERSION=$(shell cat ../../libov/.ov_full_version)
 CODENAME:=$(shell lsb_release -sc)
 REPO=../..
-PACKVER:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)-$(shell lsb_release -si)$(shell lsb_release -sr)
+PACKVER:=$(FULLVERSION)-$(shell lsb_release -si)$(shell lsb_release -sr)
 DEBS:=$(subst .csv,,$(wildcard *.csv))
 STORAGE:=debian/$(CODENAME)
 
 pack:
 	test -n "$(VERSION)"
 	test -n "$(MINORVERSION)"
+	test -n "$(FULLVERSION)"
 	@echo "Packaging:"
 	@echo " - Package version: $(PACKVER)"
 	@echo " - Packages: $(DEBS)"
