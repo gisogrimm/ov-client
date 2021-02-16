@@ -17,6 +17,7 @@ include(GNUInstallDirs)
 ## SOURCE FILES
 set(OVCLIENT_HEADERS
     ${HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_ds_service.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_digitalstage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_orlandoviols.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_render_tascar.h
@@ -26,6 +27,7 @@ set(OVCLIENT_HEADERS
 )
 set(OVCLIENT_SOURCE
     ${SOURCE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_ds_service.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_digitalstage.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_client_orlandoviols.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ov_render_tascar.cc
@@ -66,22 +68,22 @@ endif()
 
 # TARGET
 # libovclient
-add_library(ovclient STATIC ${OVCLIENT_HEADERS} ${OVCLIENT_SOURCE})
+add_library(ovclient ${OVCLIENT_HEADERS} ${OVCLIENT_SOURCE})
 target_include_directories(ovclient
-	PUBLIC
+    PUBLIC
     libov/src
     tascar/libtascar/build
     ${JACK_INCLUDE_DIRS}
-	${LIBXML++_INCLUDE_DIRS}
-	${CURL_INCLUDE_DIRS}
+    ${LIBXML++_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
 )
 target_link_libraries(ovclient
-	PUBLIC
+PUBLIC
     ov
-	tascar
+    tascar
     ${JACK_LINK_LIBRARIES}
-	OpenSSL::Crypto
-	${CURL_LIBRARIES}
+    OpenSSL::Crypto
+    ${CURL_LIBRARIES}
     nlohmann_json::nlohmann_json
     cpprestsdk::cpprest
 )
