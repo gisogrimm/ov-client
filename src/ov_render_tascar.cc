@@ -182,6 +182,7 @@ void ov_render_tascar_t::create_virtual_acoustics(xmlpp::Element* e_session,
           xmlpp::Element* e_snd(e_src->add_child("sound"));
           e_snd->set_attribute("maxdist", "50");
           e_snd->set_attribute("gainmodel", "1");
+          e_snd->set_attribute("delayline", "false");
           double gain(ch.gain * stagemember.second.gain);
           if(stagemember.second.id == thisdev.id) {
             // connect self-monitoring source ports:
@@ -625,6 +626,7 @@ void ov_render_tascar_t::start_session()
         xmlpp::Element* e_snd(e_src->add_child("sound"));
         e_snd->set_attribute("maxdist", "50");
         e_snd->set_attribute("gainmodel", "1");
+        e_snd->set_attribute("delayline", "false");
         e_snd->set_attribute("x", "4");
         xmlpp::Element* e_plugs(e_snd->add_child("plugins"));
         xmlpp::Element* e_sndfile(e_plugs->add_child("sndfile"));
