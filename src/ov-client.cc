@@ -1,11 +1,9 @@
 //#include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
-#include "ov_tools.h"
 #include <errmsg.h>
 #include <fstream>
 #include <stdint.h>
-#include <string>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
