@@ -17,7 +17,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 # DEPENDENCIES
 set(PLUGINPREFIX "ovclient")
 add_subdirectory(libov)
-#add_subdirectory(libov/tascar ${PROJECT_BINARY_DIR}/plugins)
+add_subdirectory(libov/tascar/plugins ${PROJECT_BINARY_DIR}/plugins)
 add_subdirectory(zita-njbridge ${PROJECT_BINARY_DIR}/zita)
 
 set_target_properties(zita-n2j PROPERTIES
