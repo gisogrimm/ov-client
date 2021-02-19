@@ -4,3 +4,15 @@
 [submodule "tascar"]
 	path = tascar
 	url = ../tascar
+[submodule "third_party/libxmlplusplus"]
+	path = third_party/libxmlplusplus
+	url = https://github.com/libxmlplusplus/libxmlplusplus.git
+[submodule "third_party/libxml2"]
+	path = third_party/libxml2
+	url = https://gitlab.gnome.org/GNOME/libxml2.git
+[submodule "third_party/pthreads4w"]
+	path = third_party/pthreads4w
+	url = https://github.com/fwbuilder/pthreads4w.git
+[submodule "third_party/getopt-for-windows"]
+	path = third_party/getopt-for-windows
+	url = https://github.com/Chunde/getopt-for-windows.git
