@@ -1,6 +1,7 @@
 #ifndef OV_TOOLS_H
 #define OV_TOOLS_H
 
+#include "errmsg.h"
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -18,9 +19,15 @@ std::string ovstrrep(std::string s, const std::string& pat,
 template <class T>
 T my_js_value(nlohmann::json& obj, const std::string& key, const T& defval)
 {
-  if(obj.is_object())
-    return obj.value(key, defval);
-  return defval;
+  try {
+    if(obj.is_object())
+      return obj.value(key, defval);
+    return defval;
+  }
+  catch(const std::exception& e) {
+    throw ErrMsg(std::string(e.what()) + " ('" + obj.dump() + "', key: '" +
+                 key + "')");
+  }
 }
 
 #endif
