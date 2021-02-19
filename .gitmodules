@@ -1,3 +1,6 @@
 [submodule "libov"]
 	path = libov
 	url = ../libov.git
+[submodule "zita-njbridge"]
+	path = zita-njbridge
+	url = https://github.com/digital-stage/zita-njbridge.git
