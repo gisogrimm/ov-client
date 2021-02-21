@@ -15,7 +15,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 # DEPENDENCIES
 set(PLUGINPREFIX "ovclient")
-add_subdirectory(libov EXCLUDE_FROM_ALL)
+add_subdirectory(libov)
 list(APPEND RECEIVERS
         ortf
         hrtf 
@@ -34,9 +34,9 @@ list(APPEND AUDIOPLUGINS
         delay 
         metronome
 )
-add_subdirectory(libov/tascar/plugins ${PROJECT_BINARY_DIR}/plugins EXCLUDE_FROM_ALL)
+add_subdirectory(libov/tascar/plugins ${PROJECT_BINARY_DIR}/plugins)
 get_property(TASCAR_PLUGIN_LIBRARIES GLOBAL PROPERTY TASCAR_PLUGIN_LIBRARIES)
-add_subdirectory(zita-njbridge ${PROJECT_BINARY_DIR}/zita EXCLUDE_FROM_ALL)
+add_subdirectory(zita-njbridge ${PROJECT_BINARY_DIR}/zita)
 
 message("Tascar plugin: ${TASCAR_PLUGIN_LIBRARIES}")
 
