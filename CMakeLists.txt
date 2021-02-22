@@ -29,6 +29,9 @@ list(APPEND TASCARMODS
         route
         jackrec
 )
+list(APPEND SOURCEMODS
+        omni
+)
 list(APPEND AUDIOPLUGINS
         sndfile 
         delay 
@@ -69,7 +72,7 @@ target_link_libraries(ov-client_listsounddevs PRIVATE ov)
 target_include_directories(ov-client_listsounddevs PRIVATE libov/src ${JACK_INCLUDE_DIRS})
 
 set(CPACK_PACKAGE_EXECUTABLES ov-client)
-if(APPLE)
+if(APPLE AND BUILD_APP)
         set(APP "${PROJECT_BINARY_DIR}/OVClient.app")
         install(FILES
                 ${PROJECT_SOURCE_DIR}/icon.icns
