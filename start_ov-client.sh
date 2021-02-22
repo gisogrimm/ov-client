@@ -1,2 +1,2 @@
 #!/bin/sh
-PATH=./build:$PATH LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./libov/tascar/plugins/build/ ./build/ov-client $*
+PATH=./build:$PATH LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./build/plugins ./build/ov-client $*
