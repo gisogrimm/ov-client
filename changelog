@@ -1,3 +1,6 @@
+2021-02-23, version 0.5.50
+ - bugfix for broken web front end
+
 2021-02-08, version 0.5.48
  - metronome
  - configurable self-monitor delay
