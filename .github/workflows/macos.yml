@@ -15,7 +15,7 @@ jobs:
     - name: submods
       run: git submodule init && git submodule update && (cd libov && git submodule update --init)
     - name: dependencies
-      run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils
+      run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils libsoundio
     - name: make
       run: ./build_osx.sh
     #- name: packlibs
