@@ -21,7 +21,7 @@ SOURCE_DIR = src
 
 LDLIBS += `pkg-config --libs $(EXTERNALS)`
 CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
-LDLIBS += -ldl
+LDLIBS += -ldl -lsoundio
 
 # libcpprest dependencies:
 #LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
