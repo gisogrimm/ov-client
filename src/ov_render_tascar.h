@@ -1,7 +1,7 @@
 #ifndef OV_RENDER_TASCAR
 #define OV_RENDER_TASCAR
 
-#include "../tascar/libtascar/src/session.h"
+#include "../tascar/libtascar/include/session.h"
 #include "ov_tools.h"
 #include "ov_types.h"
 #include "ovboxclient.h"

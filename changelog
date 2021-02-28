@@ -1,3 +1,6 @@
+2021-02-28, version 0.5.51
+ - increase robustness in case of invalid REST API responses
+
 2021-02-23, version 0.5.50
  - bugfix for broken web front end
 

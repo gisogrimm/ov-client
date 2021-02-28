@@ -1,5 +1,5 @@
 #include "ov_client_orlandoviols.h"
-#include "../tascar/libtascar/src/session.h"
+#include "../tascar/libtascar/include/session.h"
 #include "errmsg.h"
 #include "ov_tools.h"
 #include "soundcardtools.h"
@@ -185,9 +185,11 @@ std::string ov_client_orlandoviols_t::device_update(std::string url,
   bool first(true);
   retv = "";
   while(std::getline(ss, to, '\n')) {
-    if(first)
+    if(first) {
+      if(!to.empty() && (to[0] == '<'))
+        throw ErrMsg("Invalid hash code, propably not a REST API response.");
       hash = to;
-    else
+    } else
       retv += to + '\n';
     first = false;
   }
@@ -450,8 +452,8 @@ void ov_client_orlandoviols_t::service()
     }
     catch(const std::exception& e) {
       std::cerr << "Error: " << e.what() << std::endl;
-      std::cerr << "retrying in 5 seconds" << std::endl;
-      std::this_thread::sleep_for(std::chrono::seconds(5));
+      std::cerr << "retrying in 15 seconds" << std::endl;
+      std::this_thread::sleep_for(std::chrono::seconds(15));
     }
   }
 }
