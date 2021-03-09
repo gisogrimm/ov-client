@@ -2,19 +2,20 @@ name: MacOS make
 
 on:
   push:
-    branches: [ development, digital-stage-client ]
+    branches: [ development ]
 
 jobs:
   build:
 
     runs-on: macos-latest
+
     steps:
     - uses: actions/checkout@v2
-    - name: fetchtags
+    - name: Fetch git tags
       run: git fetch --unshallow --tags
-    - name: submods
-      run: git submodule init && git submodule update && (cd libov && git submodule update --init)
-    - name: dependencies
+    - name: Install submodules
+      run: git submodule update --init --recursive
+    - name: Install dependencies
       run: brew install pkgconfig libxml2 glibmm libxml++ jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils libsoundio
     - name: make
       run: ./build_osx.sh
