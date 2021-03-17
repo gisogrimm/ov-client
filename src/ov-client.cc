@@ -3,6 +3,7 @@
 #include "ov_render_tascar.h"
 #include <fstream>
 #include <stdint.h>
+#include <signal.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
