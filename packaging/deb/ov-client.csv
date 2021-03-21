@@ -2,10 +2,8 @@ LICENSE,usr/share/doc/ovclient
 build/ov-client,usr/bin
 build/ov-client_hostname,usr/bin
 build/ov-client_listsounddevs,usr/bin
+installovclient.sh,usr/share/ovclient/tools
 jackrec.html,usr/share/ovclient
-node_modules,usr/share/ovclient
-ovclient.css,usr/share/ovclient
-ovclient.js,usr/share/ovclient
 libov/tascar/plugins/build/ovclienttascar_ap_delay.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_metronome.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_sndfile.so,usr/lib
@@ -23,4 +21,8 @@ libov/tascar/plugins/build/ovclienttascarreceiver_ortf.so,usr/lib
 libov/tascar/plugins/build/ovclienttascarreceiver_simplefdn.so,usr/lib
 libov/tascar/plugins/build/ovclienttascarsource_cardioidmod.so,usr/lib
 libov/tascar/plugins/build/ovclienttascarsource_omni.so,usr/lib
+node_modules,usr/share/ovclient
+ovclient.css,usr/share/ovclient
+ovclient.js,usr/share/ovclient
+tools/pi/autorun,usr/share/ovclient/tools
 webmixer.js,usr/share/ovclient

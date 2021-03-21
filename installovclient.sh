@@ -10,6 +10,9 @@
     (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
     sync
 
+    # in case someone powered off during installation we need to fix unconfigured packages:
+    sudo dpkg --configure -a
+    sync
     # install dependencies:
     # retry 10 times because the raspios servers are not very stable:
     cnt=10
@@ -34,7 +37,13 @@
 
     # get autorun file:
     rm -f autorun
-    wget https://github.com/gisogrimm/ov-client/raw/master/tools/pi/autorun
+    if test -e /usr/share/ovclient/tools/autorun; then
+	# prefer the version provided with ov-client package:
+	cp /usr/share/ovclient/tools/autorun .
+    else
+	# if not available then install from git:
+	wget https://github.com/gisogrimm/ov-client/raw/master/tools/pi/autorun
+    fi
     chmod a+x autorun
     sync
 
