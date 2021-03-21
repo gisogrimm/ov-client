@@ -15,6 +15,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 # DEPENDENCIES
 find_package(Threads REQUIRED)
+find_package(XercesC REQUIRED)
 find_package(Jack REQUIRED)
 find_package(LibSndFile REQUIRED)
 find_package(LibSamplerate REQUIRED)
