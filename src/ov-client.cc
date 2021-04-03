@@ -1,12 +1,9 @@
 //#include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
-#include "ov_tools.h"
-#include <errmsg.h>
 #include <fstream>
 #include <stdint.h>
-#include <string>
-#include <udpsocket.h>
+#include <signal.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -48,8 +45,15 @@ int main(int argc, char** argv)
     nlohmann::json js_cfg({{"deviceid", getmacaddr()},
                            {"url", "http://oldbox.orlandoviols.com/"},
                            {"protocol", "ov"}});
-    if(!config.empty())
-      js_cfg = nlohmann::json::parse(config);
+    if(!config.empty()){
+      try{
+	DEBUG(config);
+	js_cfg = nlohmann::json::parse(config);
+      }
+      catch( const std::exception& err ){
+	DEBUG(err.what());
+      }
+    }
     std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
     std::string lobby(ovstrrep(
         js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));

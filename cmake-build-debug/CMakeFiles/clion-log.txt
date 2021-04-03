@@ -1,0 +1,38 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/tobias/Developer/ov/ov-client
+-- The CXX compiler identification is AppleClang 12.0.0.12000032
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ - works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found CURL: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/usr/lib/libcurl.tbd (found version "7.64.1")  
+-- Found ZLIB: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/usr/lib/libz.tbd (found version "1.2.11") 
+-- Found OpenSSL: /opt/homebrew/Cellar/openssl@1.1/1.1.1i/lib/libcrypto.dylib (found version "1.1.1i")  
+-- Found Boost: /opt/homebrew/lib/cmake/Boost-1.75.0/BoostConfig.cmake (found version "1.75.0") found components: random system thread filesystem chrono atomic date_time regex 
+-- Found nlohmann_json: /opt/homebrew/lib/cmake/nlohmann_json/nlohmann_jsonConfig.cmake (found suitable version "3.9.1", minimum required is "3.2.0") 
+Building libtascar version 0.216.0
+Building components with version 0.216.0.29-25e9e5a
+-- Checking for module 'jack'
+--   Found jack, version 1.9.17
+-- Found Jack: /usr/local/lib/libjack.dylib  
+-- Checking for module 'sndfile'
+--   Found sndfile, version 1.0.31
+-- Found LibSndFile: /opt/homebrew/Cellar/libsndfile/1.0.31/lib/libsndfile.dylib  
+-- Found PkgConfig: /opt/homebrew/bin/pkg-config (found version "0.29.2") 
+-- Could not find libsamplerate, get it http://www.mega-nerd.com/SRC/
+-- Checking for module 'fftw3'
+--   Found fftw3, version 3.3.9
+-- Found FFTW: /opt/homebrew/Cellar/fftw/3.3.9/lib/libfftw3f.dylib  
+CMake Error at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+  Could NOT find Eigen3 (missing: EIGEN3_INCLUDE_DIR EIGEN3_VERSION_OK)
+  (Required is at least version "2.91.0")
+Call Stack (most recent call first):
+  /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake:445 (_FPHSA_FAILURE_MESSAGE)
+  libov/tascar/cmake/modules/FindEigen3.cmake:93 (find_package_handle_standard_args)
+  libov/tascar/libtascar/CMakeLists.txt:104 (find_package)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/Users/tobias/Developer/ov/ov-client/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/Users/tobias/Developer/ov/ov-client/cmake-build-debug/CMakeFiles/CMakeError.log".

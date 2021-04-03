@@ -7,19 +7,20 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+
     steps:
     - uses: actions/checkout@v2
     - name: fetchtags
       run: git fetch --unshallow --tags
     - name: submods
-      run: git submodule init && git submodule update
+      run: git submodule init && git submodule update && (cd libov && git submodule update --init)
     - name: tascar
       run: wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add - &&
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
     - name: dependencies
       run: sudo apt update &&
-           sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev mhamakedeb libboost-all-dev libxml++2.6-dev libcpprest-dev nlohmann-json-dev
+           sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev mhamakedeb libboost-all-dev libxml++2.6-dev libcpprest-dev nlohmann-json3-dev libsoundio-dev libxerces-c-dev
     - name: make
       run: make
     - name: packaging

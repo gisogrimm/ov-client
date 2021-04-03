@@ -1,31 +1,14 @@
-all: showver lib tscver tscobj build binaries tscplug
+all: build lib binaries
 
-export VERSION:=$(shell grep -m 1 VERSION libov/Makefile|sed 's/^.*=//g')
-export MINORVERSION:=$(shell git rev-list --count release_0_5..HEAD)
-export COMMIT:=$(shell git rev-parse --short HEAD)
-export COMMITMOD:=$(shell test -z "`git status --porcelain -uno`" || echo "-modified")
-export FULLVERSION:=$(VERSION).$(MINORVERSION)-$(COMMIT)$(COMMITMOD)
+BINARIES = ov-client ov-client_hostname ov-client_listsounddevs
 
-showver: libov/Makefile
-	$(MAKE) ver
-
-ver:
-	echo $(FULLVERSION)
-
-BINARIES = ov-client ov-headtracker ov-client_hostname ov-client_listsounddevs
-OBJ = ov_tools spawn_process ov_client_orlandoviols 	\
-  ov_render_tascar soundcardtools
-
-EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f
+EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
-BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
 -ggdb -fno-finite-math-only
-
-CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
 ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
@@ -51,27 +34,7 @@ LDFLAGS += -Llibov/build
 
 HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 
-CXXFLAGS += -Itascar/libtascar/build
-
-TASCAROBJECTS = licensehandler.o audiostates.o coordinates.o		\
-  audiochunks.o xmlconfig.o dynamicobjects.o sourcemod.o		\
-  receivermod.o filterclass.o osc_helper.o pluginprocessor.o		\
-  acousticmodel.o scene.o render.o session_reader.o session.o		\
-  jackclient.o delayline.o errorhandling.o osc_scene.o ringbuffer.o	\
-  jackiowav.o jackrender.o audioplugin.o levelmeter.o serviceclass.o	\
-  speakerarray.o spectrum.o fft.o stft.o ola.o
-
-TASCARDMXOBJECTS =
-
-TASCARRECEIVERS = ortf hrtf simplefdn omni
-
-TASCARSOURCE = omni cardioidmod
-
-TASCARMODULS = system touchosc waitforjackport route jackrec
-
-TASCARAUDIOPLUGS = sndfile delay metronome
-
-#viewport.o sampler.o cli.o irrender.o async_file.o vbap3d.o hoa.o
+CXXFLAGS += -Ilibov/tascar/libtascar/build
 
 OSFLAG :=
 ifeq ($(OS),Windows_NT)
@@ -88,9 +51,6 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
-	 	TASCARMODULS += ovheadtracker lightctl
-		TASCARDMXOBJECTS += termsetbaud.o serialport.o dmxdriver.o
-		TASCARRECEIVERS += itu51
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
@@ -98,6 +58,7 @@ else
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
 		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
 		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
+		EXTERNALS += nlohmann-json
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -122,9 +83,6 @@ libov/build/libov.a: lib
 libov/Makefile:
 	git submodule init && git submodule update
 
-tascar/Makefile:
-	git submodule init && git submodule update
-
 build: build/.directory
 
 %/.directory:
@@ -134,17 +92,9 @@ binaries: $(BUILD_BINARIES)
 
 $(BUILD_BINARIES): libov/build/libov.a
 
-#build/ov-client: libov/build/libov.a
-
 build/%: src/%.cc
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
-
-#$(BUILD_BINARIES): $(wildcard libov/build/*.o)
-
-#build/ov-client: $(wildcard src/*.h)
-
-build/ov-client_listsounddevs build/ov-client: $(BUILD_OBJ) $(patsubst %,tascar/libtascar/build/%,$(TASCAROBJECTS))
 
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -157,33 +107,19 @@ zita-njbridge-build:
 	$(MAKE) -C zita/zita-njbridge-0.4.4/source
 ##TODO: @alessandro: Let zita-njbridge build binaries into build dir
 
-## TASCAR stuff:
-
-tascar: tscver tascar/Makefile
-
-tscbuild:
-	$(MAKE) -C tascar/libtascar build
-
-$(BUILD_OBJ) $(patsubst %,tascar/libtascar/build/%,$(TASCAROBJECTS)): tscobj
-
-tscver: tscbuild
-	$(MAKE) -C tascar/libtascar ver
-
-tscobj: tscver
-	$(MAKE) -C tascar/libtascar TSCCXXFLAGS=-DPLUGINPREFIX='\"ovclient\"' $(patsubst %,build/%,$(TASCAROBJECTS))  $(patsubst %,build/%,$(TASCARDMXOBJECTS))
-
-tscplug: tscver tscobj
-	 $(MAKE) -C tascar/plugins PLUGINPREFIX=ovclient RECEIVERS="$(TASCARRECEIVERS)" SOURCES="$(TASCARSOURCE)" TASCARMODS="$(TASCARMODULS)" TASCARMODSGUI= AUDIOPLUGINS="$(TASCARAUDIOPLUGS)" GLABSENSORS= TASCARLIB="$(patsubst %,../libtascar/build/%,$(TASCAROBJECTS))" TASCARDMXLIB="$(patsubst %,../libtascar/build/%,$(TASCARDMXOBJECTS))"
-
 clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
 
 clean:
 	rm -Rf build src/*~ ovclient*.deb
 	$(MAKE) -C libov clean
-	$(MAKE) -C tascar clean
 
 .PHONY: packaging
 
 packaging:
 	$(MAKE) -C packaging/deb pack
+
+.PHONY : doc
+
+doc:
+	(cd doc && doxygen doxygen.cfg)

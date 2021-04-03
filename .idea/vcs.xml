@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libov" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libov/tascar" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/zita-njbridge" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/zita-njbridge/zita-resampler" vcs="Git" />
+  </component>
+</project>
