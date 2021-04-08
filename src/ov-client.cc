@@ -26,7 +26,8 @@ void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
                    port_t p, void*)
 {
   std::cout << "sequence error, cid=" << (int)cid << " expected " << seq_ex
-            << " received " << seq_rec << " port " << p << std::endl;
+            << " received " << seq_rec << " diff " << seq_rec - seq_ex
+            << " port " << p << std::endl;
 }
 
 int main(int argc, char** argv)
