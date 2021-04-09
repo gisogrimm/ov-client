@@ -31,26 +31,6 @@ killall dbus-launch
 ## Stop all wifi/bluetooth devices
 rfkill block all
 
-if test ! -e /boot/ovclient-noupdate; then
-    # if not on overlayfs then update/reinstall:
-    if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
-	echo "overlay fs, not updating"
-    else
-	# remove old installer scripts:
-	rm -f installovclient.sh
-	# get the latest installer script:
-	wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
-	if test -e installovclient.sh; then
-	    # run installer to update to latest version:
-	    . installovclient.sh
-	    # activate overlay image in case the installation script failed, and try the best we can:
-	    sudo raspi-config nonint enable_overlayfs
-	fi
-	# ready, reboot:
-	sudo shutdown -r now
-    fi
-fi
-
 # activate WiFi if required:
 if test -e /boot/ovclient-wifi.txt; then
     # remove DOS line ends:  -e 's/\r//1'
@@ -71,6 +51,26 @@ if test -e /boot/ovclient-wifi.txt; then
     fi
 fi
 
+if test ! -e /boot/ovclient-noupdate; then
+    # if not on overlayfs then update/reinstall:
+    if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
+	echo "overlay fs, not updating"
+    else
+	# remove old installer scripts:
+	rm -f installovclient.sh
+	# get the latest installer script:
+	wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
+	if test -e installovclient.sh; then
+	    # run installer to update to latest version:
+	    . installovclient.sh
+	    # activate overlay image in case the installation script failed, and try the best we can:
+	    sudo raspi-config nonint enable_overlayfs
+	fi
+	# ready, reboot:
+	sudo shutdown -r now
+    fi
+fi
+
 # start client:
 while true; do
     
@@ -88,12 +88,34 @@ while true; do
 	sudo shutdown -r now
     fi
     # check for development version:
-    if test -e ~ov/ov-client.devversion; then
+    if test -e ~ov/ov-client.usedevversion; then
+	echo "switching to development version"
 	# switch to development version:
-	sudo rm -f ~ov/ov-client.devversion
+	sudo rm -f ~ov/ov-client.usedevversion
 	(echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
 	sudo apt update --assume-yes
 	sudo apt install --no-install-recommends --assume-yes ov-client
+    fi
+    if test -e ~ov/ov-client.wificfg; then
+	echo "switching wifi"
+	sudo mv ~ov/ov-client.wificfg /boot/ovclient-wifi.txt
+	# activate WiFi if required:
+	# remove DOS line ends:  -e 's/\r//1'
+	# the first line contains the SSID:
+	SSID=$(cat /boot/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
+	# the second line the WIFI password:
+	PW=$(cat /boot/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
+	COUNTRYCODE=DE
+	test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
+	echo "connecting to WiFi ${SSID}"
+	if test -n "${SSID}"; then
+	    sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+	    sleep 2
+	    rfkill unblock wifi
+	    sleep 10
+	    sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+	    sleep 20
+	fi
     fi
     sleep 7
 done
