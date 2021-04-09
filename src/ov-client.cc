@@ -2,8 +2,8 @@
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
-#include <stdint.h>
 #include <signal.h>
+#include <stdint.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -20,6 +20,14 @@ std::string get_file_contents(const std::string& fname)
   std::string str((std::istreambuf_iterator<char>(t)),
                   std::istreambuf_iterator<char>());
   return str;
+}
+
+void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
+                   port_t p, void*)
+{
+  std::cout << "sequence error, cid=" << (int)cid << " expected " << seq_ex
+            << " received " << seq_rec << " diff " << seq_rec - seq_ex
+            << " port " << p << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -45,13 +53,13 @@ int main(int argc, char** argv)
     nlohmann::json js_cfg({{"deviceid", getmacaddr()},
                            {"url", "http://oldbox.orlandoviols.com/"},
                            {"protocol", "ov"}});
-    if(!config.empty()){
-      try{
-	DEBUG(config);
-	js_cfg = nlohmann::json::parse(config);
+    if(!config.empty()) {
+      try {
+        DEBUG(config);
+        js_cfg = nlohmann::json::parse(config);
       }
-      catch( const std::exception& err ){
-	DEBUG(err.what());
+      catch(const std::exception& err) {
+        DEBUG(err.what());
       }
     }
     std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
@@ -125,6 +133,8 @@ int main(int argc, char** argv)
       std::cout << "creating renderer with device id \"" << deviceid
                 << "\" and pinglogport " << pinglogport << ".\n";
     ov_render_tascar_t render(deviceid, pinglogport);
+    if(verbose)
+      render.set_seqerr_callback(log_seq_error, nullptr);
     if(verbose)
       std::cout << "creating frontend interface for " << lobby
                 << " using protocol \"" << protocol << "\"." << std::endl;
