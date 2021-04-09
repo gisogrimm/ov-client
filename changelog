@@ -1,10 +1,15 @@
+2021-04-09, version 0.6.153
+ - experimental WiFi control interface
+ - sequence error correction
+ - bugfix for development test interface
+
 2021-04-03, version 0.6.150
  - audio proxy mode to save upload bandwidth in some conditions
  - speedup of session restart
  - minor bug fixes
  - restructured code
 
-2021-02-28, version 0.5.51
+2021-02-28, version 0.5.51 (stable version)
  - increase robustness in case of invalid REST API responses
 
 2021-02-23, version 0.5.50
