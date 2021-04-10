@@ -76,7 +76,7 @@ CXXFLAGS += $(OSFLAG)
 
 
 lib: libov/Makefile
-	$(MAKE) -C libov
+	$(MAKE) -C libov all unit-tests
 
 libov/build/libov.a: lib
 
