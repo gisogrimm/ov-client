@@ -99,6 +99,7 @@ while true; do
     if test -e ~ov/ov-client.wificfg; then
 	echo "switching wifi"
 	sudo mv ~ov/ov-client.wificfg /boot/ovclient-wifi.txt
+	sync
 	# activate WiFi if required:
 	# remove DOS line ends:  -e 's/\r//1'
 	# the first line contains the SSID:
