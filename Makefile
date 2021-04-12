@@ -2,7 +2,7 @@ all: build lib binaries
 
 BINARIES = ov-client ov-client_hostname ov-client_listsounddevs
 
-EXTERNALS = jack libxml++-2.6 liblo sndfile libcurl gsl samplerate fftw3f xerces-c
+EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 

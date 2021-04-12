@@ -24,7 +24,7 @@ find_package(FFTW REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(liblo REQUIRED)
 find_package(GSL REQUIRED)
-find_package(LibXml++ REQUIRED)
+#find_package(LibXml++ REQUIRED)
 set(PLUGINPREFIX "ovclient")
 add_subdirectory(libov)
 list(APPEND RECEIVERS
