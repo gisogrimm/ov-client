@@ -1,3 +1,7 @@
+2021-04-15, version 0.7.1
+ - add out-of-order correction
+ - improved ping statistic analysis
+
 2021-04-09, version 0.6.153
  - experimental WiFi control interface
  - sequence error correction
