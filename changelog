@@ -1,3 +1,6 @@
+2021-04-27, version 0.7.7
+ - correct the latency display
+
 2021-04-15, version 0.7.1
  - add out-of-order correction
  - improved ping statistic analysis
