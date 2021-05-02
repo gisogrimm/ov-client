@@ -1,4 +1,6 @@
 /*
+ * This file is part of the ovbox software tool, see <http://orlandoviols.com/>.
+ *
  * Copyright (c) 2020 Giso Grimm
  */
 /*

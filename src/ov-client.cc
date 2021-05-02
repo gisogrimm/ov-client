@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2020 Giso Grimm, Alessandro Aresta
- * Copyright (c) 2021 Giso Grimm
+ * This file is part of the ovbox software tool, see <http://orlandoviols.com/>.
+ *
+ * Copyright (c) 2020 2021 Giso Grimm
  */
 /*
  * ov-client is free software: you can redistribute it and/or modify
@@ -16,7 +17,6 @@
  * Version 3 along with ov-client. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include "ov_client_digitalstage.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
@@ -54,8 +54,21 @@ int main(int argc, char** argv)
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
 
-  // boost::filesystem::path selfpath = argv[0];
-
+  std::cout
+      << "ov-client is free software: you can redistribute it and/or modify\n"
+         "it under the terms of the GNU General Public License as published\n"
+         "by the Free Software Foundation, version 3 of the License.\n"
+         "\n"
+         "ov-client is distributed in the hope that it will be useful,\n"
+         "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+         "MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+         "GNU General Public License, version 3 for more details.\n"
+         "\n"
+         "You should have received a copy of the GNU General Public License,\n"
+         "Version 3 along with ov-client. If not, see "
+         "<http://www.gnu.org/licenses/>.\n"
+         "\n"
+         "Copyright (c) 2020 2021 Giso Grimm\n";
   try {
     // test for config file on raspi:
     std::string config(get_file_contents("/boot/ov-client.cfg"));
