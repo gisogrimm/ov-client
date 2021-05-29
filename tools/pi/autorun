@@ -56,16 +56,10 @@ if test ! -e /boot/ovclient-noupdate; then
     if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
 	echo "overlay fs, not updating"
     else
-	# remove old installer scripts:
-	rm -f installovclient.sh
 	# get the latest installer script:
-	wget https://github.com/gisogrimm/ov-client/raw/master/installovclient.sh
-	if test -e installovclient.sh; then
-	    # run installer to update to latest version:
-	    . installovclient.sh
-	    # activate overlay image in case the installation script failed, and try the best we can:
-	    sudo raspi-config nonint enable_overlayfs
-	fi
+	. /usr/share/ovclient/tools/installovclient.sh
+	# activate overlay image in case the installation script failed, and try the best we can:
+	sudo raspi-config nonint enable_overlayfs
 	# ready, reboot:
 	sudo shutdown -r now
     fi
