@@ -5,6 +5,7 @@
 
     export DEBIAN_FRONTEND=noninteractive
 
+    # add/update HoerTech apt repository (containing ov-client):
     sudo sed -i -e '/apt.hoertech.de/ d' -e '/^[[:blank:]]*$/ d' /etc/apt/sources.list|| echo "unable to remove previous apt entries"
     wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
     (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
