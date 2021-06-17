@@ -5,9 +5,27 @@
 
     export DEBIAN_FRONTEND=noninteractive
 
+    # update main system
+    # in case someone powered off during installation we need to fix unconfigured packages:
+    sudo dpkg --configure -a
+    sync
+    # install dependencies:
+    # retry 10 times because the raspios servers are not very stable:
+    cnt=10
+    while test $cnt -gt 0; do
+	sudo -E apt update && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+	sync
+    done
+    cnt=10
+    while test $cnt -gt 0; do
+	sudo -E apt upgrade --assume-yes && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+	sync
+    done
+
+
     # add/update HoerTech apt repository (containing ov-client):
     sudo sed -i -e '/apt.hoertech.de/ d' -e '/^[[:blank:]]*$/ d' /etc/apt/sources.list|| echo "unable to remove previous apt entries"
-    wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
+    wget -qO- http://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
     (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
     sync
 
