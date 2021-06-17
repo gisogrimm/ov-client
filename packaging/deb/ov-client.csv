@@ -11,6 +11,7 @@ libov/tascar/plugins/build/ovclienttascar_jackrec.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_lightctl.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ovheadtracker.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_route.so,usr/lib
+libov/tascar/plugins/build/ovclienttascar_sleep.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_system.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_touchosc.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_waitforjackport.so,usr/lib
