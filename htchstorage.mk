@@ -61,10 +61,10 @@ pruned-storage-%: updated-storage-%
 	@echo nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
 # Never delete old packages in the master database
-pruned-storage-master: updated-storage-master
-	@echo uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
-	@echo "Keep all existing packages on branch master"
-	@echo nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+#pruned-storage-master: updated-storage-master
+#	@echo uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+#	@echo "Keep all existing packages on branch master"
+#	@echo nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
 # copy the $SYSTEM/packages.deb tree without overwriting existing package files.
 # then, update the timestamps for all files that are now in the supply to
