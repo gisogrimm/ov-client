@@ -1,3 +1,6 @@
+2021-09-03, version 0.9.2
+ - fix of server mode bug caused by new downmix mode
+
 2021-08-31, version 0.9.1
  - initial implementation of session downmix
 
