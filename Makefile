@@ -123,3 +123,6 @@ packaging:
 
 doc:
 	(cd doc && doxygen doxygen.cfg)
+
+ver:
+	(cd libov && ./get_version.sh)

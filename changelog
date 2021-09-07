@@ -1,3 +1,6 @@
+2021-09-07, version 0.9.4
+ - optimization of downmix mode
+
 2021-09-03, version 0.9.2
  - fix of server mode bug caused by new downmix mode
 
