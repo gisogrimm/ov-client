@@ -1,3 +1,6 @@
+2021-09-30, version 0.9.6
+ - enable user-provided TASCAR code, e.g., for distributed DMX control
+
 2021-09-07, version 0.9.4
  - optimization of downmix mode
 
