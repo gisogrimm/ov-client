@@ -1,3 +1,6 @@
+2021-10-01, version 0.9.8
+ - optionally deactivate output
+
 2021-09-30, version 0.9.6
  - enable user-provided TASCAR code, e.g., for distributed DMX control
 
