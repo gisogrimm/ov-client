@@ -15,6 +15,8 @@ if ! [ -d "$2" ]; then
     echo "$2 is not a directory" >&2
     exit 1
 fi
+# minimal error handling:
+trap "echo an error occured.;exit 1" ERR
 #
 SUFFIX=ovinstaller
 IMGBASE=$(basename "$1")
