@@ -29,8 +29,8 @@ LDLIBS += -ldl
 
 #libov submodule:
 CXXFLAGS += -Ilibov/src
-LDLIBS += -lov
-LDFLAGS += -Llibov/build
+LDLIBS += -lov -lovclienttascar
+LDFLAGS += -Llibov/build -Llibov/tascar/libtascar/build
 
 HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 
