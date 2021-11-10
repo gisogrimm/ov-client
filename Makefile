@@ -7,7 +7,7 @@ EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 
 
-CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
+CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only
 
 ifeq "$(ARCH)" "x86_64"
