@@ -10,7 +10,13 @@ const homedir = require('os').homedir();
 
 httpserver = http.createServer(function (req, res) {
     // check if file is in local directory:
-    if( req.url.startsWith('/rec') & req.url.endsWith('.wav') ){
+    if( req.url.startsWith('/rec') & (
+        req.url.endsWith('.wav')||
+        req.url.endsWith('.aif')||
+        req.url.endsWith('.mat')||
+        req.url.endsWith('.flac')||
+        req.url.endsWith('.caf')
+    )){
 	// download from local directory:
 	if( fs.existsSync('.'+req.url) ){
 	    var data = fs.readFileSync('.'+req.url);
