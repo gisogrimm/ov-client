@@ -1,3 +1,6 @@
+2021-12-20, version 0.10.1
+ - add reverb-only monitor option, minor bugfixes and improvements
+
 2021-10-10, version 0.9.15
  - correct extra port sending to local IP address
 
