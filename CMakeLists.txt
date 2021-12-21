@@ -38,6 +38,7 @@ list(APPEND TASCARMODS
         touchosc
         waitforjackport
         route
+        sleep
         jackrec
         )
 list(APPEND SOURCEMODS
