@@ -55,10 +55,14 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
-		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
+		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
+		OPENSSL_ROOT=$(shell brew --prefix openssl)
+		CPPREST_ROOT=$(shell brew --prefix cpprestsdk)
+		BOOST_ROOT=$(shell brew --prefix boost)
+		NLOHMANN_JSON_ROOT=$(shell brew --prefix nlohmann-json)
 		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
 		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
-		EXTERNALS += nlohmann-json
+#		EXTERNALS += nlohmann-json
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
