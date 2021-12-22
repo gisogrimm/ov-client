@@ -56,7 +56,7 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
-		OPENSSL_ROOT_DIR=$(shell brew --prefix openssl)
+		OPENSSL_ROOT=$(shell brew --prefix openssl)
 		CPPREST_ROOT=$(shell brew --prefix cpprestsdk)
 		BOOST_ROOT=$(shell brew --prefix boost)
 		NLOHMANN_JSON_ROOT=$(shell brew --prefix nlohmann-json)
