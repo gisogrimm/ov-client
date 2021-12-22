@@ -56,9 +56,13 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem
+		OPENSSL_ROOT_DIR=$(brew --prefix openssl)
+		CPPREST_ROOT=$(brew --prefix cpprestsdk)
+		BOOST_ROOT=$(brew --prefix boost)
+		NLOHMANN_JSON_ROOT=$(brew --prefix nlohmann-json)
 		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
 		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
-		EXTERNALS += nlohmann-json
+#		EXTERNALS += nlohmann-json
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
