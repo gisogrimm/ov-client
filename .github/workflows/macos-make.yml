@@ -2,7 +2,7 @@ name: MacOS make
 
 on:
   push:
-    branches: [ feature/maxosmake ]
+    branches: [ master, development ]
 
 jobs:
   build:
