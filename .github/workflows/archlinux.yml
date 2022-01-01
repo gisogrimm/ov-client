@@ -20,7 +20,7 @@ jobs:
            sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
     - name: dependencies
       run: sudo apt update &&
-           sudo apt install --assume-yes git docker
+           sudo apt install --assume-yes git docker.io
     - name: buildenv
       run: docker build -t archlinux docker/archlinux/
     - name: make
