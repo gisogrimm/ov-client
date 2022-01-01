@@ -7,21 +7,6 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: fetchtags
-      run: git fetch --unshallow --tags
-    - name: submods
-      run: git submodule init && git submodule update && (cd libov && git submodule update --init)
-    - name: tascar
-      run: wget -qO- https://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add - &&
-           sudo apt-add-repository 'deb http://apt.hoertech.de/ bionic universe'
-    - name: dependencies
-      run: sudo apt update &&
-           sudo apt install --assume-yes git docker.io
-    - name: buildenv
-      run: docker build -t archlinux docker/archlinux/
-    - name: make
-      run: docker run --rm archlinux
+    runs:
+      using: docker
+      image: archlinux docker/archlinux/Dockerfile
