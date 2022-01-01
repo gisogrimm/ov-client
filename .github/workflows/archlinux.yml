@@ -10,3 +10,7 @@ jobs:
     runs:
       using: docker
       image: archlinux docker/archlinux/Dockerfile
+    steps:
+    - uses: actions/checkout@v2
+    - name: fetchtags
+      run: git fetch --unshallow --tags
