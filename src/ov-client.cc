@@ -100,14 +100,20 @@ int main(int argc, char** argv)
     // std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
     bool showdevname(false);
     int pinglogport(0);
+    bool allowsystemmods(false);
     std::string zitapath("");
-    const char* options = "s:hqvd:p:nf:z:";
-    struct option long_options[] = {
-        {"server", 1, 0, 's'},   {"help", 0, 0, 'h'},
-        {"quiet", 0, 0, 'q'},    {"deviceid", 1, 0, 'd'},
-        {"verbose", 0, 0, 'v'},  {"pinglogport", 1, 0, 'p'},
-        {"devname", 0, 0, 'n'},  {"frontend", 1, 0, 'f'},
-        {"zitapath", 1, 0, 'z'}, {0, 0, 0, 0}};
+    const char* options = "s:hqvd:p:nf:z:a";
+    struct option long_options[] = {{"server", 1, 0, 's'},
+                                    {"help", 0, 0, 'h'},
+                                    {"quiet", 0, 0, 'q'},
+                                    {"deviceid", 1, 0, 'd'},
+                                    {"verbose", 0, 0, 'v'},
+                                    {"pinglogport", 1, 0, 'p'},
+                                    {"devname", 0, 0, 'n'},
+                                    {"frontend", 1, 0, 'f'},
+                                    {"zitapath", 1, 0, 'z'},
+                                    {"allowsystemmods", 0, 0, 'a'},
+                                    {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
     while((opt = getopt_long(argc, argv, options, long_options,
@@ -127,6 +133,9 @@ int main(int argc, char** argv)
         break;
       case 'p':
         pinglogport = atoi(optarg);
+        break;
+      case 'a':
+        allowsystemmods = true;
         break;
       case 'v':
         verbose++;
@@ -172,6 +181,8 @@ int main(int argc, char** argv)
                 << " using protocol \"" << protocol << "\"." << std::endl;
     if(zitapath.size())
       render.set_zita_path(zitapath);
+    if(allowsystemmods)
+      render.set_allow_systemmods(true);
     ov_client_base_t* ovclient(NULL);
     switch(frontend) {
     case FRONTEND_OV:
