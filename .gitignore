@@ -39,6 +39,7 @@ zita-j2n
 
 # output directories:
 build
+docker/*.test
 
 # Backup files:
 *~
