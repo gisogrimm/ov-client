@@ -68,7 +68,8 @@ int main(int argc, char** argv)
          "Version 3 along with ov-client. If not, see "
          "<http://www.gnu.org/licenses/>.\n"
          "\n"
-         "Copyright (c) 2020 2021 Giso Grimm\n";
+         "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
+      << get_libov_version() << "\n";
   try {
     // test for config file on raspi:
     std::string config(get_file_contents("/boot/ov-client.cfg"));
@@ -82,14 +83,14 @@ int main(int argc, char** argv)
       // directory
       config = get_file_contents("ov-client.cfg");
     nlohmann::json js_cfg({{"deviceid", getmacaddr()},
-                           {"url", "http://oldbox.orlandoviols.com/"},
+                           {"url", "https://oldbox.orlandoviols.com/"},
                            {"protocol", "ov"}});
     if(!config.empty()) {
       try {
-        DEBUG(config);
         js_cfg = nlohmann::json::parse(config);
       }
       catch(const std::exception& err) {
+        DEBUG(config);
         DEBUG(err.what());
       }
     }
