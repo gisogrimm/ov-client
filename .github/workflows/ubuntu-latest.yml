@@ -25,6 +25,12 @@ jobs:
       run: make
     - name: packaging
       run: make packaging
+    - name: test-install
+      run: apt install ./packaging/deb/debian/*/ov-client_*.deb
+    - name: showversion
+      run: dpkg-query -l ov-client
+    - name: test-run
+      run: ov-client & sleep 20;killall ov-client
     - uses: actions/upload-artifact@v2
       with:
         name: debian
