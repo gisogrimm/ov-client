@@ -26,7 +26,7 @@ jobs:
     - name: packaging
       run: make packaging
     - name: test-install
-      run: apt install ./packaging/deb/debian/*/ov-client_*.deb
+      run: sudo apt install --assume-yes ./packaging/deb/debian/*/ov-client_*.deb
     - name: showversion
       run: dpkg-query -l ov-client
     - name: test-run
