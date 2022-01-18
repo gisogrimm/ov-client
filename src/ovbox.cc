@@ -99,13 +99,14 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
   GET_WIDGET(labuser);
   GET_WIDGET(labdevice);
   GET_WIDGET(buttonopen);
+  // label->add_css_class("ovbox");
   update_display();
-  show_all();
   clientthread = std::thread(&ovboxgui_t::runclient, this);
   con_timeout = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_timeout), 250);
   buttonopen->signal_clicked().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_uiurl_clicked));
+  show_all();
 }
 
 void ovboxgui_t::on_uiurl_clicked()
@@ -123,8 +124,8 @@ bool ovboxgui_t::on_timeout()
       if(errmsg.empty()) {
         if(owner.empty()) {
           label->set_label(
-              "Your device is not yet linked with an account. Please open "
-              "device settings and link with your account.");
+              "Your device is not connected to an account. Please visit " +
+              ui_url + " to connect your device.");
         } else {
           label->set_label("");
         }
@@ -301,6 +302,24 @@ int main(int argc, char** argv)
       win->zitapath = optarg;
       break;
     }
+  }
+  auto css = Gtk::CssProvider::create();
+  if(css->load_from_data(
+         ".ovbox { background-color: #4e6263;font-weight: bold; } "
+         ".status { color: #000; margin: 2px; } "
+         ".warn { color: #ff3333; margin: 2px; } "
+         ".input { margin-left: 4px; margin-right: 4px; "
+         "margin-top: 2px; margin-bottom: 4px; padding: 5px; "
+         "border-radius: 9px; background: #eee;} "
+         ".actmember { margin-left: 4px; margin-right: 4px; "
+         "margin-top: 2px; margin-bottom: 4px; background-color: #ecc348; "
+         "padding: "
+         "5px; border-radius: 9px; color: #000000; "
+         "}")) {
+    auto screen = Gdk::Screen::get_default();
+    auto ctx = win->get_style_context();
+    ctx->add_provider_for_screen(screen, css,
+                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   }
   win->show_all();
   int rv(app->run(*win));
