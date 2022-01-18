@@ -19,10 +19,6 @@ PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
 
-LDLIBS += `pkg-config --libs $(EXTERNALS)`
-CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
-LDLIBS += -ldl
-
 # libcpprest dependencies:
 #LDLIBS += -lcrypto -lboost_filesystem -lboost_system -lcpprest
 #LDLIBS += -lcrypto -lcpprest
@@ -31,6 +27,11 @@ LDLIBS += -ldl
 CXXFLAGS += -Ilibov/src
 LDLIBS += -lov -lovclienttascar
 LDFLAGS += -Llibov/build -Llibov/tascar/libtascar/build
+
+LDLIBS += `pkg-config --libs $(EXTERNALS)`
+CXXFLAGS += `pkg-config --cflags $(EXTERNALS)`
+LDLIBS += -ldl
+
 
 HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 
@@ -130,3 +131,21 @@ doc:
 
 ver:
 	(cd libov && ./get_version.sh)
+
+ifeq ($(OS),Windows_NT)
+ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/48x48/apps/|./|'
+LDFLAGS += -mwindows
+else
+ICON_PATH_REPLACEMENT = -e 's/>usr/>\/usr/1'
+endif
+
+build/%_glade.h: src/%.glade build/.directory
+	cat $< | sed -e 's/tascarversion/$(TASCARVERSION)/g' -e '/name="authors"/ r ../contributors' $(ICON_PATH_REPLACEMENT) >$*_glade
+	echo "#include <string>" > $@
+	xxd -i $*_glade >> $@
+	echo "std::string ui_"$*"((const char*)"$*"_glade,(size_t)"$*"_glade_len);" >> $@
+	rm -f $*_glade
+
+build/ovbox: EXTERNALS += gtkmm-3.0
+build/ovbox: CXXFLAGS += -I./build
+build/ovbox: build/ovbox_glade.h
