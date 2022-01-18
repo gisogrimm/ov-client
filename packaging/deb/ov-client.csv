@@ -29,5 +29,6 @@ node_modules,usr/share/ovclient
 ovclient.css,usr/share/ovclient
 ovclient.js,usr/share/ovclient
 sounds/2138735723541465742.flac,usr/share/ovclient/sounds
+sounds/4180150583.flac,usr/share/ovclient/sounds
 tools/pi/autorun,usr/share/ovclient/tools
 webmixer.js,usr/share/ovclient
