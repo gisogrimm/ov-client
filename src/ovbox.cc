@@ -138,8 +138,8 @@ bool ovboxgui_t::on_timeout()
       if(errmsg.empty()) {
         if(owner.empty()) {
           label->set_label(
-              "Your device is not connected to an account. Please visit " +
-              ui_url + " to connect your device.");
+              "Your device is not connected to an account. Please visit\n" +
+              ui_url + "\nto connect your device.");
         } else {
           label->set_label("");
         }
@@ -336,14 +336,13 @@ int main(int argc, char** argv)
   if(css->load_from_data(
          ".ovbox { background-color: #4e6263;font-weight: bold; } "
          ".status { color: #000; margin: 2px; } "
-         ".warn { color: #ff3333; margin: 2px; } "
+         ".warn { color: #ff9999; margin: 2px; } "
          ".mixerurl { color: #0000ff; background-color: #919a91; "
          "border-radius: 7px; margin: 4px; background-image: none; "
          "border-image: none; } "
-         ".input { margin-left: 4px; margin-right: 4px; background-image: "
-         "none; border-image: none; "
-         "margin-top: 2px; margin-bottom: 4px; padding: 5px; "
-         "border-radius: 9px; background: #eee;} "
+         ".input { color: #0000ff; background-color: #919a91; "
+         "border-radius: 7px; margin: 4px; background-image: none; "
+         "border-image: none; } "
          ".actmember { margin-left: 4px; margin-right: 4px; "
          "margin-top: 2px; margin-bottom: 4px; background-color: #ecc348; "
          "padding: "
