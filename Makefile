@@ -98,7 +98,7 @@ binaries: $(BUILD_BINARIES)
 $(BUILD_BINARIES): libov/build/libov.a
 
 build/%: src/%.cc
-	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
+	$(CXX) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 
 
 build/%.o: src/%.cc $(HEADER)

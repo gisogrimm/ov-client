@@ -1,0 +1,7 @@
+Section: contrib/sound
+Maintainer: Giso Grimm <giso@orlandoviols.com>
+Description: ORLANDOviols consort box client software (GUI)
+  The ORLANDOviols consort box (ovbox) is a Raspberry Pi based
+  solution for remote music collaboration. This is the desktop
+  client with graphical user interface
+Homepage: https://github.com/gisogrimm/ov-client

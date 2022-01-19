@@ -1,0 +1,4 @@
+build/ovbox,usr/bin
+packaging/deb/ovbox.desktop,usr/share/applications
+src/ovbox48.png,usr/share/icons/hicolor/48x48/apps
+src/ovbox.png,usr/share/ovclient
