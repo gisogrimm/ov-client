@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=ovbox
-Exec=ovbox
+Exec=pasuspender -- ovbox
 Type=Application
 Icon=ovbox48.png
 Categories=Audio;AudioVideo;
