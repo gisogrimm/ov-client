@@ -92,12 +92,13 @@ protected:
   std::mutex mcl;
   ov_client_base_t* ovclient = NULL;
   std::string errmsg;
+  bool session_ready = false;
 };
 
 ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
                        const Glib::RefPtr<Gtk::Builder>& refGlade)
-    : Gtk::Window(cobject), m_refBuilder(refGlade), label(NULL), buttonmixer(NULL),
-      buttonopen(NULL)
+    : Gtk::Window(cobject), m_refBuilder(refGlade), label(NULL),
+      buttonmixer(NULL), buttonopen(NULL)
 {
   GET_WIDGET(label);
   GET_WIDGET(labuser);
@@ -123,7 +124,7 @@ void ovboxgui_t::on_uiurl_clicked()
 
 void ovboxgui_t::on_mixer_clicked()
 {
-  std::string url("http://"+ep2ipstr(getipaddr())+":8080/");
+  std::string url("http://" + ep2ipstr(getipaddr()) + ":8080/");
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
   // gtk_show_uri_on_window( NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL );
 }
@@ -154,6 +155,9 @@ void ovboxgui_t::runclient()
   while(!quit_app) {
 
     try {
+      labdevice->get_style_context()->add_class("passmember");
+      labdevice->get_style_context()->remove_class("actmember");
+      session_ready = false;
       // test for config file on raspi:
       std::string config(get_file_contents("/boot/ov-client.cfg"));
       if(config.empty() && std::getenv("HOME"))
@@ -229,10 +233,23 @@ void ovboxgui_t::runclient()
       bool run_session(true);
       while((!quit_app) && run_session) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        bool now_ready = ovclient->is_session_ready();
+        if(session_ready != now_ready) {
+          session_ready = now_ready;
+          if(session_ready) {
+            labdevice->get_style_context()->add_class("actmember");
+            labdevice->get_style_context()->remove_class("passmember");
+          }else{
+            labdevice->get_style_context()->add_class("passmember");
+            labdevice->get_style_context()->remove_class("actmember");
+          }
+        }
         if(ovclient->is_going_to_stop()) {
           run_session = false;
         }
       }
+      labdevice->get_style_context()->add_class("passmember");
+      labdevice->get_style_context()->remove_class("actmember");
       if(verbose)
         std::cout << "stopping services\n";
       ovclient->stop_service();
@@ -320,20 +337,29 @@ int main(int argc, char** argv)
          ".ovbox { background-color: #4e6263;font-weight: bold; } "
          ".status { color: #000; margin: 2px; } "
          ".warn { color: #ff3333; margin: 2px; } "
-         ".mixerurl { color: #0000ff; background-color: #919a91; border-radius: 7px; margin: 4px; background-image: none; border-image: none; } "
-         ".input { margin-left: 4px; margin-right: 4px; background-image: none; border-image: none; "
+         ".mixerurl { color: #0000ff; background-color: #919a91; "
+         "border-radius: 7px; margin: 4px; background-image: none; "
+         "border-image: none; } "
+         ".input { margin-left: 4px; margin-right: 4px; background-image: "
+         "none; border-image: none; "
          "margin-top: 2px; margin-bottom: 4px; padding: 5px; "
          "border-radius: 9px; background: #eee;} "
          ".actmember { margin-left: 4px; margin-right: 4px; "
          "margin-top: 2px; margin-bottom: 4px; background-color: #ecc348; "
          "padding: "
          "5px; border-radius: 9px; color: #000000; "
+         "}"
+         ".passmember { margin-left: 4px; margin-right: 4px; "
+         "background-color: #d6d6d6;"
+         "color: #666666;"
+         "padding: 5px;"
+         "border-radius: 7px;"
+         "margin-top: 2px; margin-bottom: 4px; "
          "}")) {
     auto screen = Gdk::Screen::get_default();
     auto ctx = win->get_style_context();
     ctx->add_provider_for_screen(screen, css,
                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-    
   }
   win->show_all();
   int rv(app->run(*win));

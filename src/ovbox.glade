@@ -34,7 +34,7 @@
             <property name="label" translatable="yes">device</property>
             <style>
               <class name="ovbox"/>
-              <class name="actmember"/>
+              <class name="passmember"/>
             </style>
           </object>
           <packing>
