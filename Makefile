@@ -146,6 +146,10 @@ build/%_glade.h: src/%.glade build/.directory
 	echo "std::string ui_"$*"((const char*)"$*"_glade,(size_t)"$*"_glade_len);" >> $@
 	rm -f $*_glade
 
+build/%.res.c: src/%.res
+	(cd src && glib-compile-resources --generate-source --target=../$@ ../$<)
+
 build/ovbox: EXTERNALS += gtkmm-3.0
 build/ovbox: CXXFLAGS += -I./build
 build/ovbox: build/ovbox_glade.h
+build/ovbox: build/ovbox.res.c

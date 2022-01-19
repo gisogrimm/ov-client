@@ -6,6 +6,7 @@
     <property name="can_focus">False</property>
     <property name="default_width">240</property>
     <property name="default_height">428</property>
+    <property name="icon">usr/share/icons/hicolor/48x48/apps/ovbox48.png</property>
     <child type="titlebar">
       <placeholder/>
     </child>
@@ -18,7 +19,7 @@
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">ovbox.png</property>
+            <property name="resource">/ovbox/ovbox.png</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -43,13 +44,14 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="labuser">
+          <object class="GtkButton" id="buttonmixer">
+            <property name="label" translatable="yes">open mixer</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">user</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
             <style>
               <class name="ovbox"/>
-              <class name="status"/>
+              <class name="mixerurl"/>
             </style>
           </object>
           <packing>
@@ -77,6 +79,22 @@
           </packing>
         </child>
         <child>
+          <object class="GtkLabel" id="labuser">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">user</property>
+            <style>
+              <class name="ovbox"/>
+              <class name="status"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkButton" id="buttonopen">
             <property name="label" translatable="yes">open session</property>
             <property name="visible">True</property>
@@ -90,7 +108,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">4</property>
+            <property name="position">5</property>
           </packing>
         </child>
         <style>

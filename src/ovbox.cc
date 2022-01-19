@@ -26,6 +26,8 @@
 #include <signal.h>
 #include <stdint.h>
 
+#include "ovbox.res.c"
+
 #include "ovbox_glade.h"
 
 #define GET_WIDGET(x)                                                          \
@@ -72,6 +74,7 @@ public:
 protected:
   bool on_timeout();
   void on_uiurl_clicked();
+  void on_mixer_clicked();
   void runclient();
 
   sigc::connection con_timeout;
@@ -82,6 +85,7 @@ protected:
   Gtk::Label* label;
   Gtk::Label* labdevice;
   Gtk::Label* labuser;
+  Gtk::Button* buttonmixer;
   Gtk::Button* buttonopen;
   // calibsession_t* session;
   std::thread clientthread;
@@ -92,26 +96,35 @@ protected:
 
 ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
                        const Glib::RefPtr<Gtk::Builder>& refGlade)
-    : Gtk::Window(cobject), m_refBuilder(refGlade), label(NULL),
+    : Gtk::Window(cobject), m_refBuilder(refGlade), label(NULL), buttonmixer(NULL),
       buttonopen(NULL)
 {
   GET_WIDGET(label);
   GET_WIDGET(labuser);
   GET_WIDGET(labdevice);
+  GET_WIDGET(buttonmixer);
   GET_WIDGET(buttonopen);
-  // label->add_css_class("ovbox");
   update_display();
   clientthread = std::thread(&ovboxgui_t::runclient, this);
   con_timeout = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_timeout), 250);
   buttonopen->signal_clicked().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_uiurl_clicked));
+  buttonmixer->signal_clicked().connect(
+      sigc::mem_fun(*this, &ovboxgui_t::on_mixer_clicked));
   show_all();
 }
 
 void ovboxgui_t::on_uiurl_clicked()
 {
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
+  // gtk_show_uri_on_window( NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL );
+}
+
+void ovboxgui_t::on_mixer_clicked()
+{
+  std::string url("http://"+ep2ipstr(getipaddr())+":8080/");
+  gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
   // gtk_show_uri_on_window( NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL );
 }
 
@@ -250,7 +263,6 @@ void ovboxgui_t::update_display() {}
 
 int main(int argc, char** argv)
 {
-
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
@@ -308,7 +320,8 @@ int main(int argc, char** argv)
          ".ovbox { background-color: #4e6263;font-weight: bold; } "
          ".status { color: #000; margin: 2px; } "
          ".warn { color: #ff3333; margin: 2px; } "
-         ".input { margin-left: 4px; margin-right: 4px; "
+         ".mixerurl { color: #0000ff; background-color: #919a91; border-radius: 7px; margin: 4px; background-image: none; border-image: none; } "
+         ".input { margin-left: 4px; margin-right: 4px; background-image: none; border-image: none; "
          "margin-top: 2px; margin-bottom: 4px; padding: 5px; "
          "border-radius: 9px; background: #eee;} "
          ".actmember { margin-left: 4px; margin-right: 4px; "
@@ -320,6 +333,7 @@ int main(int argc, char** argv)
     auto ctx = win->get_style_context();
     ctx->add_provider_for_screen(screen, css,
                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    
   }
   win->show_all();
   int rv(app->run(*win));
