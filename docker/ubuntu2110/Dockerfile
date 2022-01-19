@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:21.10
 
 RUN DEBIAN_FRONTEND=noninteractive apt update --assume-yes
 
