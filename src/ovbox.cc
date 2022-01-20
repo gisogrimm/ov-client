@@ -239,7 +239,7 @@ void ovboxgui_t::runclient()
           if(session_ready) {
             labdevice->get_style_context()->add_class("actmember");
             labdevice->get_style_context()->remove_class("passmember");
-          }else{
+          } else {
             labdevice->get_style_context()->add_class("passmember");
             labdevice->get_style_context()->remove_class("actmember");
           }
