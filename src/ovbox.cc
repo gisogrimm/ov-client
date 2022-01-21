@@ -333,8 +333,8 @@ int main(int argc, char** argv)
   refBuilder->get_widget_derived("mainwin", win);
   if(!win)
     throw TASCAR::ErrMsg("No main window");
-  if( zitapath.size() )
-          win->zitapath = zitapath;
+  if(zitapath.size())
+    win->zitapath = zitapath;
 
   auto css = Gtk::CssProvider::create();
   if(css->load_from_data(
