@@ -300,16 +300,6 @@ int main(int argc, char** argv)
          "\n"
          "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
-
-  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(
-      argc, argv, "com.orlandoviols.ovbox", Gio::APPLICATION_NON_UNIQUE);
-  Glib::RefPtr<Gtk::Builder> refBuilder;
-  ovboxgui_t* win(NULL);
-  refBuilder = Gtk::Builder::create();
-  refBuilder->add_from_string(ui_ovbox);
-  refBuilder->get_widget_derived("mainwin", win);
-  if(!win)
-    throw TASCAR::ErrMsg("No main window");
   const char* options = "hvz:";
   struct option long_options[] = {{"help", 0, 0, 'h'},
                                   {"verbose", 0, 0, 'v'},
@@ -317,6 +307,7 @@ int main(int argc, char** argv)
                                   {0, 0, 0, 0}};
   int opt(0);
   int option_index(0);
+  std::string zitapath;
   verbose = 0;
   while((opt = getopt_long(argc, argv, options, long_options, &option_index)) !=
         -1) {
@@ -328,10 +319,23 @@ int main(int argc, char** argv)
       verbose++;
       break;
     case 'z':
-      win->zitapath = optarg;
+      zitapath = optarg;
       break;
     }
   }
+  auto nargc = argc;
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(
+      nargc, argv, "com.orlandoviols.ovbox", Gio::APPLICATION_NON_UNIQUE);
+  Glib::RefPtr<Gtk::Builder> refBuilder;
+  ovboxgui_t* win(NULL);
+  refBuilder = Gtk::Builder::create();
+  refBuilder->add_from_string(ui_ovbox);
+  refBuilder->get_widget_derived("mainwin", win);
+  if(!win)
+    throw TASCAR::ErrMsg("No main window");
+  if( zitapath.size() )
+          win->zitapath = zitapath;
+
   auto css = Gtk::CssProvider::create();
   if(css->load_from_data(
          ".ovbox { background-color: #4e6263;font-weight: bold; } "

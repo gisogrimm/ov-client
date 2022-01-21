@@ -57,6 +57,8 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
+		CXXFLAGS += -I`brew --prefix libsoundio`/include
+		LDFLAGS += -L`brew --prefix libsoundio`/lib
 		OPENSSL_ROOT=$(shell brew --prefix openssl)
 		CPPREST_ROOT=$(shell brew --prefix cpprestsdk)
 		BOOST_ROOT=$(shell brew --prefix boost)
@@ -64,6 +66,7 @@ else
 		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
 		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
 #		EXTERNALS += nlohmann-json
+		ZITATARGET = zita
 	endif
 		UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -79,6 +82,7 @@ endif
 
 CXXFLAGS += $(OSFLAG)
 
+build/ov-client build/ovbox: $(ZITATARGET)
 
 lib: libov/Makefile
 	$(MAKE) -C libov all unit-tests
@@ -153,3 +157,6 @@ build/ovbox: EXTERNALS += gtkmm-3.0
 build/ovbox: CXXFLAGS += -I./build
 build/ovbox: build/ovbox_glade.h
 build/ovbox: build/ovbox.res.c
+
+zita: build/.directory
+	(cd build && cmake ../zita-njbridge && make)
