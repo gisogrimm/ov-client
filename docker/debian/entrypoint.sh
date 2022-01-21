@@ -8,4 +8,6 @@ test -e ov-client || git clone https://github.com/gisogrimm/ov-client
     git checkout $1
     git submodule update --init --recursive
     make
+    make packaging
+    find -name "*.deb" -ls
 )
