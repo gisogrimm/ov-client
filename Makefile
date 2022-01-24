@@ -1,6 +1,6 @@
 all: build lib binaries
 
-BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox
+BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox test_exec
 
 EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
