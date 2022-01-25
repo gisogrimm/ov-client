@@ -90,7 +90,7 @@ lib: libov/Makefile
 libov/build/libov.a: lib
 
 libov/Makefile:
-	git submodule init && git submodule update
+	git submodule --init --recursive
 
 build: build/.directory
 
@@ -160,3 +160,6 @@ build/ovbox: build/ovbox.res.c
 
 zita: build/.directory
 	(cd build && cmake ../zita-njbridge && make)
+
+gitupdate:
+	git fetch --recurse-submodules ; git submodule --init --recursive
