@@ -266,6 +266,7 @@ void ovboxgui_t::runclient()
     if(!quit_app)
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
+  hide();
 }
 
 ovboxgui_t::~ovboxgui_t()
