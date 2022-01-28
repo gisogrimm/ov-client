@@ -10,7 +10,7 @@ if ! test -e "${PKG}.csv"; then
 fi
 rm -Rf "${PKG}" "${PKG}_`uname -s`_`uname -m`.tgz"
 mkdir "${PKG}"
-sed "${PKG}.csv" -e "s/[^,]*,[[:blank:]]*/${PKG}\//1" -e 's/\/\.\//\//1' -e 's/\/$//1' |sort -u|xargs -L 1 -- mkdir -p
-sed "${PKG}.csv" -e "s/\([^,]*\),[[:blank:]]*/..\/..\/\1 ${PKG}\//1" -e 's/\/\.\//\//1' -e 's/\/$//1'|xargs -I % -- sh -c "cp -ar %"
+cat "${PKG}.csv" | sed -e "s/[^,]*,[[:blank:]]*/${PKG}\//1" -e 's/\/\.\//\//1' -e 's/\/$//1' |sort -u|xargs -L 1 -- mkdir -p
+cat "${PKG}.csv" | sed -e "s/\([^,]*\),[[:blank:]]*/..\/..\/\1 ${PKG}\//1" -e 's/\/\.\//\//1' -e 's/\/$//1'|xargs -I % -- sh -c "cp -ar %"
 tar czf "${PKG}_`uname -s`_`uname -m`.tgz" "${PKG}"
 rm -Rf "${PKG}"
