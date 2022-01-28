@@ -3,4 +3,4 @@ all:
 .PHONY : pack
 
 pack:
-	./pack.sh ov-client
+	./mkport.sh ../../build/ov-client && ./mkport.sh ../../build/ovbox && ./pack.sh ov-client
