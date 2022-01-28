@@ -132,7 +132,7 @@ packaging:
 endif
 ifeq ($(UNAME_S),Darwin)
 packaging:
-	$(MAKE) -C packaging/deb pack
+	$(MAKE) -C packaging/Darwin pack
 endif
 
 .PHONY : doc
