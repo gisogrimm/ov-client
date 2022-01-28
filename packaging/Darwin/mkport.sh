@@ -9,7 +9,7 @@ BINDIR=$(dirname "$BIN")
 	cp $lib lib/
 	OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
 	if test -e "${LIBDIR}/${OBJ_LEAF_NAME}"; then
-	    install_name_tool -change "$lib" "lib/${OBJ_LEAF_NAME}" "${BIN}"
+	    install_name_tool -change "$lib" "lib/${OBJ_LEAF_NAME}" "${BINBASE}"
 	fi
     done
     chmod u+w lib/*
