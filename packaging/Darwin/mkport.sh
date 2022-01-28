@@ -11,7 +11,7 @@ BINDIR=$(dirname "$BIN")
 	echo "copying $lib to lib"
 	cp $lib lib/
 	OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
-	if test -e "${LIBDIR}/${OBJ_LEAF_NAME}"; then
+	if test -e "lib/${OBJ_LEAF_NAME}"; then
 	    echo "replacing  $lib by lib/${OBJ_LEAF_NAME} in ${BINBASE}"
 	    install_name_tool -change "$lib" "lib/${OBJ_LEAF_NAME}" "${BINBASE}"
 	fi
