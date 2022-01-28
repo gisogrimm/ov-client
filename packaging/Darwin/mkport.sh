@@ -16,11 +16,11 @@ echo $SCRIPT
 	    if test ! -e "${OBJ_LEAF_NAME}"; then
 		echo "copying $lib to ./"
 		cp $lib ./
-		if test -e "${OBJ_LEAF_NAME}"; then
-		    echo "replacing  $lib by ${OBJ_LEAF_NAME} in ${BINBASE}"
-		    install_name_tool -change "$lib" "${OBJ_LEAF_NAME}" "${BINBASE}"
-		    $SCRIPT "${OBJ_LEAF_NAME}"
-		fi
+		$SCRIPT "${OBJ_LEAF_NAME}"
+	    fi
+	    if test -e "${OBJ_LEAF_NAME}"; then
+		echo "replacing  $lib by ${OBJ_LEAF_NAME} in ${BINBASE}"
+		install_name_tool -change "$lib" "${OBJ_LEAF_NAME}" "${BINBASE}"
 	    fi
 	fi
     done
