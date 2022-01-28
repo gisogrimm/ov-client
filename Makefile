@@ -38,6 +38,7 @@ HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 CXXFLAGS += -Ilibov/tascar/libtascar/build
 
 OSFLAG :=
+UNAME_S :=
 ifeq ($(OS),Windows_NT)
 	OSFLAG += -D WIN32
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
@@ -125,8 +126,14 @@ clean:
 
 .PHONY: packaging
 
+ifeq ($(UNAME_S),Linux)
 packaging:
 	$(MAKE) -C packaging/deb pack
+endif
+ifeq ($(UNAME_S),Darwin)
+packaging:
+	$(MAKE) -C packaging/deb pack
+endif
 
 .PHONY : doc
 

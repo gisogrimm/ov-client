@@ -19,9 +19,9 @@ jobs:
       run: brew install pkgconfig glibmm jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils libsoundio xerces-c
     - name: make
       run: make
-    #- name: packlibs
-    #  run: USE_RPATH=1 ./make_portable.sh ./build/ov-client
+    - name: packaging
+      run: make packaging
     - uses: actions/upload-artifact@v2
       with:
-        name: osx-build
-        path: build/*
+        name: macOS-build
+        path: packaging/Darwin/*.tgz
