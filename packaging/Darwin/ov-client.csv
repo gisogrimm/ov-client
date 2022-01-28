@@ -1,7 +1,7 @@
 build/ov-client.dSYM,./
 build/ov-client,./
 build/ovbox,./
-build/*.dzlib,./
+build/*.dylib,./
 build/ovbox.dSYM,./
 build/zita-j2n,./
 build/zita-n2j,./
