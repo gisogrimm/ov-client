@@ -2,5 +2,10 @@ all:
 
 .PHONY : pack
 
-pack:
-	./mkport.sh ../../build/ov-client && ./mkport.sh ../../build/ovbox && ./pack.sh ov-client
+BINS = ov-client ovbox zita-j2n zita-n2j
+
+portable:
+	for i in $(BINS); do ./mkport.sh ../../build/$$i; done
+
+pack: portable
+	./pack.sh ov-client
