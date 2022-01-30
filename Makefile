@@ -147,7 +147,11 @@ ifeq ($(OS),Windows_NT)
 ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/48x48/apps/|./|'
 LDFLAGS += -mwindows
 else
+ifeq ($(UNAME_S),Darwin)
+ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/48x48/apps/|./|'
+else
 ICON_PATH_REPLACEMENT = -e 's/>usr/>\/usr/1'
+endif
 endif
 
 build/%_glade.h: src/%.glade build/.directory
