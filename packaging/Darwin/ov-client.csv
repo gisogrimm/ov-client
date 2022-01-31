@@ -8,3 +8,9 @@ build/zita-n2j,./
 libov/tascar/plugins/build/ovclienttascar*,./
 libov/tascar/libtascar/build/libovclienttascar*,./
 src/*.png,./
+node_modules,./
+ovclient.css,./
+ovclient.js,./
+webmixer.js,./
+jackrec.html,./
+
