@@ -1,12 +1,12 @@
 build/ov-client.dSYM,./
 build/ov-client,./
 build/ovbox,./
-build/*.dylib,./
+build/lib/*.dylib,./lib/
 build/ovbox.dSYM,./
 build/zita-j2n,./
 build/zita-n2j,./
 libov/tascar/plugins/build/ovclienttascar*,./
-libov/tascar/libtascar/build/libovclienttascar*,./
+libov/tascar/libtascar/build/libovclienttascar*,./lib/
 src/*.png,./
 node_modules,./
 ovclient.css,./

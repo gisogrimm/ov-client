@@ -56,7 +56,7 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
-		LDFLAGS += -framework IOKit -framework CoreFoundation
+		LDFLAGS += -framework IOKit -framework CoreFoundation -headerpad_max_install_names
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
 		CXXFLAGS += -I`brew --prefix libsoundio`/include
 		LDFLAGS += -L`brew --prefix libsoundio`/lib
