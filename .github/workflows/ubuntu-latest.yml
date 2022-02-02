@@ -30,7 +30,7 @@ jobs:
     - name: showversion
       run: dpkg-query -l ov-client
     - name: test-run
-      run: ov-client & sleep 20;killall ov-client
+      run: ov-client --deviceid=000000000000 & sleep 20;killall ov-client
     - uses: actions/upload-artifact@v2
       with:
         name: debian
