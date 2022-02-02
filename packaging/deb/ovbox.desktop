@@ -2,5 +2,5 @@
 Name=ovbox
 Exec=pasuspender -- ovbox
 Type=Application
-Icon=ovbox48.png
+Icon=ovbox256.png
 Categories=Audio;AudioVideo;
