@@ -10,7 +10,7 @@ libtascar-dev (headers) and the plugins from tascar_cli.
 
 ## Installation instructions
 
-For installation instructions see file [INSTALL.md](INSTALL.md).
+For installation instructions see [Wiki pages](https://github.com/gisogrimm/ovbox/wiki/Installation).
 
 Currently, only the [ORLANDOviols](http://box.orlandoviols.com/)
 configuration server is supported. This means that once your
