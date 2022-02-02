@@ -318,14 +318,7 @@ int main(int argc, char** argv)
   epaths += rdir;
   setenv("PATH", epaths.c_str(), 1);
 #ifdef __APPLE__
-  epath = getenv("DYLD_LIBRARY_PATH");
-  epaths.clear();
-  if(epath)
-    epaths = epath;
-  if(epaths.size())
-    epaths += ":";
-  epaths += rdir + "/PlugIns";
-  setenv("DYLD_LIBRARY_PATH", epaths.c_str(), 1);
+  TASCAR::set_libdir(rdir+"/lib/");
 #endif
 
   const char* options = "hvz:";
