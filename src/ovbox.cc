@@ -43,6 +43,8 @@ enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
 static bool quit_app(false);
 
+static std::string bindir;
+
 static void sighandler(int sig)
 {
   quit_app = true;
@@ -210,6 +212,7 @@ void ovboxgui_t::runclient()
       labdevice->set_label(deviceid);
       buttonopen->set_label(ui_url);
       ov_render_tascar_t render(deviceid, pinglogport);
+      render.bindir = bindir;
       if(verbose)
         render.set_seqerr_callback(log_seq_error, nullptr);
       if(verbose)
@@ -319,6 +322,7 @@ int main(int argc, char** argv)
   setenv("PATH", epaths.c_str(), 1);
 #ifdef __APPLE__
   TASCAR::set_libdir(rdir + "/lib/");
+  bindir = rdir;
 #endif
   char dtemp[1024];
   strcpy(dtemp, "/tmp/com.orlandoviols.ovbox-XXXXXX");
