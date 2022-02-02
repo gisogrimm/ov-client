@@ -3,10 +3,9 @@ var os = require('os');
 var fs = require('fs');
 var iolib = require('socket.io');
 var osc = require('node-osc');
+var path = require('path');
 
 const homedir = require('os').homedir();
-
-//oscClient2 = new osc.Client( 'localhost', 9872 );
 
 httpserver = http.createServer(function (req, res) {
     // check if file is in local directory:
@@ -32,9 +31,12 @@ httpserver = http.createServer(function (req, res) {
 	    return;
 	}
     }
-    var hosjs = fs.readFileSync('ovclient.js');
-    var hoscss = fs.readFileSync('ovclient.css');
-    var jackrec = fs.readFileSync('jackrec.html');
+    var sdir = path.dirname(process.argv[1]);
+    if( sdir.length > 0 )
+        sdir = sdir + '/';
+    var hosjs = fs.readFileSync(sdir+'ovclient.js');
+    var hoscss = fs.readFileSync(sdir+'ovclient.css');
+    var jackrec = fs.readFileSync(sdir+'jackrec.html');
     var ipaddr = os.hostname();
     if( process.argv.length > 2 )
 	ipaddr = process.argv[2];
