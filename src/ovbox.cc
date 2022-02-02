@@ -318,8 +318,13 @@ int main(int argc, char** argv)
   epaths += rdir;
   setenv("PATH", epaths.c_str(), 1);
 #ifdef __APPLE__
-  TASCAR::set_libdir(rdir+"/lib/");
+  TASCAR::set_libdir(rdir + "/lib/");
 #endif
+  char dtemp[1024];
+  strcpy(dtemp, "/tmp/com.orlandoviols.ovbox-XXXXXX");
+  mkdtemp(dtemp);
+  std::cout << "working directory: " << dtemp << std::endl;
+  chdir(dtemp);
 
   const char* options = "hvz:";
   struct option long_options[] = {{"help", 0, 0, 'h'},
