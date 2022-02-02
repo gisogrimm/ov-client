@@ -148,7 +148,7 @@ ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/48x48/apps/|./|'
 LDFLAGS += -mwindows
 else
 ifeq ($(UNAME_S),Darwin)
-ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/.*/apps/|./|'
+ICON_PATH_REPLACEMENT = -e 's|usr/share/icons/hicolor/.*/apps/||'
 else
 ICON_PATH_REPLACEMENT = -e 's/>usr/>\/usr/1'
 endif
