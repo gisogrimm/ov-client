@@ -23,8 +23,11 @@
 #include <gtkmm.h>
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
+#include <libgen.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "ovbox.res.c"
 
@@ -301,6 +304,20 @@ int main(int argc, char** argv)
          "\n"
          "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
+
+  // update search path to contain directory of this binary:
+  char* rpath = realpath(argv[0], NULL);
+  std::string rdir = dirname(rpath);
+  free(rpath);
+  char* epath = getenv("PATH");
+  std::string epaths;
+  if(epath)
+    epaths = epath;
+  if(epaths.size())
+    epaths += ":";
+  epaths += rdir;
+  setenv("PATH", epaths.c_str(), 1);
+
   const char* options = "hvz:";
   struct option long_options[] = {{"help", 0, 0, 'h'},
                                   {"verbose", 0, 0, 'v'},
