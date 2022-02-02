@@ -11,7 +11,7 @@ fi
 SCRIPT=$(realpath $(pwd)/$0)
 BINBASE=$(echo "$BIN" | awk -F'/' '{print $NF}')
 #
-for lib in `otool -L $BINBASE | sed -e "/dylib/! d" -e "/@loader_path/ d" -e "s/[[:blank:]]*\//\//1" -e "s/dylib .*/dylib/1" -e "/\//! d"`; do
+for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/@loader_path/ d" -e "s/[[:blank:]]*\//\//1" -e "s/dylib .*/dylib/1" -e "/\//! d"`; do
     OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
     if test "$OBJ_LEAF_NAME" != "$BINBASE"; then
 	if test ! -e "${LIBDIR}/${OBJ_LEAF_NAME}"; then
