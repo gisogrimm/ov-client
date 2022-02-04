@@ -111,7 +111,6 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
   GET_WIDGET(buttonmixer);
   GET_WIDGET(buttonopen);
   update_display();
-  clientthread = std::thread(&ovboxgui_t::runclient, this);
   con_timeout = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_timeout), 250);
   buttonopen->signal_clicked().connect(
@@ -119,6 +118,7 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
   buttonmixer->signal_clicked().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_mixer_clicked));
   show_all();
+  clientthread = std::thread(&ovboxgui_t::runclient, this);
 }
 
 void ovboxgui_t::on_uiurl_clicked()
