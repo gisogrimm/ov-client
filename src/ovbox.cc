@@ -72,6 +72,7 @@ public:
              const Glib::RefPtr<Gtk::Builder>& refGlade);
   virtual ~ovboxgui_t();
   void update_display();
+  void runclient();
 
   std::string zitapath = "";
   std::string ui_url = "http://box.orlandoviols.com/";
@@ -80,20 +81,17 @@ protected:
   bool on_timeout();
   void on_uiurl_clicked();
   void on_mixer_clicked();
-  void runclient();
+  void on_hide();
 
   sigc::connection con_timeout;
 
   Glib::RefPtr<Gtk::Builder> m_refBuilder;
   // Signal handlers:
-  // void on_quit();
   Gtk::Label* label;
   Gtk::Label* labdevice;
   Gtk::Label* labuser;
   Gtk::Button* buttonmixer;
   Gtk::Button* buttonopen;
-  // calibsession_t* session;
-  std::thread clientthread;
   std::mutex mcl;
   ov_client_base_t* ovclient = NULL;
   std::string errmsg;
@@ -117,21 +115,24 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
       sigc::mem_fun(*this, &ovboxgui_t::on_uiurl_clicked));
   buttonmixer->signal_clicked().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_mixer_clicked));
+  signal_hide().connect(sigc::mem_fun(*this, &ovboxgui_t::on_hide));
   show_all();
-  clientthread = std::thread(&ovboxgui_t::runclient, this);
+}
+
+void ovboxgui_t::on_hide()
+{
+  quit_app = true;
 }
 
 void ovboxgui_t::on_uiurl_clicked()
 {
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
-  // gtk_show_uri_on_window( NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL );
 }
 
 void ovboxgui_t::on_mixer_clicked()
 {
   std::string url("http://" + ep2ipstr(getipaddr()) + ":8080/");
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
-  // gtk_show_uri_on_window( NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL );
 }
 
 bool ovboxgui_t::on_timeout()
@@ -238,6 +239,8 @@ void ovboxgui_t::runclient()
       errmsg = "";
       bool run_session(true);
       while((!quit_app) && run_session) {
+        while(gtk_events_pending())
+          gtk_main_iteration();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         bool now_ready = ovclient->is_session_ready();
         if(session_ready != now_ready) {
@@ -279,8 +282,6 @@ ovboxgui_t::~ovboxgui_t()
 {
   con_timeout.disconnect();
   quit_app = true;
-  if(clientthread.joinable())
-    clientthread.join();
 }
 
 void ovboxgui_t::update_display() {}
@@ -395,9 +396,9 @@ int main(int argc, char** argv)
                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   }
   win->show_all();
-  int rv(app->run(*win));
+  win->runclient();
   delete win;
-  return rv;
+  return 0;
 }
 
 /*
