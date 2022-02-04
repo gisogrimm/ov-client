@@ -1,5 +1,6 @@
 build/ovbox,usr/bin
+libov/tascar/plugins/build/ovclienttascar_tracegui.so,usr/lib
 packaging/deb/ovbox.desktop,usr/share/applications
-src/ovbox48.png,usr/share/icons/hicolor/48x48/apps/
-src/ovbox256.png,usr/share/icons/hicolor/256x256/apps/
 src/ovbox.png,usr/share/ovclient
+src/ovbox256.png,usr/share/icons/hicolor/256x256/apps/
+src/ovbox48.png,usr/share/icons/hicolor/48x48/apps/
