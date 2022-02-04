@@ -1,6 +1,8 @@
 build/ov-client_hostname,usr/bin
 build/ov-client_listsounddevs,usr/bin
 build/ov-client,usr/bin
+build/ovzita-j2n,usr/bin
+build/ovzita-n2j,usr/bin
 installovclient.sh,usr/share/ovclient/tools
 jackrec.html,usr/share/ovclient
 libov/tascar/libtascar/build/libovclienttascardmx.so.*,usr/lib/

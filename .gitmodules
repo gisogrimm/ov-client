@@ -3,4 +3,4 @@
 	url = https://github.com/gisogrimm/libov.git
 [submodule "zita-njbridge"]
 	path = zita-njbridge
-	url = https://github.com/digital-stage/zita-njbridge.git
+	url = https://github.com/gisogrimm/zita-njbridge.git

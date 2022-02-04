@@ -22,6 +22,8 @@
 #include <fstream>
 #include <signal.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <libgen.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 
@@ -70,6 +72,20 @@ int main(int argc, char** argv)
          "\n"
          "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
+
+  // update search path to contain directory of this binary:
+  char* rpath = realpath(argv[0], NULL);
+  std::string rdir = dirname(rpath);
+  free(rpath);
+  char* epath = getenv("PATH");
+  std::string epaths;
+  if(epath)
+    epaths = epath;
+  if(epaths.size())
+    epaths += ":";
+  epaths += rdir;
+  setenv("PATH", epaths.c_str(), 1);
+
   try {
     // test for config file on raspi:
     std::string config(get_file_contents("/boot/ov-client.cfg"));

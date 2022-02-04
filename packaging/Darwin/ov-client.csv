@@ -3,8 +3,8 @@ build/ov-client,./
 build/ovbox,./
 build/lib/*.dylib,./lib/
 build/ovbox.dSYM,./
-build/zita-j2n,./
-build/zita-n2j,./
+build/ovzita-j2n,./
+build/ovzita-n2j,./
 libov/tascar/plugins/build/ovclienttascar*,./lib/
 libov/tascar/libtascar/build/libovclienttascar*,./lib/
 src/*.png,./

@@ -53,6 +53,7 @@ else
 		OSFLAG += -D LINUX
 		CXXFLAGS += -fext-numeric-literals
 		LDLIBS += -lasound
+		ZITATARGET = zita
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
