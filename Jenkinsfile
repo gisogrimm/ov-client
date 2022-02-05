@@ -10,6 +10,9 @@ def tascar_build_steps(stage_name) {
     // Avoid that artifacts from previous builds influence this build
     sh "git reset --hard && git clean -ffdx"
 
+    // Update submodules
+    sh "git submodule update --init --recursive"
+
     // Autodetect libs/compiler
     sh "make"
 
