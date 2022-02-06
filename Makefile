@@ -172,11 +172,16 @@ build/ovbox: build/ovbox.res.c
 
 ifeq ($(UNAME_S),Darwin)
 zita: build/.directory
-	$(MAKE) -C zita-njbridge/source -f Makefile-osx
+	$(MAKE) -C zita-njbridge/zita-resampler/source libzita-resampler.a && \
+	$(MAKE) -C zita-njbridge/source CXXFLAGS+="$(shell pkg-config --cflags jack) -I../zita-resampler/source" LDFLAGS+="$(shell pkg-config --libs jack) -L../zita-resampler/source" -f Makefile-osx && \
+	cp zita-njbridge/source/zita-n2j build/ovzita-n2j && \
+	cp zita-njbridge/source/zita-j2n build/ovzita-j2n
 else
 zita: build/.directory
-	$(MAKE) -C zita-njbridge/zita-resampler/source && \
-	$(MAKE) -C zita-njbridge/source -f Makefile-linux
+	$(MAKE) -C zita-njbridge/zita-resampler/source libzita-resampler.a && \
+	$(MAKE) -C zita-njbridge/source CXXFLAGS+="$(shell pkg-config --cflags jack) -I../zita-resampler/source" LDFLAGS+="$(shell pkg-config --libs jack) -L../zita-resampler/source" -f Makefile-linux && \
+	cp zita-njbridge/source/zita-n2j build/ovzita-n2j && \
+	cp zita-njbridge/source/zita-j2n build/ovzita-j2n
 endif
 #	(cd build && cmake ../zita-njbridge && make)
 
