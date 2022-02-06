@@ -170,8 +170,15 @@ build/ovbox: CXXFLAGS += -I./build
 build/ovbox: build/ovbox_glade.h
 build/ovbox: build/ovbox.res.c
 
+ifeq ($(UNAME_S),Darwin)
 zita: build/.directory
-	(cd build && cmake ../zita-njbridge && make)
+	$(MAKE) -C zita-njbridge/source -f Makefile-osx
+else
+zita: build/.directory
+	$(MAKE) -C zita-njbridge/zita-resampler/source && \
+	$(MAKE) -C zita-njbridge/source -f Makefile-linux
+endif
+#	(cd build && cmake ../zita-njbridge && make)
 
 gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
