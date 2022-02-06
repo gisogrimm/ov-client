@@ -10,7 +10,7 @@ PACKVER:=$(FULLVERSION)_$(shell uname -s)_$(shell uname -m)
 
 .PHONY : pack
 
-BINS = ov-client ovbox zita-j2n zita-n2j
+BINS = ov-client ovbox ovzita-j2n ovzita-n2j
 
 portable:
 	for i in $(BINS); do ./mkport.sh ../../build/$$i; done
