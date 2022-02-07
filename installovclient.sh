@@ -16,7 +16,7 @@
 	sudo -E apt update && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
 	sync
     done
-    if test $cnd == 0; then
+    if test $cnt -eq 0; then
         echo "failed 10 times, switching to GWDG mirror"
         sudo sed -i -e '/raspbian/ d' -e '/^[[:blank:]]*$/ d' /etc/apt/sources.list|| echo "unable to remove previous apt entries"
         (echo "";echo "deb http://ftp.gwdg.de/pub/linux/debian/raspbian/raspbian/ buster main contrib non-free rpi")|sudo tee -a /etc/apt/sources.list
