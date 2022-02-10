@@ -1,4 +1,9 @@
-2202-02-02, version 0.13.1
+2022-02-10, version 0.14.1
+ - update zita-njbridge to latest version
+ - many minor bugfixes related to MacOS version and GUI
+ - support HifiBerry audio devices
+
+2022-02-02, version 0.13.1
  - initial macOS client, minor bugfixes
 
 2022-01-20, version 0.12.1
