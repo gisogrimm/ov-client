@@ -114,7 +114,7 @@ while true; do
     fi
     if test -e ~ov/ov-client.hifiberry; then
         HBERRY=$(cat ~ov/ov-client.hifiberry)
-        rm -f ~ov/ov-client.hifiberry
+        sudo rm -f ~ov/ov-client.hifiberry
         sudo sed -i -e 's/[^#]*hifiberry-/#&/g' /boot/config.txt|| echo "unable to disable hifiberry modules"
         if test "${HBERRY}" != "none"; then
             sudo sed -i -e "/dtoverlay*.hifiberry-${HBERRY}/ d" /boot/config.txt|| echo "unable to add new hifiberry entry"
