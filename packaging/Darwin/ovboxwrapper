@@ -1,0 +1,8 @@
+#!/bin/sh
+export HOMEBREW_REPOSITORY=/opt/homebrew
+export HOMEBREW_PREFIX=/opt/homebrew
+export HOMEBREW_CELLAR=/opt/homebrew/Cellar
+export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:$PATH
+export RDIR=$(realpath $(dirname $0)/../Resources)
+export BDIR=$(realpath $(dirname $0))
+$BDIR/ovbox.bin

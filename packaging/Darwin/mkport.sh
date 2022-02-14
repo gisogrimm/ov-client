@@ -6,6 +6,7 @@ if test -z "$2"; then
 else
     LIBDIR="$2"
 fi
+LIBDIR=$(echo $LIBDIR|sed -e 's/lib\/lib/lib/g')
 mkdir -p "${LIBDIR}"
 SCRIPT=$(realpath $0)
 BINBASE=$(echo "$BIN" | awk -F'/' '{print $NF}')
@@ -32,6 +33,5 @@ for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/@loader_path/ d" -e "s/[[:b
 done
 for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/libovclient/! d" -e "s/[[:blank:]]*\//\//1" -e "s/dylib .*/dylib/1"`; do
     OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
-    echo install_name_tool -change "$lib" "@loader_path/lib/${OBJ_LEAF_NAME}" "${BIN}"
     install_name_tool -change "$lib" "@loader_path/lib/${OBJ_LEAF_NAME}" "${BIN}"
 done
