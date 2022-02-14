@@ -31,7 +31,9 @@ for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/@loader_path/ d" -e "s/[[:b
 	fi
     fi
 done
-for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/libovclient/! d" -e "s/[[:blank:]]*\//\//1" -e "s/dylib .*/dylib/1"`; do
-    OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
-    install_name_tool -change "$lib" "@loader_path/lib/${OBJ_LEAF_NAME}" "${BIN}"
-done
+if test "${BINBASE}" = "ovbox" || test "${BINBASE}" = "ov-client"; then
+    for lib in `otool -L $BIN | sed -e "/dylib/! d" -e "/libovclient/! d" -e "s/[[:blank:]]*\//\//1" -e "s/dylib .*/dylib/1"`; do
+	OBJ_LEAF_NAME=$(echo "$lib" | awk -F'/' '{print $NF}')
+	install_name_tool -change "$lib" "@loader_path/lib/${OBJ_LEAF_NAME}" "${BIN}"
+    done
+fi
