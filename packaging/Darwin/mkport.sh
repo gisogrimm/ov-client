@@ -6,7 +6,7 @@ if test -z "$2"; then
 else
     LIBDIR="$2"
 fi
-LIBDIR=$(echo $LIBDIR|sed -e 's/lib\/lib/lib/g')
+LIBDIR=$(realpath $(echo $LIBDIR|sed -e 's/lib\/lib/lib/g'))
 mkdir -p "${LIBDIR}"
 SCRIPT=$(realpath $0)
 BINBASE=$(echo "$BIN" | awk -F'/' '{print $NF}')
