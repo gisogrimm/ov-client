@@ -12,10 +12,15 @@ PACKVER:=$(FULLVERSION)_$(shell uname -s)_$(shell uname -m)
 
 BINS = ov-client ovbox ovzita-j2n ovzita-n2j
 LIBS = libovclienttascar.0.dylib libovclienttascargui.0.dylib
+PLUGS = $(shell (cd ../../libov/tascar/plugins/build;echo ovclient*.dylib))
+
+plug:
+	echo $(PLUGS)
 
 portable:
 	rm -Rf bin;mkdir -p bin ;for i in $(BINS); do cp ../../build/$$i bin/ ;./mkport.sh ./bin/$$i; done; \
-	mkdir -p bin/lib ;for i in $(LIBS); do cp ../../libov/tascar/libtascar/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i; done
+	mkdir -p bin/lib ;for i in $(LIBS); do cp ../../libov/tascar/libtascar/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i; done; \
+	for i in $(PLUGS); do cp ../../libov/tascar/plugins/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i; done;
 
 pack: portable
 	./pack.sh ovbox $(PACKVER)
