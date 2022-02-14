@@ -13,7 +13,7 @@ PACKVER:=$(FULLVERSION)_$(shell uname -s)_$(shell uname -m)
 BINS = ov-client ovbox ovzita-j2n ovzita-n2j
 
 portable:
-	for i in $(BINS); do ./mkport.sh ../../build/$$i; done
+	rm -Rf bin;mkdir -p bin ;for i in $(BINS); do cp ../../build/$$i bin/ ;./mkport.sh ./bin/$$i; done
 
 pack: portable
-	./pack.sh ov-client $(PACKVER)
+	./pack.sh ovbox $(PACKVER)

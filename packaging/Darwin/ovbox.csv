@@ -1,0 +1,11 @@
+packaging/Darwin/bin/*,./Contents/MacOS/
+packaging/Darwin/Info.plist,./Contents/
+libov/tascar/plugins/build/ovclienttascar*,./Contents/MacOS/lib/
+libov/tascar/libtascar/build/libovclienttascar*,./Contents/MacOS/lib/
+src/*.png,./Contents/Resources/
+src/*.icns,./Contents/Resources/
+node_modules,./Contents/MacOS/
+ovclient.css,./Contents/MacOS/
+ovclient.js,./Contents/MacOS/
+webmixer.js,./Contents/MacOS/
+jackrec.html,./Contents/MacOS/

@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-  <dict>
-    <key>CFBundleName</key>
-    <string>ovbox</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.orlandoviols.ovbox</string>
-  </dict>
+<dict>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>ovbox.icns</string>
+	</array>
+	<key>CFBundleIconFile</key>
+	<string>ovbox.icns</string>
+	<key>CFBundleName</key>
+	<string>ovbox</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.orlandoviols.ovbox</string>
+</dict>
 </plist>
