@@ -1,8 +1,13 @@
 #!/bin/sh
-export HOMEBREW_REPOSITORY=/opt/homebrew
-export HOMEBREW_PREFIX=/opt/homebrew
-export HOMEBREW_CELLAR=/opt/homebrew/Cellar
-export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:$PATH
+HOMEBREW_REPOSITORY=/opt/homebrew
+if test -e /usr/local/Cellar; then
+    HOMEBREW_REPOSITORY=/usr/local
+fi
+export HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY
+export HOMEBREW_PREFIX=$HOMEBREW_REPOSITORY
+export HOMEBREW_CELLAR=$HOMEBREW_REPOSITORY/Cellar
+export PATH=$HOMEBREW_REPOSITORY/bin:$HOMEBREW_REPOSITORY/sbin:$PATH
 export RDIR=$(realpath $(dirname $0)/../Resources)
 export BDIR=$(realpath $(dirname $0))
+export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${BDIR}/lib"
 $BDIR/ovbox.bin

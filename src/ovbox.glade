@@ -112,6 +112,21 @@
             <property name="position">5</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkLabel" id="version">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">0.0.0</property>
+            <style>
+              <class name="labversion"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">6</property>
+          </packing>
+        </child>
         <style>
           <class name="ovbox"/>
         </style>

@@ -20,10 +20,10 @@
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
+#include <libgen.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <libgen.h>
 
 enum frontend_t { FRONTEND_OV, FRONTEND_DS };
 

@@ -90,6 +90,7 @@ protected:
   Gtk::Label* label;
   Gtk::Label* labdevice;
   Gtk::Label* labuser;
+  Gtk::Label* version;
   Gtk::Button* buttonmixer;
   Gtk::Button* buttonopen;
   std::mutex mcl;
@@ -108,6 +109,8 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
   GET_WIDGET(labdevice);
   GET_WIDGET(buttonmixer);
   GET_WIDGET(buttonopen);
+  GET_WIDGET(version);
+  version->set_label(get_libov_version());
   update_display();
   con_timeout = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &ovboxgui_t::on_timeout), 250);
@@ -383,6 +386,7 @@ int main(int argc, char** argv)
          "padding: "
          "5px; border-radius: 9px; color: #000000; "
          "}"
+         ".labversion { font-size: 90%; color: #222; font-weight: normal;} "
          ".passmember { margin-left: 4px; margin-right: 4px; "
          "background-color: #d6d6d6;"
          "color: #666666;"
