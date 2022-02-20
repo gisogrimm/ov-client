@@ -76,6 +76,33 @@ socket.on("updatefader", function(fader,val){
     }
 });
 
+socket.on('oscvarlist', function(parents,varlist){
+    let el=document.getElementById('plugpars');
+    while (el.firstChild) {el.removeChild(el.firstChild);}
+    for( var k=0;k<parents.length;++k){
+        const p = parents[k];
+        var d;
+        console.log(p.parent);
+        let dp = document.getElementById(p.parent);
+        if( dp )
+            d = dp.appendChild(document.createElement('div'));
+        else
+            d = el.appendChild(document.createElement('div'));
+        d.setAttribute('id',p.id);
+        d.setAttribute('class','parblock');
+        d.appendChild(document.createTextNode(p.label));
+    }
+    for( const key in varlist ){
+        const v = varlist[key];
+        let p=document.getElementById(v.parent);
+        if( p ){
+            var d = p.appendChild(document.createElement('div'));
+            d.setAttribute('class','parstrip');
+            d.appendChild(document.createTextNode(v.label));
+        }
+    }
+});
+
 function str_pad_left(string,pad,length) {
     return (new Array(length+1).join(pad)+string).slice(-length);
 }

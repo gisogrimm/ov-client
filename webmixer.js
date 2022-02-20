@@ -53,7 +53,7 @@ httpserver = http.createServer(function (req, res) {
     res.write('<html><head><style>');
     res.write(hoscss);
     res.write('</style><title>ov-client web mixer</title>\n</head><body>\n');
-    res.write('<h1>'+devname+'</h1>\n<div id="mixer">mixer</div>\n');
+    res.write('<h1>'+devname+'</h1>\n<div id="mixer">mixer</div><div id="plugpars"></div>\n');
     res.write('<script src="http://'+ipaddr+':8080/socket.io/socket.io.js"></script>\n');
     res.write('<script>\n');
     res.write('var socket = io("http://'+ipaddr+':8080");\n');
@@ -71,8 +71,30 @@ var oscServer, oscClient;
 oscServer = new osc.Server( 9000, '0.0.0.0' );
 oscClient = new osc.Client( 'localhost', 9871 );
 
+
+function findOverlap(a, b) {
+  if (b.length === 0) {
+    return "";
+  }
+
+  if (a.endsWith(b)) {
+    return b;
+  }
+
+  if (a.indexOf(b) >= 0) {
+    return b;
+  }
+
+  return findOverlap(a, b.substring(0, b.length - 1));
+}
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
+
 io.on('connection', function (socket) {
     socket.on('config', function (obj) {
+        var varlist = {};
 	oscClient.send('/status', socket.id + ' connected');
 	oscServer.on('message', async function(msg, rinfo) {
 	    if( msg[0] == '/touchosc/scene' ){
@@ -103,11 +125,58 @@ io.on('connection', function (socket) {
 		socket.emit('jackrectime', msg[1] );
 	    if( msg[0] == '/jackrec/error' )
 		socket.emit('jackrecerr', msg[1] );
-
+	    if( msg[0] == '/varlist/getval' ){
+                if( varlist[msg[1]] !== null ){
+                    console.log(msg[2]);
+                }
+            }
+	    if( msg[0] == '/varlist/begin' )
+                varlist = {};
+	    if( msg[0] == '/varlist' ){
+                if( (msg[2] == 'f') && (msg[3]>0) ){
+                    varlist[msg[1]] = {'path':msg[1],'range':msg[4],'comment':msg[5],'label':msg[1]};
+                }
+            }
+	    if( msg[0] == '/varlist/end' ){
+                var parents = [];
+                var sparents = [];
+                for(const key in varlist){
+                    var grps = varlist[key].path.split('/');
+                    varlist[key].label = grps.pop();
+                    varlist[key].parent = grps.join('');
+                    while( grps.length > 0 ){
+                        const level = grps.length;
+                        var parent = grps.join('');
+                        var grapa = null;
+                        var grlab = grps.pop();
+                        if( grlab ){
+                            grapa = grps.join('');
+                            grlab = grlab.replace('bus.','');
+                        }
+                        if( grlab && (grlab.length > 0) ){
+                            if( sparents.indexOf(parent) < 0 ){
+                                parents.unshift({'id':parent,'parent':grapa,'label':grlab,'level':level});
+                                sparents.push(parent);
+                            }
+                        }
+                    }
+                }
+                parents.sort((a, b) => {
+                    if( a.level != b.level ) return a.level-b.level;
+                    if( b.label < a.label ) return 1;
+                    if( b.label > a.label ) return -1;
+                    return 0;
+                } );
+                //parents = parents.filter(onlyUnique);
+                console.log(parents);
+                //console.log(varlist);
+                socket.emit('oscvarlist',parents,varlist);
+            }
 	});
 	oscClient.send('/touchosc/connect',16);
 	oscClient.send('/jackrec/listports');
 	oscClient.send('/jackrec/listfiles');
+        oscClient.send('/sendvarsto','osc.udp://localhost:9000/','/varlist','/bus.');
     });
     socket.on('message', function (obj) {
 	oscClient.send(obj);

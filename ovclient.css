@@ -143,3 +143,19 @@ button {
     background-color: #b00000;
     border-radius: 18px;
 }
+.parblock {
+    display: block;
+    border: 1px solid #333;
+    background-color: #66668850;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
+.parstrip {
+    display: block;
+    border: 1px solid #666;
+    background-color: #999;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
