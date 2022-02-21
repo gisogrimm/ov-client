@@ -134,7 +134,9 @@ io.on('connection', function (socket) {
                 varlist = {};
 	          if( msg[0] == '/varlist' ){
                 if( (msg[2] == 'f') && (msg[3]>0) ){
-                    varlist[msg[1]] = {'path':msg[1],'range':msg[4],'comment':msg[5],'label':msg[1]};
+                    var grps = msg[1].split('/');
+                    if( grps.length > 3 )
+                        varlist[msg[1]] = {'path':msg[1],'range':msg[4],'comment':msg[5],'label':msg[1]};
                 }
             }
 	          if( msg[0] == '/varlist/end' ){

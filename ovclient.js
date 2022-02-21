@@ -91,7 +91,9 @@ socket.on('oscvarlist', function(parents,varlist){
     for( var k=0;k<parents.length;++k){
         const p = parents[k];
         var d;
-        let dp = document.getElementById(p.parent);
+        var dp = null;
+        if( p.parent && (p.parent.length>0) )
+            dp = document.getElementById(p.parent);
         if( dp )
             d = dp.appendChild(document.createElement('div'));
         else
@@ -106,21 +108,26 @@ socket.on('oscvarlist', function(parents,varlist){
         if( p ){
             var dplug = p.appendChild(document.createElement('div'));
             dplug.setAttribute('class','parstrip');
-            var dpluglab = dplug.appendChild(document.createElement('div'));
+            var dpluglab = dplug.appendChild(document.createElement('label'));
+            //dpluglab.setAttribute('type','label');
             dpluglab.setAttribute('class','parstriplabel');
             dpluglab.appendChild(document.createTextNode(v.label));
+            //dpluglab.setAttribute('value',v.label);
+            dpluglab.setAttribute('title',v.comment);
             var inp = dplug.appendChild(document.createElement('input'));
             inp.setAttribute('class','parstripctl');
             inp.setAttribute('id',v.id);
+            inp.setAttribute('title',v.comment);
             var inp2 = dplug.appendChild(document.createElement('input'));
             inp2.setAttribute('class','parstripdisp');
             inp2.setAttribute('id',v.id+'.disp');
             inp2.setAttribute('type','number');
             inp2.setAttribute('step','any');
+            inp2.setAttribute('title',v.comment);
             var rg = v.range.split(',');
             if( rg.length == 2 ){
-                const vmin = parseFloat(rg[0].replace('[','').replace(']',''));
-                const vmax = parseFloat(rg[1].replace('[','').replace(']',''));
+                var vmin = parseFloat(rg[0].replace('[','').replace(']',''));
+                var vmax = parseFloat(rg[1].replace('[','').replace(']',''));
                 const step = (vmax-vmin)/256;
                 if( rg[0].startsWith(']') )
                     vmin += step;
