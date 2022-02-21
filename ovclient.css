@@ -14,8 +14,10 @@ body {
 .mixerstrip {
     width: 100%;
     background-color: #a0a0ff40;
-    margin: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     padding: 8px;
+    border-radius: 15px;
 }
 .mixerego {
     background-color: #ffa0a040;
@@ -28,6 +30,8 @@ body {
     width: 9%;
     height: 25px;
     border-radius: 5px;
+    font-size: 80%;
+    float: right;
 }
 .fader {
     -webkit-appearance: none;
@@ -87,32 +91,32 @@ button {
 }
 .jackrec {
     background-color: #a0a0a0;
-    margin: 30px;
+    margin-top: 30px;
     padding: 10px;
+    display: block;
+    width: 100%;
+    border-radius: 15px;
 }
 .jackrecctl {
     padding: 10px;
     margin: 10px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: #000000;
+    border: 1px solid #666;
+    border-radius: 15px;
 }
 .jackrecerr {
     color: #800000;
     font-weight: bold;
 }
 .filelist {
-    border-width: 2px;
-    border-style: solid;
-    border-color: #000000;
+    border: 1px solid #666;
+    border-radius: 15px;
     color: #000000;
     margin: 10px;
     padding: 10px;
 }
 .portlist {
-    border-width: 2px;
-    border-style: solid;
-    border-color: #000000;
+    border: 1px solid #666;
+    border-radius: 15px;
     color: #000000;
     margin: 10px;
     padding: 10px;
@@ -120,7 +124,6 @@ button {
 .listhead {
     color: #000;
     margin: 10px;
-    padding: 10px;
 }
 .ctlbutton {
     font-size: 28px;
@@ -147,9 +150,10 @@ button {
     display: block;
     border: 1px solid #333;
     background-color: #66668850;
-    border-radius: 5px;
-    margin: 5px;
-    padding: 5px;
+    border-radius: 15px;
+    margin: 0px;
+    margin-top: 5px;
+    padding: 8px;
 }
 .parstrip {
     display: block;
@@ -168,6 +172,13 @@ button {
     display: inline-block;
 }
 .parstripdisp {
-    width: 5%;
-    display: inline-block;
+    width: 7%;
+    font-size: 80%;
+    float: right;
+}
+#plugpars {
+    width: 100%;
+    display: block;
+    margin: 0px;
+    padding: 0px;
 }
