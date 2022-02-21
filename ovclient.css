@@ -159,3 +159,15 @@ button {
     margin: 5px;
     padding: 5px;
 }
+.parstriplabel {
+    width: 20%;
+    display: inline-block;
+}
+.parstripctl {
+    width: 65%;
+    display: inline-block;
+}
+.parstripdisp {
+    width: 5%;
+    display: inline-block;
+}

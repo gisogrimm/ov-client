@@ -76,13 +76,21 @@ socket.on("updatefader", function(fader,val){
     }
 });
 
+socket.on('updatevar', function(id, val){
+    let el=document.getElementById(id);
+    if( el )
+        el.setAttribute('value',val);
+    let el2=document.getElementById(id+'.disp');
+    if( el2 )
+        el2.setAttribute('value',val);
+});
+
 socket.on('oscvarlist', function(parents,varlist){
     let el=document.getElementById('plugpars');
     while (el.firstChild) {el.removeChild(el.firstChild);}
     for( var k=0;k<parents.length;++k){
         const p = parents[k];
         var d;
-        console.log(p.parent);
         let dp = document.getElementById(p.parent);
         if( dp )
             d = dp.appendChild(document.createElement('div'));
@@ -96,9 +104,48 @@ socket.on('oscvarlist', function(parents,varlist){
         const v = varlist[key];
         let p=document.getElementById(v.parent);
         if( p ){
-            var d = p.appendChild(document.createElement('div'));
-            d.setAttribute('class','parstrip');
-            d.appendChild(document.createTextNode(v.label));
+            var dplug = p.appendChild(document.createElement('div'));
+            dplug.setAttribute('class','parstrip');
+            var dpluglab = dplug.appendChild(document.createElement('div'));
+            dpluglab.setAttribute('class','parstriplabel');
+            dpluglab.appendChild(document.createTextNode(v.label));
+            var inp = dplug.appendChild(document.createElement('input'));
+            inp.setAttribute('class','parstripctl');
+            inp.setAttribute('id',v.id);
+            var inp2 = dplug.appendChild(document.createElement('input'));
+            inp2.setAttribute('class','parstripdisp');
+            inp2.setAttribute('id',v.id+'.disp');
+            inp2.setAttribute('type','number');
+            inp2.setAttribute('step','any');
+            var rg = v.range.split(',');
+            if( rg.length == 2 ){
+                const vmin = parseFloat(rg[0].replace('[','').replace(']',''));
+                const vmax = parseFloat(rg[1].replace('[','').replace(']',''));
+                const step = (vmax-vmin)/256;
+                if( rg[0].startsWith(']') )
+                    vmin += step;
+                if( rg[1].endsWith('[') )
+                    vmax -= step;
+                inp.setAttribute('type','range');
+                inp.setAttribute('min',vmin);
+                inp.setAttribute('max',vmax);
+                inp.setAttribute('step',step);
+            }else{
+                inp.setAttribute('type','number');
+                inp.setAttribute('step','any');
+            }
+            inp.onchange = function handleChange(e){
+                socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
+                let inp = document.getElementById(v.id+'.disp');
+                if( inp )
+                    inp.value = e.target.valueAsNumber;
+            };
+            inp2.onchange = function handleChange(e){
+                socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
+                let inp = document.getElementById(v.id);
+                if( inp )
+                    inp.value = e.target.valueAsNumber;
+            };
         }
     }
 });

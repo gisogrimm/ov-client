@@ -11,25 +11,25 @@ httpserver = http.createServer(function (req, res) {
     // check if file is in local directory:
     if( req.url.startsWith('/rec') & (
         req.url.endsWith('.wav')||
-        req.url.endsWith('.aif')||
-        req.url.endsWith('.mat')||
-        req.url.endsWith('.flac')||
-        req.url.endsWith('.caf')
+            req.url.endsWith('.aif')||
+            req.url.endsWith('.mat')||
+            req.url.endsWith('.flac')||
+            req.url.endsWith('.caf')
     )){
-	// download from local directory:
-	if( fs.existsSync('.'+req.url) ){
-	    var data = fs.readFileSync('.'+req.url);
-	    res.writeHead(200);
-	    res.end(data);
-	    return;
-	}
-	// check in home directory:
-	if( fs.existsSync(homedir+req.url) ){
-	    var data = fs.readFileSync(homedir+req.url);
-	    res.writeHead(200);
-	    res.end(data);
-	    return;
-	}
+	      // download from local directory:
+	      if( fs.existsSync('.'+req.url) ){
+	          var data = fs.readFileSync('.'+req.url);
+	          res.writeHead(200);
+	          res.end(data);
+	          return;
+	      }
+	      // check in home directory:
+	      if( fs.existsSync(homedir+req.url) ){
+	          var data = fs.readFileSync(homedir+req.url);
+	          res.writeHead(200);
+	          res.end(data);
+	          return;
+	      }
     }
     var sdir = path.dirname(process.argv[1]);
     if( sdir.length > 0 )
@@ -39,12 +39,12 @@ httpserver = http.createServer(function (req, res) {
     var jackrec = fs.readFileSync(sdir+'jackrec.html');
     var ipaddr = os.hostname();
     if( process.argv.length > 2 )
-	ipaddr = process.argv[2];
+	      ipaddr = process.argv[2];
     var devname = os.hostname();
     if( process.argv.length > 3 )
-	devname = process.argv[3];
+	      devname = process.argv[3];
     try{
-	devname = fs.readFileSync('devicename');
+	      devname = fs.readFileSync('devicename');
     }
     catch(ee){
     }
@@ -73,75 +73,76 @@ oscClient = new osc.Client( 'localhost', 9871 );
 
 
 function findOverlap(a, b) {
-  if (b.length === 0) {
-    return "";
-  }
+    if (b.length === 0) {
+        return "";
+    }
 
-  if (a.endsWith(b)) {
-    return b;
-  }
+    if (a.endsWith(b)) {
+        return b;
+    }
 
-  if (a.indexOf(b) >= 0) {
-    return b;
-  }
+    if (a.indexOf(b) >= 0) {
+        return b;
+    }
 
-  return findOverlap(a, b.substring(0, b.length - 1));
+    return findOverlap(a, b.substring(0, b.length - 1));
 }
 
 function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
+    return self.indexOf(value) === index;
 }
 
 io.on('connection', function (socket) {
     socket.on('config', function (obj) {
         var varlist = {};
-	oscClient.send('/status', socket.id + ' connected');
-	oscServer.on('message', async function(msg, rinfo) {
-	    if( msg[0] == '/touchosc/scene' ){
-		socket.emit('scene', 'scene');
-	    }
-	    if( msg[0].startsWith('/touchosc/label') && (!msg[0].endsWith('/color')) && (msg[1].length>1)){
-		socket.emit('newfader', msg[0].substr(15), msg[1] );
-	    }
-	    if( msg[0].startsWith('/touchosc/fader') && (!msg[0].endsWith('/color')) ){
-		socket.emit('updatefader', msg[0], msg[1] );
-	    }
-	    if( msg[0].startsWith('/touchosc/level') ){
-		socket.emit('updatefader', msg[0], msg[1] );
-	    }
-	    if( msg[0] == '/jackrec/start' )
-		socket.emit('jackrecstart', '');
-	    if( msg[0] == '/jackrec/stop' )
-		socket.emit('jackrecstop', '');
-	    if( msg[0] == '/jackrec/portlist' )
-		socket.emit('jackrecportlist', '');
-	    if( msg[0] == '/jackrec/port' )
-		socket.emit('jackrecaddport', msg[1] );
-	    if( msg[0] == '/jackrec/filelist' )
-		socket.emit('jackrecfilelist', '');
-	    if( msg[0] == '/jackrec/file' )
-		socket.emit('jackrecaddfile', msg[1] );
-	    if( msg[0] == '/jackrec/rectime' )
-		socket.emit('jackrectime', msg[1] );
-	    if( msg[0] == '/jackrec/error' )
-		socket.emit('jackrecerr', msg[1] );
-	    if( msg[0] == '/varlist/getval' ){
+	      oscClient.send('/status', socket.id + ' connected');
+	      oscServer.on('message', async function(msg, rinfo) {
+	          if( msg[0] == '/touchosc/scene' ){
+		            socket.emit('scene', 'scene');
+	          }
+	          if( msg[0].startsWith('/touchosc/label') && (!msg[0].endsWith('/color')) && (msg[1].length>1)){
+		            socket.emit('newfader', msg[0].substr(15), msg[1] );
+	          }
+	          if( msg[0].startsWith('/touchosc/fader') && (!msg[0].endsWith('/color')) ){
+		            socket.emit('updatefader', msg[0], msg[1] );
+	          }
+	          if( msg[0].startsWith('/touchosc/level') ){
+		            socket.emit('updatefader', msg[0], msg[1] );
+	          }
+	          if( msg[0] == '/jackrec/start' )
+		            socket.emit('jackrecstart', '');
+	          if( msg[0] == '/jackrec/stop' )
+		            socket.emit('jackrecstop', '');
+	          if( msg[0] == '/jackrec/portlist' )
+		            socket.emit('jackrecportlist', '');
+	          if( msg[0] == '/jackrec/port' )
+		            socket.emit('jackrecaddport', msg[1] );
+	          if( msg[0] == '/jackrec/filelist' )
+		            socket.emit('jackrecfilelist', '');
+	          if( msg[0] == '/jackrec/file' )
+		            socket.emit('jackrecaddfile', msg[1] );
+	          if( msg[0] == '/jackrec/rectime' )
+		            socket.emit('jackrectime', msg[1] );
+	          if( msg[0] == '/jackrec/error' )
+		            socket.emit('jackrecerr', msg[1] );
+	          if( msg[0] == '/varlist/getval' ){
                 if( varlist[msg[1]] !== null ){
-                    console.log(msg[2]);
+                    socket.emit('updatevar',msg[1].replace(/[^a-zA-Z0-9]/g,''),msg[2]);
                 }
             }
-	    if( msg[0] == '/varlist/begin' )
+	          if( msg[0] == '/varlist/begin' )
                 varlist = {};
-	    if( msg[0] == '/varlist' ){
+	          if( msg[0] == '/varlist' ){
                 if( (msg[2] == 'f') && (msg[3]>0) ){
                     varlist[msg[1]] = {'path':msg[1],'range':msg[4],'comment':msg[5],'label':msg[1]};
                 }
             }
-	    if( msg[0] == '/varlist/end' ){
+	          if( msg[0] == '/varlist/end' ){
                 var parents = [];
                 var sparents = [];
                 for(const key in varlist){
                     var grps = varlist[key].path.split('/');
+                    varlist[key].id = varlist[key].path.replace(/[^a-zA-Z0-9]/g,'');
                     varlist[key].label = grps.pop();
                     varlist[key].parent = grps.join('');
                     while( grps.length > 0 ){
@@ -167,25 +168,26 @@ io.on('connection', function (socket) {
                     if( b.label > a.label ) return -1;
                     return 0;
                 } );
-                //parents = parents.filter(onlyUnique);
-                console.log(parents);
-                //console.log(varlist);
                 socket.emit('oscvarlist',parents,varlist);
+                for(const key in varlist){
+                    const v = varlist[key];
+                    oscClient.send(v.path+'/get','osc.udp://localhost:9000/','/varlist/getval');
+                }
             }
-	});
-	oscClient.send('/touchosc/connect',16);
-	oscClient.send('/jackrec/listports');
-	oscClient.send('/jackrec/listfiles');
+	      });
+	      oscClient.send('/touchosc/connect',16);
+	      oscClient.send('/jackrec/listports');
+	      oscClient.send('/jackrec/listfiles');
         oscClient.send('/sendvarsto','osc.udp://localhost:9000/','/varlist','/bus.');
     });
     socket.on('message', function (obj) {
-	oscClient.send(obj);
+	      oscClient.send(obj);
     });
     socket.on('msg', function (obj) {
-	if( obj.hasOwnProperty('value') && (obj.value != null) ){
-	    oscClient.send( obj.path, obj.value );
-	}else{
-	    oscClient.send( obj.path );
-	}
+	      if( obj.hasOwnProperty('value') && (obj.value != null) ){
+	          oscClient.send( obj.path, obj.value );
+	      }else{
+	          oscClient.send( obj.path );
+	      }
     });
 });
