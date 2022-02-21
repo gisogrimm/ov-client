@@ -6,6 +6,9 @@ build/ovzita-j2n,usr/bin
 build/ovzita-n2j,usr/bin
 installovclient.sh,usr/share/ovclient/tools
 jackrec.html,usr/share/ovclient
+libov/tascar/libtascar/build/libovclienttascar.so.*,usr/lib/
+libov/tascar/libtascar/build/libovclienttascardmx.so.*,usr/lib/
+libov/tascar/libtascar/build/libovclienttascargui.so.*,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_ap_bandpass.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_delay.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_feedbackdelay.so,usr/lib
