@@ -143,12 +143,14 @@ socket.on('oscvarlist', function(parents,varlist){
             }
             inp.onchange = function handleChange(e){
                 socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
+                socket.emit("msg",{"path":"/uploadchannelcfg","value":null});
                 let inp = document.getElementById(v.id+'.disp');
                 if( inp )
                     inp.value = e.target.valueAsNumber;
             };
             inp2.onchange = function handleChange(e){
                 socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
+                socket.emit("msg",{"path":"/uploadchannelcfg","value":null});
                 let inp = document.getElementById(v.id);
                 if( inp )
                     inp.value = e.target.valueAsNumber;
