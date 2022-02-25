@@ -45,7 +45,7 @@ STORAGE_DIR = /STORAGE/$(PROJECT)/$(BRANCH_NAME)/
 
 # How many days to keep debian packages in storage that are superceded by a
 # newer version
-RETENTION = 28
+RETENTION = 14
 
 storage: pruned-storage-$(BRANCH_NAME)
 
@@ -59,6 +59,8 @@ pruned-storage-%: updated-storage-%
 	@echo uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
 	@echo Storage pruning finished.
 	@echo nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+pruned-storage-master: RETENTION = 28
 
 # Never delete old packages in the master database
 #pruned-storage-master: updated-storage-master
