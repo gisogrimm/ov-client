@@ -33,6 +33,7 @@ socket.on("newfader", function(faderno,val){
     el_fader.setAttribute("value",val);
     el_fader.setAttribute("step","0.1");
     el_fader.setAttribute("id",fader);
+    el_fader.onchange = upload_session_gains;
     let el_gaintext=document.createElement("input");
     el_gaintext.setAttribute("type","number");
     el_gaintext.setAttribute("class","gaintxtfader");
@@ -141,16 +142,16 @@ socket.on('oscvarlist', function(parents,varlist){
                 inp.setAttribute('type','number');
                 inp.setAttribute('step','any');
             }
-            inp.onchange = function handleChange(e){
+            inp.onchange = function(e){
                 socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
-                socket.emit("msg",{"path":"/uploadchannelcfg","value":null});
+                socket.emit("msg",{"path":"/uploadpluginsettings","value":null});
                 let inp = document.getElementById(v.id+'.disp');
                 if( inp )
                     inp.value = e.target.valueAsNumber;
             };
-            inp2.onchange = function handleChange(e){
+            inp2.onchange = function(e){
                 socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
-                socket.emit("msg",{"path":"/uploadchannelcfg","value":null});
+                socket.emit("msg",{"path":"/uploadpluginsettings","value":null});
                 let inp = document.getElementById(v.id);
                 if( inp )
                     inp.value = e.target.valueAsNumber;
@@ -158,6 +159,11 @@ socket.on('oscvarlist', function(parents,varlist){
         }
     }
 });
+
+function upload_session_gains()
+{
+    socket.emit("msg",{"path":"/uploadsessiongains","value":null});
+}
 
 function str_pad_left(string,pad,length) {
     return (new Array(length+1).join(pad)+string).slice(-length);
@@ -240,13 +246,13 @@ function handleChange(e) {
 	socket.emit("msg", { path: e.target.id.substr(3), value: e.target.valueAsNumber } );
 	let fad=document.getElementById(e.target.id.substr(3));
 	if( fad!=null ){
-	    fad.value=val;
+	    fad.value=e.target.valueAsNumber;
 	}
     }else{
 	socket.emit("msg", { path: e.target.id, value: e.target.valueAsNumber } );
 	let fadt=document.getElementById(e.target.id);
 	if( fadt!=null ){
-	    fadt.value=val.toFixed(1);
+	    fadt.value=e.target.valueAsNumber.toFixed(1);
 	}
     }
 }
