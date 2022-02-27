@@ -182,3 +182,9 @@ button {
     margin: 0px;
     padding: 0px;
 }
+.jackrecsrcport {
+    width: auto;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #888;
+}

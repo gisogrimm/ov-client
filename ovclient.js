@@ -1,6 +1,9 @@
+var deviceid = '';
+
 socket.on("connect", function() {
     socket.emit("config",{});
 });
+socket.on('deviceid',function(id){deviceid=id;});
 socket.on("scene", function(scene){
     let el=document.getElementById("mixer");
     while (el.firstChild) {el.removeChild(el.firstChild);}
@@ -17,9 +20,9 @@ socket.on("newfader", function(faderno,val){
     let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
     let classname = "mixerstrip";
-    if( val == "ego" )
+    if( (val == "ego")||(val == "monitor") )
 	classname = classname + " mixerego";
-    if( (val == "master") || (val == "reverb") )
+    if( (val == "main") || (val == "reverb") )
 	classname = classname + " mixerother";
     el_div.setAttribute("class",classname);
     let el_lab=document.createElement("label");
@@ -83,7 +86,7 @@ socket.on('updatevar', function(id, val){
         el.setAttribute('value',val);
     let el2=document.getElementById(id+'.disp');
     if( el2 )
-        el2.setAttribute('value',val);
+        el2.setAttribute('value',parseFloat(val.toPrecision(4)));
 });
 
 socket.on('oscvarlist', function(parents,varlist){
@@ -147,7 +150,7 @@ socket.on('oscvarlist', function(parents,varlist){
                 socket.emit("msg",{"path":"/uploadpluginsettings","value":null});
                 let inp = document.getElementById(v.id+'.disp');
                 if( inp )
-                    inp.value = e.target.valueAsNumber;
+                    inp.value = parseFloat(e.target.valueAsNumber.toPrecision(4));
             };
             inp2.onchange = function(e){
                 socket.emit("msg",{"path":v.path,"value":e.target.valueAsNumber});
@@ -198,16 +201,47 @@ socket.on("jackrecportlist", function(t){
 });
 
 socket.on('jackrecaddport', function(p){
+    var labs = p;
+    var classes = 'mixerstrip jackrecsrcport';
+    var helps = '';
+    if( p.startsWith('n2j_') )
+        return;
+    if( p.startsWith('system:capture') ){
+        classes += ' mixerego';
+        helps = 'Hardware input';
+    }
+    if( p.startsWith('bus.') ){
+        classes += ' mixerego';
+        helps = 'My input (with effects)';
+        labs = labs.replace('bus.','').replace(':out.0','');
+    }
+    if( p == deviceid + '.metronome:out.0' ){
+        return;
+    }
+    if( p == deviceid + '.metronome:out.1' ){
+        classes += ' mixerother';
+        helps = 'Metronome';
+        labs = 'metronome';
+    }
+    if( p.startsWith('render.'+deviceid) ){
+        classes += ' mixerother';
+        helps = 'My headphone output';
+        labs = labs.replace('render.'+deviceid+':','');
+    }
+    labs = labs.replace('.'+deviceid+':out','');
     let el=document.getElementById("portlist");
     let div=el.appendChild(document.createElement('div'));
+    div.setAttribute('class',classes);
     let inp=div.appendChild(document.createElement('input'));
+    inp.setAttribute('title',helps);
     inp.setAttribute('type','checkbox');
     inp.setAttribute('value',p);
     inp.setAttribute('id',p);
     inp.setAttribute('class','jackport checkbox');
     let lab=div.appendChild(document.createElement('label'));
     lab.setAttribute('for',p);
-    lab.appendChild(document.createTextNode(p));
+    lab.setAttribute('title',helps);
+    lab.appendChild(document.createTextNode(labs));
 });
 
 socket.on("jackrecfilelist", function(t){
