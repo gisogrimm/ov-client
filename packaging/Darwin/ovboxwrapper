@@ -9,5 +9,5 @@ export HOMEBREW_CELLAR=$HOMEBREW_REPOSITORY/Cellar
 export PATH=$HOMEBREW_REPOSITORY/bin:$HOMEBREW_REPOSITORY/sbin:/usr/local/bin:$PATH
 export RDIR=$(realpath $(dirname $0)/../Resources)
 export BDIR=$(realpath $(dirname $0))
-export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${BDIR}/lib"
+export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:/usr/local/lib:${BDIR}/lib"
 $BDIR/ovbox.bin
