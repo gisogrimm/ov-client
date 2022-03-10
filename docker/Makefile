@@ -1,4 +1,4 @@
-all: archlinux.test debian.test fedora.test
+all: ubuntu2104.test ubuntu2110.test debian.test archlinux.test fedora.test
 
 GITBRANCH=$(shell git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
 
