@@ -1,3 +1,7 @@
+2022-03-10, version 0.17.1
+ - add audio plugins
+ - improve audio recorder interface
+
 2022-02-10, version 0.16.1
  - update zita-njbridge to latest version
  - many minor bugfixes related to MacOS version and GUI
