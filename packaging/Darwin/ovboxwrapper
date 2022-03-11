@@ -10,8 +10,7 @@ export PATH="${HOMEBREW_REPOSITORY}/bin:${HOMEBREW_REPOSITORY}/sbin:${PATH}"
 export RDIR=$(realpath $(dirname $0)/../Resources)
 export BDIR=$(realpath $(dirname $0))
 export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${BDIR}/lib"
-if ! which jackd; then
-    export DYLD_LIBRARY_PATH="/usr/local/lib:${DYLD_LIBRARY_PATH}:${BDIR}/lib"
-    export PATH="/usr/local/bin:${HOMEBREW_REPOSITORY}/bin:${HOMEBREW_REPOSITORY}/sbin:${PATH}"
-fi
-$BDIR/ovbox.bin
+(
+    cd "${TMPDIR}"
+    $BDIR/ovbox.bin
+)
