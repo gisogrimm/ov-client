@@ -22,4 +22,4 @@ pack:
 	echo " - Packages: $(DEBS)" && \
 	rm -Rf debian && \
 	mkdir -p $(STORAGE) && \
-	for p in $(DEBS); do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); mhamakedeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done
+	for p in $(DEBS); do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); ./packaging/deb/htchdebian-mkdeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done
