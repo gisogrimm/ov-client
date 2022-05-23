@@ -1,4 +1,5 @@
 build/ovbox,usr/bin
+libov/tascar/libtascar/build/libovclienttascargui.so.*,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_tracegui.so,usr/lib
 packaging/deb/ovbox.desktop,usr/share/applications
 src/ovbox.png,usr/share/ovclient
