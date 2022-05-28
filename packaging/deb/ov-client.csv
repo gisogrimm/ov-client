@@ -32,6 +32,7 @@ libov/tascar/plugins/build/ovclienttascar_mask_multibeam.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_matrix.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_midicc2osc.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_oscserver.so,usr/lib
+libov/tascar/plugins/build/ovclienttascar_oscrelay.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ovheadtracker.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_route.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_savegains.so,usr/lib
