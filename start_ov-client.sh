@@ -1,4 +1,6 @@
 #!/bin/sh
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./build/plugins/:./build/libov/tascar/plugins/:libov/tascar/plugins/build/:libov/tascar/libtascar/build/
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$LD_LIBRARY_PATH
-PATH=./build:$PATH LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./build/plugins/:./build/libov/tascar/plugins/:libov/tascar/plugins/build/:libov/tascar/libtascar/build/ $DBGTOOL ./build/ov-client $*
+PLUGINDIR=$(realpath ./libov/tascar/plugins/build/)
+TSCLIBDIR=$(realpath ./libov/tascar/libtascar/build/)
+export LD_LIBRARY_PATH="${TSCLIBDIR}:${PLUGINDIR}:${LD_LIBRARY_PATH}"
+export DYLD_LIBRARY_PATH="${TSCLIBDIR}:${PLUGINDIR}:${DYLD_LIBRARY_PATH}"
+PATH=./build:$PATH $DBGTOOL ./build/ov-client $*
