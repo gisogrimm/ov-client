@@ -21,6 +21,7 @@ libov/tascar/plugins/build/ovclienttascar_ap_sine.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_sndfile.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_spksim.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_tubesim.so,usr/lib
+libov/tascar/plugins/build/ovclienttascar_echoc.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_epicycles.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_granularsynth.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_hoafdnrot.so,usr/lib
