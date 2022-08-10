@@ -1,3 +1,8 @@
+2022-08-10, version 0.19.1
+ - initial support for TCP transmission
+ - initial support for non-adaptive echo cancellation
+ - various minor improvements
+
 2022-06-24, version 0.18.9
  - make startup on MacOS more robust
 
