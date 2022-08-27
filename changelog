@@ -1,3 +1,6 @@
+2022-08-27, version 0.19.4
+ - provide user access to echo cancellation parameters
+
 2022-08-10, version 0.19.1
  - initial support for TCP transmission
  - initial support for non-adaptive echo cancellation
