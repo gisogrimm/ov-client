@@ -76,6 +76,9 @@ public:
 
   std::string zitapath = "";
   std::string ui_url = "http://box.orlandoviols.com/";
+  int pinglogport = 0;
+  bool allowsystemmods = false;
+  std::string cli_deviceid = "";
 
 protected:
   bool on_timeout();
@@ -162,7 +165,6 @@ bool ovboxgui_t::on_timeout()
 void ovboxgui_t::runclient()
 {
   while(!quit_app) {
-
     try {
       labdevice->get_style_context()->add_class("passmember");
       labdevice->get_style_context()->remove_class("actmember");
@@ -196,8 +198,6 @@ void ovboxgui_t::runclient()
       ui_url = ovstrrep(js_cfg.value("ui", "http://box.orlandoviols.com/"),
                         "\\/", "/");
       std::string protocol(js_cfg.value("protocol", "ov"));
-      int pinglogport(0);
-      bool allowsystemmods(false);
       frontend_t frontend(FRONTEND_OV);
       if(protocol == "ov")
         frontend = FRONTEND_OV;
@@ -205,6 +205,8 @@ void ovboxgui_t::runclient()
         frontend = FRONTEND_DS;
       else
         throw ErrMsg("Invalid front end protocol \"" + protocol + "\".");
+      if(!cli_deviceid.empty())
+        deviceid = cli_deviceid;
       if(deviceid.empty()) {
         throw ErrMsg(
             "Invalid (empty) device id. Please ensure that the network "
@@ -334,29 +336,16 @@ int main(int argc, char** argv)
   std::cout << "working directory: " << dtemp << std::endl;
   chdir(dtemp);
 
-  const char* options = "hvz:";
+  const char* options = "hvz:p:d:a";
   struct option long_options[] = {{"help", 0, 0, 'h'},
                                   {"verbose", 0, 0, 'v'},
+                                  {"pinglogport", 1, 0, 'p'},
+                                  {"allowsystemmods", 0, 0, 'a'},
+                                  {"deviceid", 1, 0, 'd'},
                                   {"zitapath", 1, 0, 'z'},
                                   {0, 0, 0, 0}};
   int opt(0);
   int option_index(0);
-  std::string zitapath;
-  verbose = 0;
-  while((opt = getopt_long(argc, argv, options, long_options, &option_index)) !=
-        -1) {
-    switch(opt) {
-    case 'h':
-      app_usage("ov-client", long_options, "");
-      return 0;
-    case 'v':
-      verbose++;
-      break;
-    case 'z':
-      zitapath = optarg;
-      break;
-    }
-  }
   auto nargc = argc;
   Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(
       nargc, argv, "com.orlandoviols.ovbox", Gio::APPLICATION_NON_UNIQUE);
@@ -367,9 +356,30 @@ int main(int argc, char** argv)
   refBuilder->get_widget_derived("mainwin", win);
   if(!win)
     throw TASCAR::ErrMsg("No main window");
-  if(zitapath.size())
-    win->zitapath = zitapath;
-
+  verbose = 0;
+  while((opt = getopt_long(argc, argv, options, long_options, &option_index)) !=
+        -1) {
+    switch(opt) {
+    case 'h':
+      app_usage("ovbox", long_options, "");
+      return 0;
+    case 'v':
+      verbose++;
+      break;
+    case 'z':
+      win->zitapath = optarg;
+      break;
+    case 'd':
+      win->cli_deviceid = optarg;
+      break;
+    case 'p':
+      win->pinglogport = atoi(optarg);
+      break;
+    case 'a':
+      win->allowsystemmods = true;
+      break;
+    }
+  }
   auto css = Gtk::CssProvider::create();
   if(css->load_from_data(
          ".ovbox { background-color: #4e6263;font-weight: bold; } "
