@@ -3,6 +3,12 @@
   <modules>
     <datalogging fileformat="mat">
       <osc path="/ping" size="2" ignorefirst="true"/>
+      <osc path="/ovboxping/srv" size="2" ignorefirst="true"/>
+      <osc path="/ovboxping/p2p" size="2" ignorefirst="true"/>
+      <osc path="/ovboxping/loc" size="2" ignorefirst="true"/>
+      <osc path="/ovboxlatency/srv" size="7" ignorefirst="true"/>
+      <osc path="/ovboxlatency/p2p" size="7" ignorefirst="true"/>
+      <osc path="/ovboxlatency/loc" size="7" ignorefirst="true"/>
     </datalogging>
     <system command="ov-client -p 50100"/>
   </modules>
