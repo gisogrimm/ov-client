@@ -20,7 +20,7 @@ socket.on("newfader", function(faderno,val){
     let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
     let classname = "mixerstrip";
-    if( (val == "ego")||(val == "monitor") )
+    if( val.startsWith("ego.")||(val == "monitor") )
 	classname = classname + " mixerego";
     if( (val == "main") || (val == "reverb") )
 	classname = classname + " mixerother";
