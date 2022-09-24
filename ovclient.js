@@ -20,6 +20,7 @@ socket.on("newfader", function(faderno,val){
     let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
     let classname = "mixerstrip";
+    val = val.replace('.'+deviceid,'');
     if( val.startsWith("ego.")||(val == "monitor") )
 	classname = classname + " mixerego";
     if( (val == "main") || (val == "reverb") )
@@ -42,7 +43,6 @@ socket.on("newfader", function(faderno,val){
     el_gaintext.setAttribute("class","gaintxtfader");
     el_gaintext.setAttribute("min","-20");
     el_gaintext.setAttribute("max","10");
-    el_gaintext.setAttribute("value",val);
     el_gaintext.setAttribute("step","0.1");
     el_gaintext.setAttribute("id","txt"+fader);
     let el_meter=document.createElement("meter");
@@ -52,13 +52,11 @@ socket.on("newfader", function(faderno,val){
     el_meter.setAttribute("low","71");
     el_meter.setAttribute("high","84");
     el_meter.setAttribute("optimum","54");
-    el_meter.setAttribute("value",val);
     el_meter.setAttribute("id",levelid);
     let el_metertext=document.createElement("input");
     el_metertext.setAttribute("type","text");
     el_metertext.setAttribute("readonly","true");
     el_metertext.setAttribute("class","gaintxtfader");
-    el_metertext.setAttribute("value",val);
     el_metertext.setAttribute("id","txt"+levelid);
     el_mixer.appendChild(el_div);
     el_div.appendChild(el_lab);
