@@ -1,3 +1,6 @@
+2022-09-24, version 0.19.12
+ - optional channel names, webmixer improvements
+
 2022-08-27, version 0.19.4
  - provide user access to echo cancellation parameters
 

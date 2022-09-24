@@ -21,6 +21,8 @@ socket.on("newfader", function(faderno,val){
     let el_mixer=document.getElementById("mixer");
     let classname = "mixerstrip";
     val = val.replace('.'+deviceid,'');
+    val = val.replace(deviceid+'.','');
+    val = val.replace('bus.','');
     if( val.startsWith("ego.")||(val == "monitor") )
 	classname = classname + " mixerego";
     if( (val == "main") || (val == "reverb") )
@@ -32,7 +34,7 @@ socket.on("newfader", function(faderno,val){
     let el_fader=document.createElement("input");
     el_fader.setAttribute("class","fader");
     el_fader.setAttribute("type","range");
-    el_fader.setAttribute("min","-20");
+    el_fader.setAttribute("min","-30");
     el_fader.setAttribute("max","10");
     el_fader.setAttribute("value",val);
     el_fader.setAttribute("step","0.1");
@@ -41,7 +43,7 @@ socket.on("newfader", function(faderno,val){
     let el_gaintext=document.createElement("input");
     el_gaintext.setAttribute("type","number");
     el_gaintext.setAttribute("class","gaintxtfader");
-    el_gaintext.setAttribute("min","-20");
+    el_gaintext.setAttribute("min","-30");
     el_gaintext.setAttribute("max","10");
     el_gaintext.setAttribute("step","0.1");
     el_gaintext.setAttribute("id","txt"+fader);
