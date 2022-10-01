@@ -12,6 +12,7 @@ libov/tascar/plugins/build/ovclienttascar_ap_bandpass.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_delay.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_feedbackdelay.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_filter.so,usr/lib
+libov/tascar/plugins/build/ovclienttascar_ap_flanger.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_gain.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_loopmachine.so,usr/lib
 libov/tascar/plugins/build/ovclienttascar_ap_metronome.so,usr/lib
