@@ -118,19 +118,16 @@ int main(int argc, char** argv)
     bool showdevname(false);
     int pinglogport(0);
     bool allowsystemmods(false);
+    bool secondary(false);
     std::string zitapath("");
-    const char* options = "s:hqvd:p:nf:z:a";
-    struct option long_options[] = {{"server", 1, 0, 's'},
-                                    {"help", 0, 0, 'h'},
-                                    {"quiet", 0, 0, 'q'},
-                                    {"deviceid", 1, 0, 'd'},
-                                    {"verbose", 0, 0, 'v'},
-                                    {"pinglogport", 1, 0, 'p'},
-                                    {"devname", 0, 0, 'n'},
-                                    {"frontend", 1, 0, 'f'},
-                                    {"zitapath", 1, 0, 'z'},
-                                    {"allowsystemmods", 0, 0, 'a'},
-                                    {0, 0, 0, 0}};
+    const char* options = "s:hqvd:p:nf:z:a2";
+    struct option long_options[] = {
+        {"server", 1, 0, 's'},    {"help", 0, 0, 'h'},
+        {"quiet", 0, 0, 'q'},     {"deviceid", 1, 0, 'd'},
+        {"verbose", 0, 0, 'v'},   {"pinglogport", 1, 0, 'p'},
+        {"devname", 0, 0, 'n'},   {"frontend", 1, 0, 'f'},
+        {"zitapath", 1, 0, 'z'},  {"allowsystemmods", 0, 0, 'a'},
+        {"secondary", 0, 0, '2'}, {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
     while((opt = getopt_long(argc, argv, options, long_options,
@@ -166,8 +163,13 @@ int main(int argc, char** argv)
       case 'z':
         zitapath = optarg;
         break;
+      case '2':
+        secondary = true;
+        break;
       }
     }
+    if(secondary)
+      deviceid += "_2";
     frontend_t frontend(FRONTEND_OV);
     if(protocol == "ov")
       frontend = FRONTEND_OV;
@@ -190,7 +192,7 @@ int main(int argc, char** argv)
     if(verbose)
       std::cout << "creating renderer with device id \"" << deviceid
                 << "\" and pinglogport " << pinglogport << ".\n";
-    ov_render_tascar_t render(deviceid, pinglogport);
+    ov_render_tascar_t render(deviceid, pinglogport, secondary);
     if(verbose)
       render.set_seqerr_callback(log_seq_error, nullptr);
     if(verbose)

@@ -79,6 +79,7 @@ public:
   int pinglogport = 0;
   bool allowsystemmods = false;
   std::string cli_deviceid = "";
+  bool secondary = false;
 
 protected:
   bool on_timeout();
@@ -217,7 +218,7 @@ void ovboxgui_t::runclient()
                   << "\" and pinglogport " << pinglogport << ".\n";
       labdevice->set_label(deviceid);
       buttonopen->set_label(ui_url);
-      ov_render_tascar_t render(deviceid, pinglogport);
+      ov_render_tascar_t render(deviceid, pinglogport, secondary);
       render.bindir = bindir;
       if(verbose)
         render.set_seqerr_callback(log_seq_error, nullptr);
@@ -336,14 +337,12 @@ int main(int argc, char** argv)
   std::cout << "working directory: " << dtemp << std::endl;
   chdir(dtemp);
 
-  const char* options = "hvz:p:d:a";
-  struct option long_options[] = {{"help", 0, 0, 'h'},
-                                  {"verbose", 0, 0, 'v'},
-                                  {"pinglogport", 1, 0, 'p'},
-                                  {"allowsystemmods", 0, 0, 'a'},
-                                  {"deviceid", 1, 0, 'd'},
-                                  {"zitapath", 1, 0, 'z'},
-                                  {0, 0, 0, 0}};
+  const char* options = "hvz:p:d:a2";
+  struct option long_options[] = {
+      {"help", 0, 0, 'h'},        {"verbose", 0, 0, 'v'},
+      {"pinglogport", 1, 0, 'p'}, {"allowsystemmods", 0, 0, 'a'},
+      {"deviceid", 1, 0, 'd'},    {"zitapath", 1, 0, 'z'},
+      {"secondary", 0, 0, '2'},   {0, 0, 0, 0}};
   int opt(0);
   int option_index(0);
   auto nargc = argc;
@@ -378,8 +377,13 @@ int main(int argc, char** argv)
     case 'a':
       win->allowsystemmods = true;
       break;
+    case '2':
+      win->secondary = true;
+      break;
     }
   }
+  if(win->secondary)
+    win->cli_deviceid += "_2";
   auto css = Gtk::CssProvider::create();
   if(css->load_from_data(
          ".ovbox { background-color: #4e6263;font-weight: bold; } "
