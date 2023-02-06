@@ -6,11 +6,17 @@
 	<array>
 		<string>ovbox.icns</string>
 	</array>
+  
 	<key>CFBundleIconFile</key>
 	<string>ovbox.icns</string>
+  
 	<key>CFBundleName</key>
 	<string>ovbox</string>
+  
 	<key>CFBundleIdentifier</key>
 	<string>com.orlandoviols.ovbox</string>
+  
+  <key>NSMicrophoneUsageDescription</key>
+  <string>${PRODUCT_NAME} Microphone Usage</string>
 </dict>
 </plist>
