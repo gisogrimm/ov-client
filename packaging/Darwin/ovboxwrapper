@@ -3,9 +3,8 @@ HOMEBREW_REPOSITORY=/opt/homebrew
 if test -e /usr/local/Cellar; then
     HOMEBREW_REPOSITORY=/usr/local
 fi
-if test "$(which jackd)" = "/usr/local/bin/jackd"; then
-    DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:/usr/local/lib"
-fi
+DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:/usr/local/lib"
+PATH="${PATH}:/usr/local/bin"
 export HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY
 export HOMEBREW_PREFIX=$HOMEBREW_REPOSITORY
 export HOMEBREW_CELLAR=$HOMEBREW_REPOSITORY/Cellar
