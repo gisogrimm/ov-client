@@ -3,10 +3,13 @@
 #include <OSCMatch.h>
 #include <OSCMessage.h>
 #include <OSCTiming.h>
-#include <SLIPEncodedSerial.h>
-#include <SLIPEncodedUSBSerial.h>
+//#include <SLIPEncodedSerial.h>
+//#include <SLIPEncodedUSBSerial.h>
 
-#include <WiFi.h>
+// use ESP8266WiFi.h on ESP8266 board, e.g., Wemos D1 R2 & mini:
+#include <ESP8266WiFi.h>
+// use WiFi.h on ESP32 board:
+//#include <WiFi.h>
 #include <WiFiUdp.h>
 
 #include <Wire.h>
@@ -14,14 +17,21 @@
 #define DEBUG
 #include "MPU6050_6Axis_MotionApps20.h"
 
+#include "ads1115_glab.h"
+double lsbsize = 0.0000078125;  // Volt/bit
+
 MPU6050 mpu;
 
 uint16_t remote_port = 0;
+uint16_t remote_port_eog = 0;
 IPAddress next_remote_ip;
 IPAddress remote_ip;
+IPAddress remote_ip_eog;
 char remote_path[1024];
+char remote_path_eog[1024];
 
 OSCMessage msg_data("/headtrack");
+OSCMessage msg_eog("/eog");
 
 // MPU control/status vars
 bool dmpReady = false;   // set true if DMP init was successful
@@ -72,10 +82,12 @@ IPAddress subnet(255, 255, 255, 0);
 
 void setup() {
   msg_data.add(1.0).add(1.0f).add(1.0f).add(1.0f).add(1.0f).add(1.0f).add(1.0f).add(1.0f);
+  msg_eog.add(1.0).add(1.0f);
   WiFi.macAddress(mac);
   sprintf(ssid, "head-%02x%02x%02x%02x", mac[2], mac[3], mac[4], mac[5]);
-  WiFi.disconnect();
   WiFi.mode(WIFI_AP);
+  WiFi.disconnect();
+  delay(500);
   WiFi.softAP(ssid, pass);
   WiFi.softAPConfig(local_IP, gateway, subnet);
   Udp.begin(9999);
@@ -113,12 +125,26 @@ void osc_connect(OSCMessage &msg) {
     remote_ip = next_remote_ip;
     msg.getString(1, remote_path);
     msg_data.setAddress(remote_path);
-    //msg_data.setupMessage();
+  }
+}
+
+void osc_connect_eog(OSCMessage &msg) {
+  if ((msg.size() == 2) && msg.isInt(0) && msg.isString(1)) {
+    remote_port_eog = msg.getInt(0);
+    remote_ip_eog = next_remote_ip;
+    msg.getString(1, remote_path_eog);
+    msg_eog.setAddress(remote_path_eog);
+    ads1115_configure();
+    ads1115_configure();
   }
 }
 
 void osc_disconnect(OSCMessage &msg) {
   remote_port = 0;
+}
+
+void osc_disconnect_eog(OSCMessage &msg) {
+  remote_port_eog = 0;
 }
 
 void osc_calib(OSCMessage &msg) {
@@ -136,6 +162,8 @@ void proc_osc() {
     if (!msg.hasError()) {
       msg.dispatch("/connect", osc_connect);
       msg.dispatch("/disconnect", osc_disconnect);
+      msg.dispatch("/eog/connect", osc_connect_eog);
+      msg.dispatch("/eog/disconnect", osc_disconnect_eog);
       msg.dispatch("/calib", osc_calib);
     }
   }
@@ -145,6 +173,14 @@ void send_msg() {
   if (remote_port > 0) {
     Udp.beginPacket(remote_ip, remote_port);
     msg_data.send(Udp);
+    Udp.endPacket();
+  }
+}
+
+void send_msg_eog() {
+  if (remote_port_eog > 0) {
+    Udp.beginPacket(remote_ip_eog, remote_port_eog);
+    msg_eog.send(Udp);
     Udp.endPacket();
   }
 }
@@ -196,40 +232,10 @@ void loop() {
     if (dt > 0) {
       msg_data.set(0, rt).set(1, q.w).set(2, q.x).set(3, q.y).set(4, q.z).set(5, rotx).set(6, roty).set(7, rotz);
       send_msg();
-      // Serial.print('Q');
-      // Serial.print(q.w);
-      // Serial.print(',');
-      // Serial.print(q.x);
-      // Serial.print(',');
-      // Serial.print(q.y);
-      // Serial.print(',');
-      // Serial.print(q.z);
-      // Serial.print(": ");
-      // Serial.print(remote_ip.toString());
-      // Serial.print(' ');
-      // Serial.println(remote_path);
-
-      // Serial.print("W");
-      // Serial.print(aaWorld.x);
-      // Serial.print(',');
-      // Serial.print(aaWorld.y);
-      // Serial.print(',');
-      // Serial.println(aaWorld.z);
-
-      // Serial.print('R');
-      // Serial.print(dt);
-      // Serial.print(',');
-      // Serial.print(ax);
-      // Serial.print(',');
-      // Serial.print(ay);
-      // Serial.print(',');
-      // Serial.print(az);
-      // Serial.print(',');
-      // Serial.print(gx);
-      // Serial.print(',');
-      // Serial.print(gy);
-      // Serial.print(',');
-      // Serial.println(gz);
+      if (remote_port_eog > 0) {
+        msg_eog.set(0, rt).set(1, lsbsize * (double)ads1115_read());
+        send_msg_eog();
+      }
     }
     if (calib_cnt) {
       gx0 += gx;
@@ -264,24 +270,9 @@ void loop() {
       }
     } else {
       if (dt > 0) {
-        //rotx += (gx - gx0) * dt * rotscale;
-        //roty += (gy - gy0) * dt * rotscale;
-        //rotz += (gz - gz0) * dt * rotscale;
         rotx += gx * dt * rotscale;
         roty += gy * dt * rotscale;
         rotz += gz * dt * rotscale;
-        // Serial.print('G');
-        // Serial.print(rotx);
-        // Serial.print(',');
-        // Serial.print(roty);
-        // Serial.print(',');
-        // Serial.println(rotz);
-        //Serial.print('A');
-        //Serial.print(ax);
-        //Serial.print(',');
-        //Serial.print(ay);
-        //Serial.print(',');
-        //Serial.println(az);
       }
     }
   }
