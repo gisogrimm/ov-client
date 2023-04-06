@@ -1,3 +1,10 @@
+2023-04-06, version 0.19.30
+ - use OSC based head tracker instead of USB-serial
+ - adapt paths on MacOS
+ - request microphone permissions on MacOS
+ - allow port names with spaces
+ - many minor improvements
+
 2022-10-11, version 0.19.15
  - correct head tracking
 
