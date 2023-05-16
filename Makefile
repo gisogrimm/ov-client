@@ -192,4 +192,4 @@ gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
 
 install:
-	cat packaging/deb/*.csv |sed -e 's/,usr/ -t $${PREFIX}/1' -e 's/.*/install -D &/1' | PREFIX=$(PREFIX) xargs -L 1 -- echo 
+	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
