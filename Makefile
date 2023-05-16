@@ -87,7 +87,10 @@ CXXFLAGS += $(OSFLAG)
 build/ov-client build/ovbox: $(ZITATARGET)
 
 lib: build
-	$(MAKE) -C libov all && $(MAKE) -C libov unit-tests
+	$(MAKE) -C libov all
+
+libtest:
+	$(MAKE) -C libov unit-tests
 
 libov/build/libov.a: lib
 
