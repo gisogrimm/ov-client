@@ -190,3 +190,6 @@ endif
 
 gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
+
+install:
+	cat packaging/deb/*.csv |sed -e 's/,usr/ -t $${PREFIX}/1' -e 's/.*/install -D &/1' | PREFIX=$(PREFIX) xargs -L 1 -- echo 
