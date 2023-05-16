@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: brew install pkgconfig glibmm jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils libsoundio xerces-c jpeg
     - name: make
-      run: make
+      run: make lib libtest && make
     - name: packaging
       run: make packaging
     - uses: actions/upload-artifact@v2
