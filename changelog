@@ -1,7 +1,9 @@
+2023-05-18, version 0.20.2
+ - prepare for packaging on archlinux
+
 2023-05-05, version 0.20.1
  - reduce ping frequency to minimize data usage
  - correct spatial localization
- - prepare for packaging on archlinux
 
 2023-04-06, version 0.19.30
  - use OSC based head tracker instead of USB-serial
