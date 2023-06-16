@@ -188,3 +188,10 @@ button {
     padding: 2px;
     border: 1px solid #888;
 }
+.objmix {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #666;
+    border-radius: 15px;
+    background-color: #7f505040;
+}

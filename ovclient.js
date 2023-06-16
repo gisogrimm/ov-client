@@ -1,6 +1,148 @@
 var deviceid = '';
+var inchannelpos = [];
+var objmix_sel = -1;
+var objmix_drag = false;
+
+/* accepts parameters
+ * h  Object = {h:x, s:y, v:z}
+ * OR 
+ * h, s, v
+*/
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
+}
+
+function pos2scr( pos )
+{
+    const canvas = document.getElementById("objmixer");
+    const scale = 0.22*canvas.height;
+    return {x:(0.5*canvas.width-scale*pos[1]),y:0.9*canvas.height-scale*pos[0]};
+}
+
+function scr2pos( pos )
+{
+    const canvas = document.getElementById("objmixer");
+    const scale = 0.22*canvas.height;
+    return {y:-(pos.x-0.5*canvas.width)/scale,
+            x:(-pos.y+0.9*canvas.height)/scale};
+}
+
+function on_canvas_click( e )
+{
+    const canvas = document.getElementById("objmixer");
+    var rect = canvas.getBoundingClientRect();
+    var ksel = -1;
+    for( var k=0; k<inchannelpos.length;k++){
+        const vertex = inchannelpos[k];
+        var pos = pos2scr([vertex.x,vertex.y,vertex.z]);
+        pos.x = pos.x - e.clientX + rect.left;
+        pos.y = pos.y - e.clientY + rect.top;
+        const d = Math.sqrt(pos.x*pos.x + pos.y*pos.y);
+        if( d < 18 )
+            ksel = k;
+    }
+    objmix_sel = ksel;
+    if( ksel >= 0 ){
+        objmix_drag = true;
+    }
+}
+
+function on_canvas_up( e )
+{
+    if( objmix_drag ){
+        objmix_drag = false;
+    }
+}
+
+function on_canvas_move( e )
+{
+    if( objmix_drag ){
+        const canvas = document.getElementById("objmixer");
+        var rect = canvas.getBoundingClientRect();
+        const np = scr2pos({x: e.clientX-rect.left, y: e.clientY-rect.top});
+        inchannelpos[objmix_sel].x = np.x;
+        inchannelpos[objmix_sel].y = np.y;
+        objmix_draw();
+        socket.emit("msg",{path:'/'+deviceid+'/ego/'+inchannelpos[objmix_sel].name+'/pos',
+                           value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
+    }
+}
+
+function objmix_draw()
+{
+    const canvas = document.getElementById("objmixer");
+    const ctx = canvas.getContext("2d");
+    //ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = '#153d17';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+    ctx.beginPath();
+    p0 = pos2scr( [0,0] );
+    p1 = pos2scr( [0,4] );
+    p2 = pos2scr( [0,-4] );
+    p3 = pos2scr( [4,0] );
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(p2.x,p2.y);
+    ctx.moveTo(p0.x,p0.y);
+    ctx.lineTo(p3.x,p3.y);
+    ctx.moveTo(p0.x,p0.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(p0.x,p0.y,Math.abs(p1.x-p0.x),0,Math.PI,true);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(p0.x,p0.y,0.25*Math.abs(p1.x-p0.x),0,Math.PI,true);
+    ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.font = "20px sans";
+    //canvas.width = canvas.width;
+    for( var k=0; k<inchannelpos.length;k++){
+        const vertex = inchannelpos[k];
+        const pos = pos2scr([vertex.x,vertex.y,vertex.z]);
+        const colrgb = HSVtoRGB(k/inchannelpos.length, 0.85, 0.8 );
+        ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2, true); // Outer circle
+        ctx.fill();
+        ctx.fillText(vertex.name, pos.x+20, pos.y-5);
+    }
+    ctx.restore();
+}
+
+function update_objmix_sounds()
+{
+    const canvas = document.getElementById("objmixer");
+    canvas.addEventListener( 'pointerdown', on_canvas_click );
+    canvas.addEventListener( 'pointerup', on_canvas_up );
+    canvas.addEventListener( 'pointermove', on_canvas_move );
+    objmix_draw();
+}
 
 socket.on("connect", function() {
+    inchannelpos = [];
     socket.emit("config",{});
 });
 socket.on('deviceid',function(id){deviceid=id;});
@@ -14,7 +156,14 @@ socket.on("scene", function(scene){
     elgainstore.setAttribute("class","gainstore");
     el.appendChild(elgainstore);
 });
+socket.on("vertexpos", function(name, x, y, z){
+    inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z});
+    update_objmix_sounds();
+});
 socket.on("newfader", function(faderno,val){
+    // remove effect bus from mixer:
+    if( val.startsWith('bus.') )
+        return;
     fader="/touchosc/fader"+faderno;
     levelid="/touchosc/level"+faderno;
     let el_div = document.createElement("div");
@@ -23,8 +172,10 @@ socket.on("newfader", function(faderno,val){
     val = val.replace('.'+deviceid,'');
     val = val.replace(deviceid+'.','');
     val = val.replace('bus.','');
-    if( val.startsWith("ego.")||(val == "monitor") )
+    if( val.startsWith("ego.")||(val == "monitor") ){
 	classname = classname + " mixerego";
+        val = val.replace('ego.','');
+    }
     if( (val == "main") || (val == "reverb") )
 	classname = classname + " mixerother";
     el_div.setAttribute("class",classname);

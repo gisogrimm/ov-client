@@ -1,3 +1,5 @@
+// node-js file for the ovbox web mixer
+
 var http = require('http');
 var os = require('os');
 var fs = require('fs');
@@ -123,6 +125,11 @@ io.on('connection', function (socket) {
 	    if( msg[0].startsWith('/touchosc/level') ){
 		socket.emit('updatefader', msg[0], msg[1] );
 	    }
+            if( msg[0] == '/vertexpos' ){
+                const vpvars = msg[1].split('/');
+                //console.log(vpvars);
+                socket.emit('vertexpos', vpvars[3], msg[2], msg[3], msg[4] );
+            }
 	    if( msg[0] == '/jackrec/start' )
 		socket.emit('jackrecstart', '');
 	    if( msg[0] == '/jackrec/stop' )
@@ -195,6 +202,7 @@ io.on('connection', function (socket) {
 	oscClient.send('/jackrec/listports');
 	oscClient.send('/jackrec/listfiles');
         oscClient.send('/sendvarsto','osc.udp://localhost:9000/','/varlist','/bus.');
+        oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     });
     socket.on('message', function (obj) {
 	oscClient.send(obj);
