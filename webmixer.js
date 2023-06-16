@@ -78,7 +78,17 @@ httpserver = http.createServer(function (req, res) {
     res.write('var socket = io("http://'+ipaddr+':8080");\n');
     res.write(hosjs);
     res.write('</script>\n');
-    res.write(jackrec);
+    if( req.url.startsWith('/objmix') ){
+        res.write('<div id="objmix" class="objmix">\n');
+        res.write('<canvas id="objmixer" width="800" height="400">object mixer</canvas>\n');
+        res.write('<br/>\n');
+        res.write('<input class="ctlbutton" type="button" value="store positions">\n');
+        res.write('</div>\n');
+        res.write('<a href="/">mixer + audio recorder</a>\n');
+    }else{
+        res.write(jackrec);
+        res.write('<a href="/objmix">object base mixer</a>\n');
+    }
     res.end('</body></html>');
 });
 

@@ -5,9 +5,9 @@ var objmix_drag = false;
 
 /* accepts parameters
  * h  Object = {h:x, s:y, v:z}
- * OR 
+ * OR
  * h, s, v
-*/
+ */
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
     if (arguments.length === 1) {
@@ -19,12 +19,12 @@ function HSVtoRGB(h, s, v) {
     q = v * (1 - f * s);
     t = v * (1 - (1 - f) * s);
     switch (i % 6) {
-        case 0: r = v, g = t, b = p; break;
-        case 1: r = q, g = v, b = p; break;
-        case 2: r = p, g = v, b = t; break;
-        case 3: r = p, g = q, b = v; break;
-        case 4: r = t, g = p, b = v; break;
-        case 5: r = v, g = p, b = q; break;
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
     }
     return {
         r: Math.round(r * 255),
@@ -79,6 +79,8 @@ function on_canvas_move( e )
 {
     if( objmix_drag ){
         const canvas = document.getElementById("objmixer");
+        if( !canvas )
+            return;
         var rect = canvas.getBoundingClientRect();
         const np = scr2pos({x: e.clientX-rect.left, y: e.clientY-rect.top});
         inchannelpos[objmix_sel].x = np.x;
@@ -92,6 +94,8 @@ function on_canvas_move( e )
 function objmix_draw()
 {
     const canvas = document.getElementById("objmixer");
+    if( !canvas )
+        return;
     const ctx = canvas.getContext("2d");
     //ctx.globalCompositeOperation = "destination-over";
     ctx.fillStyle = '#153d17';
@@ -135,6 +139,8 @@ function objmix_draw()
 function update_objmix_sounds()
 {
     const canvas = document.getElementById("objmixer");
+    if( !canvas )
+        return;
     canvas.addEventListener( 'pointerdown', on_canvas_click );
     canvas.addEventListener( 'pointerup', on_canvas_up );
     canvas.addEventListener( 'pointermove', on_canvas_move );
@@ -148,13 +154,15 @@ socket.on("connect", function() {
 socket.on('deviceid',function(id){deviceid=id;});
 socket.on("scene", function(scene){
     let el=document.getElementById("mixer");
-    while (el.firstChild) {el.removeChild(el.firstChild);}
-    let elheader=document.createElement("h2");
-    elheader.setAttribute("class","scene");
-    el.append(scene,elheader);
-    let elgainstore=document.createElement("p");
-    elgainstore.setAttribute("class","gainstore");
-    el.appendChild(elgainstore);
+    if( el ){
+        while (el.firstChild) {el.removeChild(el.firstChild);}
+        let elheader=document.createElement("h2");
+        elheader.setAttribute("class","scene");
+        el.append(scene,elheader);
+        let elgainstore=document.createElement("p");
+        elgainstore.setAttribute("class","gainstore");
+        el.appendChild(elgainstore);
+    }
 });
 socket.on("vertexpos", function(name, x, y, z){
     inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z});
@@ -168,57 +176,59 @@ socket.on("newfader", function(faderno,val){
     levelid="/touchosc/level"+faderno;
     let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
-    let classname = "mixerstrip";
-    val = val.replace('.'+deviceid,'');
-    val = val.replace(deviceid+'.','');
-    val = val.replace('bus.','');
-    if( val.startsWith("ego.")||(val == "monitor") ){
-	classname = classname + " mixerego";
-        val = val.replace('ego.','');
+    if( el_mixer ){
+        let classname = "mixerstrip";
+        val = val.replace('.'+deviceid,'');
+        val = val.replace(deviceid+'.','');
+        val = val.replace('bus.','');
+        if( val.startsWith("ego.")||(val == "monitor") ){
+	    classname = classname + " mixerego";
+            val = val.replace('ego.','');
+        }
+        if( (val == "main") || (val == "reverb") )
+	    classname = classname + " mixerother";
+        el_div.setAttribute("class",classname);
+        let el_lab=document.createElement("label");
+        el_lab.setAttribute("for",fader);
+        el_lab.append(val);
+        let el_fader=document.createElement("input");
+        el_fader.setAttribute("class","fader");
+        el_fader.setAttribute("type","range");
+        el_fader.setAttribute("min","-30");
+        el_fader.setAttribute("max","10");
+        el_fader.setAttribute("value",val);
+        el_fader.setAttribute("step","0.1");
+        el_fader.setAttribute("id",fader);
+        el_fader.onchange = upload_session_gains;
+        let el_gaintext=document.createElement("input");
+        el_gaintext.setAttribute("type","number");
+        el_gaintext.setAttribute("class","gaintxtfader");
+        el_gaintext.setAttribute("min","-30");
+        el_gaintext.setAttribute("max","10");
+        el_gaintext.setAttribute("step","0.1");
+        el_gaintext.setAttribute("id","txt"+fader);
+        let el_meter=document.createElement("meter");
+        el_meter.setAttribute("class","level");
+        el_meter.setAttribute("min","0");
+        el_meter.setAttribute("max","94");
+        el_meter.setAttribute("low","71");
+        el_meter.setAttribute("high","84");
+        el_meter.setAttribute("optimum","54");
+        el_meter.setAttribute("id",levelid);
+        let el_metertext=document.createElement("input");
+        el_metertext.setAttribute("type","text");
+        el_metertext.setAttribute("readonly","true");
+        el_metertext.setAttribute("class","gaintxtfader");
+        el_metertext.setAttribute("id","txt"+levelid);
+        el_mixer.appendChild(el_div);
+        el_div.appendChild(el_lab);
+        el_div.appendChild(document.createElement("br"));
+        el_div.appendChild(el_fader);
+        el_div.appendChild(el_gaintext);
+        el_div.appendChild(document.createElement("br"));
+        el_div.appendChild(el_meter);
+        el_div.appendChild(el_metertext);
     }
-    if( (val == "main") || (val == "reverb") )
-	classname = classname + " mixerother";
-    el_div.setAttribute("class",classname);
-    let el_lab=document.createElement("label");
-    el_lab.setAttribute("for",fader);
-    el_lab.append(val);
-    let el_fader=document.createElement("input");
-    el_fader.setAttribute("class","fader");
-    el_fader.setAttribute("type","range");
-    el_fader.setAttribute("min","-30");
-    el_fader.setAttribute("max","10");
-    el_fader.setAttribute("value",val);
-    el_fader.setAttribute("step","0.1");
-    el_fader.setAttribute("id",fader);
-    el_fader.onchange = upload_session_gains;
-    let el_gaintext=document.createElement("input");
-    el_gaintext.setAttribute("type","number");
-    el_gaintext.setAttribute("class","gaintxtfader");
-    el_gaintext.setAttribute("min","-30");
-    el_gaintext.setAttribute("max","10");
-    el_gaintext.setAttribute("step","0.1");
-    el_gaintext.setAttribute("id","txt"+fader);
-    let el_meter=document.createElement("meter");
-    el_meter.setAttribute("class","level");
-    el_meter.setAttribute("min","0");
-    el_meter.setAttribute("max","94");
-    el_meter.setAttribute("low","71");
-    el_meter.setAttribute("high","84");
-    el_meter.setAttribute("optimum","54");
-    el_meter.setAttribute("id",levelid);
-    let el_metertext=document.createElement("input");
-    el_metertext.setAttribute("type","text");
-    el_metertext.setAttribute("readonly","true");
-    el_metertext.setAttribute("class","gaintxtfader");
-    el_metertext.setAttribute("id","txt"+levelid);
-    el_mixer.appendChild(el_div);
-    el_div.appendChild(el_lab);
-    el_div.appendChild(document.createElement("br"));
-    el_div.appendChild(el_fader);
-    el_div.appendChild(el_gaintext);
-    el_div.appendChild(document.createElement("br"));
-    el_div.appendChild(el_meter);
-    el_div.appendChild(el_metertext);
 });
 socket.on("updatefader", function(fader,val){
     let fad=document.getElementById(fader);
@@ -348,7 +358,8 @@ socket.on("jackrectime", function(t){
 
 socket.on("jackrecportlist", function(t){
     let el=document.getElementById("portlist");
-    while (el.firstChild) {el.removeChild(el.firstChild);}
+    if( el )
+        while (el.firstChild) {el.removeChild(el.firstChild);}
 });
 
 socket.on('jackrecaddport', function(p){
@@ -381,27 +392,32 @@ socket.on('jackrecaddport', function(p){
     }
     labs = labs.replace('.'+deviceid+':out','');
     let el=document.getElementById("portlist");
-    let div=el.appendChild(document.createElement('div'));
-    div.setAttribute('class',classes);
-    let inp=div.appendChild(document.createElement('input'));
-    inp.setAttribute('title',helps);
-    inp.setAttribute('type','checkbox');
-    inp.setAttribute('value',p);
-    inp.setAttribute('id',p);
-    inp.setAttribute('class','jackport checkbox');
-    let lab=div.appendChild(document.createElement('label'));
-    lab.setAttribute('for',p);
-    lab.setAttribute('title',helps);
-    lab.appendChild(document.createTextNode(labs));
+    if( el ){
+        let div=el.appendChild(document.createElement('div'));
+        div.setAttribute('class',classes);
+        let inp=div.appendChild(document.createElement('input'));
+        inp.setAttribute('title',helps);
+        inp.setAttribute('type','checkbox');
+        inp.setAttribute('value',p);
+        inp.setAttribute('id',p);
+        inp.setAttribute('class','jackport checkbox');
+        let lab=div.appendChild(document.createElement('label'));
+        lab.setAttribute('for',p);
+        lab.setAttribute('title',helps);
+        lab.appendChild(document.createTextNode(labs));
+    }
 });
 
 socket.on("jackrecfilelist", function(t){
     let el=document.getElementById("filelist");
-    while (el.firstChild) {el.removeChild(el.firstChild);}
+    if( el )
+        while (el.firstChild) {el.removeChild(el.firstChild);}
 });
 
 socket.on('jackrecaddfile', function(p){
     let el=document.getElementById("filelist");
+    if( !el )
+        return;
     let div=el.appendChild(document.createElement('div'));
     let inp=div.appendChild(document.createElement('input'));
     inp.setAttribute('type','checkbox');
@@ -424,7 +440,8 @@ socket.on('jackrecstop', function(p){
 
 let form = document.getElementById("mixer");
 
-form.oninput = handleChange;
+if( form )
+    form.oninput = handleChange;
 
 function handleChange(e) {
     if( e.target.id.substr(0,3)=="txt" ){
@@ -445,6 +462,8 @@ function handleChange(e) {
 function jackrec_start() {
     socket.emit("msg", {path: '/jackrec/clear',value: null});
     let el=document.getElementById("portlist");
+    if( !el )
+        return;
     let ports=el.getElementsByClassName('jackport');
     for( var k=0;k<ports.length;k++){
 	if( ports[k].checked ){
@@ -457,6 +476,8 @@ function jackrec_start() {
 
 function jackrec_delete() {
     let el=document.getElementById("filelist");
+    if( !el )
+        return;
     let ports=el.getElementsByClassName('filename');
     for( var k=0;k<ports.length;k++){
 	if( ports[k].checked ){
@@ -476,6 +497,8 @@ function jackrec_stop() {
 function jackrec_selectallfiles() {
     let ischecked=document.getElementById("selectallfiles").checked;
     let el=document.getElementById("filelist");
+    if( !el )
+        return;
     let ports=el.getElementsByClassName('filename');
     for( var k=0;k<ports.length;k++){
 	ports[k].checked = ischecked;
