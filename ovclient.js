@@ -78,6 +78,7 @@ function on_canvas_up( e )
     if( objmix_drag ){
         objmix_drag = false;
         socket.emit('objmixposcomplete');
+        e.preventDefault();
     }
 }
 
@@ -94,6 +95,7 @@ function on_canvas_move( e )
         objmix_draw();
         socket.emit("msg",{path:'/'+deviceid+'/ego/'+inchannelpos[objmix_sel].name+'/pos',
                            value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
+        e.preventDefault();
     }
 }
 

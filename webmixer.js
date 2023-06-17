@@ -146,7 +146,6 @@ io.on('connection', function (socket) {
 	    }
             if( msg[0] == '/vertexpos' ){
                 const vpvars = msg[1].split('/');
-                //console.log(vpvars);
                 socket.emit('vertexpos', vpvars[3], msg[2], msg[3], msg[4] );
             }
 	    if( msg[0] == '/jackrec/start' )

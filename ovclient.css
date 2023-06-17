@@ -196,9 +196,11 @@ button {
     border-radius: 15px;
     background-color: #77777740;
     overflow: clip;
+    touch-action: none;
 }
 .objmixer {
     width: 100%;
+    touch-action: none;
 }
 .objmixctl {
     margin: 15px;
