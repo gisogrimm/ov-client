@@ -33,17 +33,22 @@ function HSVtoRGB(h, s, v) {
     };
 }
 
+function objmix_getscale( w, h )
+{
+    return 0.22*Math.min(w,h);
+}
+
 function pos2scr( pos )
 {
     const canvas = document.getElementById("objmixer");
-    const scale = 0.22*canvas.height;
+    const scale = objmix_getscale(canvas.width, canvas.height);
     return {x:(0.5*canvas.width-scale*pos[1]),y:0.9*canvas.height-scale*pos[0]};
 }
 
 function scr2pos( pos )
 {
     const canvas = document.getElementById("objmixer");
-    const scale = 0.22*canvas.height;
+    const scale = objmix_getscale(canvas.width, canvas.height);
     return {y:-(pos.x-0.5*canvas.width)/scale,
             x:(-pos.y+0.9*canvas.height)/scale};
 }
@@ -59,7 +64,7 @@ function on_canvas_click( e )
         pos.x = pos.x - e.clientX + rect.left;
         pos.y = pos.y - e.clientY + rect.top;
         const d = Math.sqrt(pos.x*pos.x + pos.y*pos.y);
-        if( d < 18 )
+        if( d < 24 )
             ksel = k;
     }
     objmix_sel = ksel;
@@ -72,6 +77,7 @@ function on_canvas_up( e )
 {
     if( objmix_drag ){
         objmix_drag = false;
+        socket.emit('objmixposcomplete');
     }
 }
 
@@ -121,7 +127,7 @@ function objmix_draw()
     ctx.stroke();
     ctx.restore();
     ctx.save();
-    ctx.font = "20px sans";
+    ctx.font = "24px sans";
     //canvas.width = canvas.width;
     for( var k=0; k<inchannelpos.length;k++){
         const vertex = inchannelpos[k];
@@ -129,9 +135,9 @@ function objmix_draw()
         const colrgb = HSVtoRGB(k/inchannelpos.length, 0.85, 0.8 );
         ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2, true); // Outer circle
+        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2, true); // Outer circle
         ctx.fill();
-        ctx.fillText(vertex.name, pos.x+20, pos.y-5);
+        ctx.fillText(vertex.name, pos.x+24, pos.y-5);
     }
     ctx.restore();
 }
@@ -141,6 +147,8 @@ function update_objmix_sounds()
     const canvas = document.getElementById("objmixer");
     if( !canvas )
         return;
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = 0.55*canvas.width;
     canvas.addEventListener( 'pointerdown', on_canvas_click );
     canvas.addEventListener( 'pointerup', on_canvas_up );
     canvas.addEventListener( 'pointermove', on_canvas_move );
@@ -151,6 +159,7 @@ socket.on("connect", function() {
     inchannelpos = [];
     socket.emit("config",{});
 });
+
 socket.on('deviceid',function(id){deviceid=id;});
 socket.on("scene", function(scene){
     let el=document.getElementById("mixer");
@@ -165,6 +174,13 @@ socket.on("scene", function(scene){
     }
 });
 socket.on("vertexpos", function(name, x, y, z){
+    var needclear = false;
+    for( var k=0; k<inchannelpos.length;k++){
+        if( inchannelpos[k].name == name )
+            needclear = true;
+    }
+    if( needclear )
+        inchannelpos = [];
     inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z});
     update_objmix_sounds();
 });
@@ -348,6 +364,10 @@ function recerror( e ){
 	el.appendChild(document.createTextNode(e));
 }
 
+function objmix_upload_posandgains(){
+    socket.emit("msg",{"path":"/uploadobjmix","value":null});
+}
+
 socket.on("jackrecerr", function(e){recerror(e)} );
 
 socket.on("jackrectime", function(t){
@@ -436,6 +456,10 @@ socket.on('jackrecstart', function(p){
 socket.on('jackrecstop', function(p){
     let el=document.getElementById("recindicator");
     el.style = 'display: none;';
+});
+
+socket.on('objmixredraw', function(p){
+    objmix_draw();
 });
 
 let form = document.getElementById("mixer");

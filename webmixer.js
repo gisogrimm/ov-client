@@ -80,14 +80,20 @@ httpserver = http.createServer(function (req, res) {
     res.write('</script>\n');
     if( req.url.startsWith('/objmix') ){
         res.write('<div id="objmix" class="objmix">\n');
-        res.write('<canvas id="objmixer" width="800" height="400">object mixer</canvas>\n');
+        res.write('<canvas id="objmixer">object mixer</canvas>\n');
         res.write('<br/>\n');
-        res.write('<input class="ctlbutton" type="button" value="store positions">\n');
+        res.write('<div class="objmixctl">\n');
+        res.write('<input class="ctlbutton" type="button" value="store positions and gains" onclick="objmix_upload_posandgains();">\n');
         res.write('</div>\n');
+        res.write('</div>\n');
+        res.write('<div class="objmixctl">\n');
         res.write('<a href="/">mixer + audio recorder</a>\n');
+        res.write('</div>\n');
     }else{
         res.write(jackrec);
+        res.write('<div class="objmixctl">\n');
         res.write('<a href="/objmix">object base mixer</a>\n');
+        res.write('</div>\n');
     }
     res.end('</body></html>');
 });
@@ -119,6 +125,9 @@ function onlyUnique(value, index, self) {
 
 io.on('connection', function (socket) {
     socket.emit('deviceid',deviceid);
+    socket.on('objmixposcomplete', async function (obj) {
+        socket.emit('objmixredraw');
+    });
     socket.on('config', function (obj) {
         var varlist = {};
 	oscClient.send('/status', socket.id + ' connected');

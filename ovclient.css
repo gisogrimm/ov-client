@@ -189,11 +189,19 @@ button {
     border: 1px solid #888;
 }
 .objmix {
-    padding: 10px;
-    margin: 10px;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
     border: 1px solid #666;
     border-radius: 15px;
-    background-color: #7f505040;
+    background-color: #77777740;
+    overflow: clip;
+}
+.objmixer {
+    width: 100%;
+}
+.objmixctl {
+    margin: 15px;
 }
 a {
     color: #fff;
