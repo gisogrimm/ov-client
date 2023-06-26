@@ -1,6 +1,7 @@
 all: build lib binaries
 
-BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox test_exec
+BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox	\
+  test_exec ovrealpath
 
 EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
@@ -9,6 +10,8 @@ BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only
+
+CFLAGS = -Wall -Wno-deprecated-declarations
 
 ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
@@ -109,6 +112,8 @@ $(BUILD_BINARIES): libov/build/libov.a
 build/%: src/%.cc
 	$(CXX) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 
+build/ovrealpath: src/ovrealpath.c
+	$(CC) $(CFLAGS) $< -o $@
 
 build/%.o: src/%.cc $(HEADER)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -193,3 +198,4 @@ gitupdate:
 
 install:
 	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
+

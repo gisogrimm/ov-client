@@ -10,7 +10,7 @@ PACKVER:=$(FULLVERSION)_$(shell uname -s)_$(shell uname -m)
 
 .PHONY : pack
 
-BINS = ov-client ovbox ovzita-j2n ovzita-n2j
+BINS = ov-client ovbox ovzita-j2n ovzita-n2j ovrealpath
 LIBS = libovclienttascar.0.dylib libovclienttascargui.0.dylib
 PLUGS = $(shell (cd ../../libov/tascar/plugins/build;echo ovclient*.dylib))
 

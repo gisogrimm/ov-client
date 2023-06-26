@@ -9,10 +9,11 @@ export HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY
 export HOMEBREW_PREFIX=$HOMEBREW_REPOSITORY
 export HOMEBREW_CELLAR=$HOMEBREW_REPOSITORY/Cellar
 export PATH="${HOMEBREW_REPOSITORY}/bin:${HOMEBREW_REPOSITORY}/sbin:${PATH}"
-export RDIR=$(realpath $(dirname $0)/../Resources)
-export BDIR=$(realpath $(dirname $0))
+DNAME=$(dirname $0)
+export RDIR=$($(dirname $0)/ovrealpath $(dirname $0)/../Resources)
+export BDIR=$($(dirname $0)/ovrealpath $(dirname $0))
 export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${BDIR}/lib"
 (
     cd "${TMPDIR}"
-    $BDIR/ovbox.bin
+    $BDIR/ovbox.bin $*
 )
