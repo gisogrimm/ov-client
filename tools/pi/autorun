@@ -86,7 +86,13 @@ while true; do
 	echo "switching to development version"
 	# switch to development version:
 	sudo rm -f ~ov/ov-client.usedevversion
-	(echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
+        # identify OS release code name:
+        OSREL=`lsb_release -a|grep Codename|sed 's/Codename:[[:blank:]]*//1'`
+        OSRELHTCH="$OSREL"
+        if test "$OSREL" = "buster"; then
+            OSRELHTCH=bionic
+        fi
+	(echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
 	sudo apt update --assume-yes
 	sudo apt install --no-install-recommends --assume-yes ov-client
     fi

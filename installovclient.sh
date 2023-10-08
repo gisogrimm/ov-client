@@ -5,6 +5,15 @@
 
     export DEBIAN_FRONTEND=noninteractive
 
+    # identify OS release code name:
+    OSREL=`lsb_release -a|grep Codename|sed 's/Codename:[[:blank:]]*//1'`
+    OSRELHTCH="$OSREL"
+    if test "$OSREL" = "buster"; then
+        OSRELHTCH=bionic
+    fi
+    # identify OS architecture:
+    OSARCH=`dpkg-architecture | grep -e 'DEB_BUILD_ARCH='|sed 's/[^=]*=//1'`
+
     # update main system
     # in case someone powered off during installation we need to fix unconfigured packages:
     sudo dpkg --configure -a
@@ -13,13 +22,13 @@
     # retry 10 times because the raspios servers are not very stable:
     cnt=10
     while test $cnt -gt 0; do
-	sudo -E apt update && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+	sudo -E apt update && cnt=-1 || ( sleep 20; let cnt=$cnt-1 )
 	sync
     done
     if test $cnt -eq 0; then
         echo "failed 10 times, switching to GWDG mirror"
         sudo sed -i -e '/raspbian/ d' -e '/^[[:blank:]]*$/ d' /etc/apt/sources.list|| echo "unable to remove previous apt entries"
-        (echo "";echo "deb http://ftp.gwdg.de/pub/linux/debian/raspbian/raspbian/ buster main contrib non-free rpi")|sudo tee -a /etc/apt/sources.list
+        (echo "";echo "deb http://ftp.gwdg.de/pub/linux/debian/raspbian/raspbian/ ${OSREL} main contrib non-free rpi")|sudo tee -a /etc/apt/sources.list
         sync
         cnt=10
         while test $cnt -gt 0; do
@@ -37,7 +46,7 @@
     # add/update HoerTech apt repository (containing ov-client):
     sudo sed -i -e '/apt.hoertech.de/ d' -e '/^[[:blank:]]*$/ d' /etc/apt/sources.list|| echo "unable to remove previous apt entries"
     wget -qO- http://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
-    (echo "";echo "deb [arch=armhf] http://apt.hoertech.de bionic universe")|sudo tee -a /etc/apt/sources.list
+    (echo "";echo "deb [arch=${OSARCH}] http://apt.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
     sync
 
     # in case someone powered off during installation we need to fix unconfigured packages:
