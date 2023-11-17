@@ -42,26 +42,31 @@ if test -e /boot/ovclient-wifi.txt; then
     test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
     echo "connecting to WiFi ${SSID}"
     if test -n "${SSID}"; then
-	sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
-	sleep 2
-	rfkill unblock wifi
-	sleep 10
-	sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
-	sleep 20
+    sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+    sleep 2
+    rfkill unblock wifi
+    sleep 10
+    sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+    sleep 20
     fi
 fi
 
 if test ! -e /boot/ovclient-noupdate; then
     # if not on overlayfs then update/reinstall:
     if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
-	echo "overlay fs, not updating"
+    echo "overlay fs, not updating"
     else
-	# get the latest installer script:
-	. /usr/share/ovclient/tools/installovclient.sh
-	# activate overlay image in case the installation script failed, and try the best we can:
-	sudo raspi-config nonint enable_overlayfs
-	# ready, reboot:
-	sudo shutdown -r now
+    # get the latest installer script:
+    . /usr/share/ovclient/tools/installovclient.sh
+        # test for openMHA install request:
+        if test -e /boot/ov-client-instmha; then
+            rm -f /boot/ov-client-instmha
+            sudo apt install --no-install-recommends --assume-yes openmha openmha-examples
+        fi
+    # activate overlay image in case the installation script failed, and try the best we can:
+    sudo raspi-config nonint enable_overlayfs
+    # ready, reboot:
+    sudo shutdown -r now
     fi
 fi
 
@@ -71,52 +76,60 @@ while true; do
     sudo su -l ov -c "ov-client" || sudo touch ~ov/ov-client.firmwareupdate
     # test for modified configuration:
     if test -e ~ov/ov-client.cfg; then
-	sudo mv ~ov/ov-client.cfg /boot/
-	sync
+    sudo mv ~ov/ov-client.cfg /boot/
+    sync
     fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
-	# firmware update requested: disable overlayfs and restart
-	sudo rm -f ~ov/ov-client.firmwareupdate
-	sudo raspi-config nonint disable_overlayfs
-	sudo shutdown -r now
+    # firmware update requested: disable overlayfs and restart
+    sudo rm -f ~ov/ov-client.firmwareupdate
+    sudo raspi-config nonint disable_overlayfs
+    sudo shutdown -r now
+    fi
+    # test for openMHA install request:
+    if test -e ~ov/ov-client.installopenmha; then
+    # firmware update requested: disable overlayfs and restart
+    sudo rm -f ~ov/ov-client.installopenmha
+        sudo touch /boot/ov-client-instmha
+    sudo raspi-config nonint disable_overlayfs
+    sudo shutdown -r now
     fi
     # check for development version:
     if test -e ~ov/ov-client.usedevversion; then
-	echo "switching to development version"
-	# switch to development version:
-	sudo rm -f ~ov/ov-client.usedevversion
-        # identify OS release code name:
-        OSREL=`lsb_release -a|grep Codename|sed 's/Codename:[[:blank:]]*//1'`
-        OSRELHTCH="$OSREL"
-        if test "$OSREL" = "buster"; then
-            OSRELHTCH=bionic
-        fi
-	(echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
-	sudo apt update --assume-yes
-	sudo apt install --no-install-recommends --assume-yes ov-client
+    echo "switching to development version"
+    # switch to development version:
+    sudo rm -f ~ov/ov-client.usedevversion
+    # identify OS release code name:
+    OSREL=`lsb_release -a|grep Codename|sed 's/Codename:[[:blank:]]*//1'`
+    OSRELHTCH="$OSREL"
+    if test "$OSREL" = "buster"; then
+        OSRELHTCH=bionic
+    fi
+    (echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
+    sudo apt update --assume-yes
+    sudo apt install --no-install-recommends --assume-yes ov-client
     fi
     if test -e ~ov/ov-client.wificfg; then
-	echo "switching wifi"
-	sudo mv ~ov/ov-client.wificfg /boot/ovclient-wifi.txt
-	sync
-	# activate WiFi if required:
-	# remove DOS line ends:  -e 's/\r//1'
-	# the first line contains the SSID:
-	SSID=$(cat /boot/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
-	# the second line the WIFI password:
-	PW=$(cat /boot/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
-	COUNTRYCODE=DE
-	test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
-	echo "connecting to WiFi ${SSID}"
-	if test -n "${SSID}"; then
-	    sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
-	    sleep 2
-	    rfkill unblock wifi
-	    sleep 10
-	    sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
-	    sleep 20
-	fi
+        echo "switching wifi"
+        sudo mv ~ov/ov-client.wificfg /boot/ovclient-wifi.txt
+        sync
+        # activate WiFi if required:
+        # remove DOS line ends:  -e 's/\r//1'
+        # the first line contains the SSID:
+        SSID=$(cat /boot/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
+        # the second line the WIFI password:
+        PW=$(cat /boot/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
+        COUNTRYCODE=DE
+        test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
+        echo "connecting to WiFi ${SSID}"
+        if test -n "${SSID}"; then
+            sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+            sleep 2
+            rfkill unblock wifi
+            sleep 10
+            sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+            sleep 20
+        fi
     fi
     if test -e ~ov/ov-client.hifiberry; then
         HBERRY=$(cat ~ov/ov-client.hifiberry)
@@ -130,7 +143,7 @@ while true; do
             ) | sudo tee /boot/config.txt
         fi
         sudo sed -i -e '/^$/N;/^\n$/D' /boot/config.txt||echo "unable to remove multiple empty lines"
-	sync
+        sync
         sudo shutdown -r now
     fi
     sleep 7
