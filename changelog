@@ -1,3 +1,8 @@
+2023-12-21, version 0.20.14
+ - many minor improvements in binaural reproduction and reverb simulation
+ - improvements for MacOS
+ - support for 64 Bit arm architecture
+
 2023-05-18, version 0.20.2
  - prepare for packaging on archlinux
 
