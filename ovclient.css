@@ -44,7 +44,12 @@ body {
     -webkit-transition: .2s;
     transition: opacity .2s;
 }
-
+.mutebuttondiv {
+    float: right;
+}
+.mutebuttonlabel {
+    font-size: 70%;
+}
 .fader::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;

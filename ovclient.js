@@ -192,6 +192,7 @@ socket.on("newfader", function(faderno,val){
         return;
     fader="/touchosc/fader"+faderno;
     levelid="/touchosc/level"+faderno;
+    muteid="/touchosc/mute"+faderno;
     let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
     if( el_mixer ){
@@ -200,15 +201,27 @@ socket.on("newfader", function(faderno,val){
         val = val.replace(deviceid+'.','');
         val = val.replace('bus.','');
         if( val.startsWith("ego.")||(val == "monitor") ){
-	    classname = classname + " mixerego";
+	          classname = classname + " mixerego";
             val = val.replace('ego.','');
         }
         if( (val == "main") || (val == "reverb") )
-	    classname = classname + " mixerother";
+	          classname = classname + " mixerother";
         el_div.setAttribute("class",classname);
         let el_lab=document.createElement("label");
         el_lab.setAttribute("for",fader);
+        el_lab.setAttribute("class","mixerlabel");
         el_lab.append(val);
+        let el_mutebuttondiv = document.createElement("div");
+        el_mutebuttondiv.setAttribute("class", "mutebuttondiv");
+        let el_span = el_mutebuttondiv.appendChild(document.createElement("span"));
+        el_span.setAttribute("class", "mutebuttonlabel");
+        el_span.appendChild(document.createTextNode("mute "));
+        let el_mutebutton = document.createElement("input");
+        el_mutebuttondiv.appendChild(el_mutebutton);
+        el_mutebutton.setAttribute("class", "mutebutton");
+        el_mutebutton.setAttribute("type", "checkbox");
+        el_mutebutton.setAttribute("id", muteid);
+        //el_mutebutton.onchange = upload_session_gains;
         let el_fader=document.createElement("input");
         el_fader.setAttribute("class","fader");
         el_fader.setAttribute("type","range");
@@ -240,6 +253,7 @@ socket.on("newfader", function(faderno,val){
         el_metertext.setAttribute("id","txt"+levelid);
         el_mixer.appendChild(el_div);
         el_div.appendChild(el_lab);
+        el_div.appendChild(el_mutebuttondiv);
         el_div.appendChild(document.createElement("br"));
         el_div.appendChild(el_fader);
         el_div.appendChild(el_gaintext);
@@ -251,11 +265,18 @@ socket.on("newfader", function(faderno,val){
 socket.on("updatefader", function(fader,val){
     let fad=document.getElementById(fader);
     if( fad!=null ){
-	fad.value=val;
+	      fad.value=val;
     }
     let fadt=document.getElementById("txt"+fader);
     if( fadt!=null ){
-	fadt.value=val.toFixed(1);
+	      fadt.value=val.toFixed(1);
+    }
+});
+
+socket.on("updatemute", function(fader,val){
+    let fad=document.getElementById(fader);
+    if( fad!=null ){
+	      fad.checked=(val == 1);
     }
 });
 
@@ -471,17 +492,24 @@ if( form )
 
 function handleChange(e) {
     if( e.target.id.substr(0,3)=="txt" ){
-	socket.emit("msg", { path: e.target.id.substr(3), value: e.target.valueAsNumber } );
-	let fad=document.getElementById(e.target.id.substr(3));
-	if( fad!=null ){
-	    fad.value=e.target.valueAsNumber;
-	}
+	      socket.emit("msg", { path: e.target.id.substr(3), value: e.target.valueAsNumber } );
+	      let fad=document.getElementById(e.target.id.substr(3));
+	      if( fad!=null ){
+	          fad.value=e.target.valueAsNumber;
+	      }
     }else{
-	socket.emit("msg", { path: e.target.id, value: e.target.valueAsNumber } );
-	let fadt=document.getElementById(e.target.id);
-	if( fadt!=null ){
-	    fadt.value=e.target.valueAsNumber.toFixed(1);
-	}
+        if(e.target.type == "checkbox" ){
+            if(e.target.checked)
+	              socket.emit("msg", { path: e.target.id, value: 1 } );
+            else
+	              socket.emit("msg", { path: e.target.id, value: 0 } );
+        }else{
+	          socket.emit("msg", { path: e.target.id, value: e.target.valueAsNumber } );
+	          let fadt=document.getElementById(e.target.id);
+	          if( fadt!=null ){
+	              fadt.value=e.target.valueAsNumber.toFixed(1);
+	          }
+        }
     }
 }
 
