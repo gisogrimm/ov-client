@@ -93,7 +93,10 @@ function on_canvas_move( e )
         inchannelpos[objmix_sel].x = np.x;
         inchannelpos[objmix_sel].y = np.y;
         objmix_draw();
-        socket.emit("msg",{path:'/'+deviceid+'/ego/'+inchannelpos[objmix_sel].name+'/pos',
+        //console.log(inchannelpos[objmix_sel].path);
+        //socket.emit("msg",{path:'/'+deviceid+'/ego/'+inchannelpos[objmix_sel].name+'/pos',
+        //                   value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
+        socket.emit("msg",{path:inchannelpos[objmix_sel].path,
                            value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
         e.preventDefault();
     }
@@ -134,7 +137,7 @@ function objmix_draw()
     for( var k=0; k<inchannelpos.length;k++){
         const vertex = inchannelpos[k];
         const pos = pos2scr([vertex.x,vertex.y,vertex.z]);
-        const colrgb = HSVtoRGB(k/inchannelpos.length, 0.85, 0.8 );
+        const colrgb = HSVtoRGB(k/inchannelpos.length, 0.65, 0.8 );
         ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2, true); // Outer circle
@@ -175,7 +178,9 @@ socket.on("scene", function(scene){
         el.appendChild(elgainstore);
     }
 });
-socket.on("vertexpos", function(name, x, y, z){
+socket.on("vertexpos", function(name, x, y, z, path){
+    // add an input channel for object-based mixing.
+    // if the provided object is already in list, then clear list:
     var needclear = false;
     for( var k=0; k<inchannelpos.length;k++){
         if( inchannelpos[k].name == name )
@@ -183,7 +188,10 @@ socket.on("vertexpos", function(name, x, y, z){
     }
     if( needclear )
         inchannelpos = [];
-    inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z});
+    // append object:
+    inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z, 'path' : path});
+    console.log(name);
+    console.log(path);
     update_objmix_sounds();
 });
 socket.on("newfader", function(faderno,val){

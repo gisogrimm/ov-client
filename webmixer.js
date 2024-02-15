@@ -87,12 +87,12 @@ httpserver = http.createServer(function (req, res) {
         res.write('</div>\n');
         res.write('</div>\n');
         res.write('<div class="objmixctl">\n');
-        res.write('<a href="/">mixer + audio recorder</a>\n');
+        res.write('<a href="/">channel mixer + audio recorder</a>\n');
         res.write('</div>\n');
     }else{
         res.write(jackrec);
         res.write('<div class="objmixctl">\n');
-        res.write('<a href="/objmix">object base mixer</a>\n');
+        res.write('<a href="/objmix">object-based mixer</a>\n');
         res.write('</div>\n');
     }
     res.end('</body></html>');
@@ -149,7 +149,10 @@ io.on('connection', function (socket) {
             }
             if( msg[0] == '/vertexpos' ){
                 const vpvars = msg[1].split('/');
-                socket.emit('vertexpos', vpvars[3], msg[2], msg[3], msg[4] );
+                var vpname = vpvars[2] + '.' + vpvars[3];
+                if( vpvars[2] == 'ego' )
+                    vpname = vpvars[3];
+                socket.emit('vertexpos', vpname, msg[2], msg[3], msg[4], msg[1] );
             }
             if( msg[0] == '/jackrec/start' )
                 socket.emit('jackrecstart', '');
@@ -223,7 +226,8 @@ io.on('connection', function (socket) {
         oscClient.send('/jackrec/listports');
         oscClient.send('/jackrec/listfiles');
         oscClient.send('/sendvarsto','osc.udp://localhost:9000/','/varlist','/bus.');
-        oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
+        //oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
+        oscClient.send('/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     });
     socket.on('message', function (obj) {
         oscClient.send(obj);
