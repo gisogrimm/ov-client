@@ -227,7 +227,7 @@ io.on('connection', function (socket) {
         oscClient.send('/jackrec/listfiles');
         oscClient.send('/sendvarsto','osc.udp://localhost:9000/','/varlist','/bus.');
         //oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
-        oscClient.send('/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
+        oscClient.send('/*/globalpos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     });
     socket.on('message', function (obj) {
         oscClient.send(obj);

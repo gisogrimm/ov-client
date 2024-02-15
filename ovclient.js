@@ -190,8 +190,6 @@ socket.on("vertexpos", function(name, x, y, z, path){
         inchannelpos = [];
     // append object:
     inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z, 'path' : path});
-    console.log(name);
-    console.log(path);
     update_objmix_sounds();
 });
 socket.on("newfader", function(faderno,val){
