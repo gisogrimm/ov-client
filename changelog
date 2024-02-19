@@ -1,3 +1,7 @@
+2024-02-19, version 0.21.1
+ - object-based mixing interface
+ - optional high-frequency ping measurements
+
 2023-12-21, version 0.20.14
  - many minor improvements in binaural reproduction and reverb simulation
  - improvements for MacOS
