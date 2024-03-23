@@ -21,8 +21,6 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: fetchtags
-      run: git fetch --unshallow --tags
     - name: submods
       run: git submodule init && git submodule update --init --recursive && (cd libov && git submodule update --init)
     - name: lineendings
