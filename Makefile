@@ -50,6 +50,7 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
 		OSFLAG += -D IA32
 	endif
+	EXTERNALS += portaudio
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
