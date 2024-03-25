@@ -1,7 +1,7 @@
 all: build lib binaries
 
 BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox	\
-  test_exec ovrealpath
+  ovrealpath
 
 EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
@@ -51,6 +51,10 @@ ifeq ($(OS),Windows_NT)
 		OSFLAG += -D IA32
 	endif
 	EXTERNALS += portaudio-2.0
+
+	LDLIBS += -lrpcrt4
+	ZITATARGET = zita
+
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)

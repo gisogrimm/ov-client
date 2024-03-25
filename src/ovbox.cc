@@ -315,6 +315,7 @@ int main(int argc, char** argv)
          "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
 
+#ifndef _WIN32
   // update search path to contain directory of this binary:
   char* rpath = realpath(argv[0], NULL);
   std::string rdir = dirname(rpath);
@@ -327,15 +328,18 @@ int main(int argc, char** argv)
     epaths += ":";
   epaths += rdir;
   setenv("PATH", epaths.c_str(), 1);
+#endif
 #ifdef __APPLE__
   TASCAR::set_libdir(rdir + "/lib/");
   bindir = rdir;
 #endif
+#ifndef _WIN32
   char dtemp[1024];
   strcpy(dtemp, "/tmp/com.orlandoviols.ovbox-XXXXXX");
   mkdtemp(dtemp);
   std::cout << "working directory: " << dtemp << std::endl;
   chdir(dtemp);
+#endif
 
   const char* options = "hvz:p:d:a2";
   struct option long_options[] = {
