@@ -12,6 +12,7 @@ webmixer.js,bin/
 jackrec.html,bin/
 # add msys binaries:
 $(which jackd),bin/
+/ucrt64/lib/jack,lib/
 $(which node),bin/
 $(which node.exe),bin/
 # add node modules:
