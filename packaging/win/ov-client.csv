@@ -13,6 +13,7 @@ jackrec.html,bin/
 # add msys binaries:
 $(which jackd),bin/
 $(which node),bin/
+$(which node.exe),bin/
 # add node modules:
 node_modules,bin/
 # make portable package:
