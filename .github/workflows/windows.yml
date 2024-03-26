@@ -27,3 +27,9 @@ jobs:
       run: git config --global core.autocrlf true
     - name: build
       run: make lib && make
+    - name: packaging
+      run: make -C packaging/win
+    - uses: actions/upload-artifact@v4
+      with:
+        name: windows
+        path: packaging/win/*.zip
