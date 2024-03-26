@@ -1,0 +1,23 @@
+LICENSE,
+# core binaries:
+build/ovbox.exe,bin/
+build/ovzita*.exe,bin/
+# add TASCAR plugins:
+libov/tascar/libtascar/libovclienttascar*.dll,bin/
+libov/tascar/plugins/build/ovclienttascar*.dll,bin/
+# node files for web mixer:
+ovclient.css,bin/
+ovclient.js,bin/
+webmixer.js,bin/
+jackrec.html,bin/
+# add msys binaries:
+$(which jackd),bin/
+$(which node),bin/
+# add node modules:
+node_modules,bin/
+# make portable package:
+$(cygcheck bin/*|grep msys64|sort -bu),bin/
+
+# Local Variables:
+# mode: shell-script
+# End:
