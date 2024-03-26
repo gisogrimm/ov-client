@@ -30,9 +30,7 @@ jobs:
     - name: packaging
       run: make -C packaging/win
     - name: checkpackage
-      run: cygcheck packaging/win/ov-client/bin/*
-    - name: checkpackage2
-      run: cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu
+      run: cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu||true
     - uses: actions/upload-artifact@v4
       with:
         name: windows

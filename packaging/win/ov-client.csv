@@ -3,7 +3,7 @@ LICENSE,
 build/ovbox.exe,bin/
 build/ovzita*.exe,bin/
 # add TASCAR plugins:
-libov/tascar/libtascar/libovclienttascar*.dll,bin/
+libov/tascar/libtascar/build/libovclienttascar*.dll,bin/
 libov/tascar/plugins/build/ovclienttascar*.dll,bin/
 # node files for web mixer:
 ovclient.css,bin/
@@ -17,7 +17,7 @@ $(which node.exe),bin/
 # add node modules:
 node_modules,bin/
 # make portable package:
-$(cygcheck bin/*|grep msys64|sort -bu),bin/
+$(cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu),bin/
 
 # Local Variables:
 # mode: shell-script
