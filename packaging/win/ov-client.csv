@@ -16,8 +16,18 @@ $(which node),bin/
 $(which node.exe),bin/
 # add node modules:
 node_modules,bin/
+# gtk stuff:
+/ucrt64/lib/gdk-pixbuf-2.0,bin/lib/
+/ucrt64/share/glib-2.0/schemas,bin/share/glib-2.0/
+/ucrt64/share/icons/Adwaita,bin/share/icons/
+/ucrt64/share/icons/hicolor,bin/share/icons/
+src/ovbox256.png,bin/usr/share/icons/hicolor/256x256/apps/
+src/ovbox48.png,bin/usr/share/icons/hicolor/48x48/apps/
+/ucrt64/bin/gdbus.exe,bin/
+/ucrt64/bin/broadwayd.exe,bin/
 # make portable package:
-$(cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu),bin/
+$(cygcheck packaging/win/ov-client/bin/* packaging/win/ov-client/bin/lib/gdk-pixbuf-2.0/*/*.dll|grep msys64|sort -bu),bin/
+$(glib-compile-schemas packaging/win/ov-client/bin/share/glib-2.0/schemas)
 
 # Local Variables:
 # mode: shell-script

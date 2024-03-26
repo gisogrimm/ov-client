@@ -14,8 +14,9 @@ STARTDIR=$(pwd)
 rm -Rf "${BASENAME}" "${BASENAME}-$2.zip"
 # create subfolders:
 cat "$1"|sed -e "/#.*/ d" -e  "s/.*,/${BASENAME}\//1"|sort -u|xargs -l mkdir -p
+# show files:
+cat "$1"|(cd ../.. && sed -e "/^[ \t]*$/ d" -e "/#.*/ d" -e "s|\(.*\),\(.*\)|cp -r \1 ${STARTDIR}/${BASENAME}/\2|1")
 # copy files:
-cat "$1"|(cd ../.. && sed -e "/#.*/ d" -e "s|\(.*\),\(.*\)|cp -r \1 ${STARTDIR}/${BASENAME}/\2|1")
-cat "$1"|(cd ../.. && sed -e "/#.*/ d" -e "s|\(.*\),\(.*\)|cp -r \1 ${STARTDIR}/${BASENAME}/\2|1"|bash)
+cat "$1"|(cd ../.. && sed -e "/^[ \t]*$/ d" -e "/#.*/ d" -e "s|\(.*\),\(.*\)|cp -r \1 ${STARTDIR}/${BASENAME}/\2|1"|bash)
 # package files:
 zip -r "${BASENAME}-$2.zip" "${BASENAME}"
