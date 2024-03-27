@@ -52,7 +52,7 @@ ifeq ($(OS),Windows_NT)
 	endif
 	EXTERNALS += portaudio-2.0
 
-	LDLIBS += -lrpcrt4
+	LDLIBS += -lrpcrt4 -lole32 -lshell32
 	ZITATARGET = zita
 
 else

@@ -28,6 +28,10 @@
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <Objbase.h>
+#include <shellapi.h>
+#endif
 
 #include "ovbox.res.c"
 
@@ -133,13 +137,21 @@ void ovboxgui_t::on_hide()
 
 void ovboxgui_t::on_uiurl_clicked()
 {
+#ifdef _WIN32
+  ShellExecute(NULL, "open", ui_url, NULL, NULL, 0);
+#else
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 }
 
 void ovboxgui_t::on_mixer_clicked()
 {
   std::string url("http://" + ep2ipstr(getipaddr()) + ":8080/");
+#ifdef _WIN32
+  ShellExecute(NULL, "open", url, NULL, NULL, 0);
+#else
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 }
 
 bool ovboxgui_t::on_timeout()
@@ -297,6 +309,10 @@ int main(int argc, char** argv)
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
+
+#ifdef _WIN32
+  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+#endif
 
   std::cout
       << "ov-client is free software: you can redistribute it and/or modify\n"
