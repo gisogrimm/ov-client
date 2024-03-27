@@ -33,5 +33,5 @@ jobs:
       run: cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu||true
     - uses: actions/upload-artifact@v4
       with:
-        name: windows
+        name: ov-client-windows
         path: packaging/win/*.zip

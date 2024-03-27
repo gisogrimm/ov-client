@@ -23,5 +23,5 @@ jobs:
       run: make packaging
     - uses: actions/upload-artifact@v2
       with:
-        name: macOS-build
+        name: ov-client-macos
         path: packaging/Darwin/*.tgz
