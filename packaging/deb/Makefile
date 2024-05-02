@@ -23,3 +23,6 @@ pack:
 	rm -Rf debian && \
 	mkdir -p $(STORAGE) && \
 	for p in $(DEBS); do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); ./packaging/deb/htchdebian-mkdeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done
+
+testallpackaged:
+	rm -f $@; (cd ../.. && for i in libov/tascar/plugins/build/ovclienttascar*.so; do grep -q -e $$i packaging/deb/*.csv || (touch packaging/deb/$@;echo "$$i is not packaged");done); ! (test -e $@ && rm -f $@)
