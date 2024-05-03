@@ -4,17 +4,17 @@
  * Copyright (c) 2020-2024 Giso Grimm
  */
 /*
- * ov-client is free software: you can redistribute it and/or modify
+ * ovbox_cli is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation, version 3 of the License.
  *
- * ov-client is distributed in the hope that it will be useful,
+ * ovbox_cli is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License, version 3 for more details.
  *
  * You should have received a copy of the GNU General Public License,
- * Version 3 along with ov-client. If not, see <http://www.gnu.org/licenses/>.
+ * Version 3 along with ovbox_cli. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ov_client_orlandoviols.h"
@@ -57,20 +57,20 @@ int main(int argc, char** argv)
   signal(SIGINT, &sighandler);
 
   std::cout
-      << "ov-client is free software: you can redistribute it and/or modify\n"
+      << "ovbox_cli is free software: you can redistribute it and/or modify\n"
          "it under the terms of the GNU General Public License as published\n"
          "by the Free Software Foundation, version 3 of the License.\n"
          "\n"
-         "ov-client is distributed in the hope that it will be useful,\n"
+         "ovbox_cli is distributed in the hope that it will be useful,\n"
          "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
          "MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
          "GNU General Public License, version 3 for more details.\n"
          "\n"
          "You should have received a copy of the GNU General Public License,\n"
-         "Version 3 along with ov-client. If not, see "
+         "Version 3 along with ovbox_cli. If not, see "
          "<http://www.gnu.org/licenses/>.\n"
          "\n"
-         "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
+         "Copyright (c) 2020-2024 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
 
   // update search path to contain directory of this binary:
@@ -134,7 +134,7 @@ int main(int argc, char** argv)
                              &option_index)) != -1) {
       switch(opt) {
       case 'h':
-        app_usage("ov-client", long_options, "");
+        app_usage("ovbox_cli", long_options, "");
         return 0;
       case 'q':
         verbose = 0;
