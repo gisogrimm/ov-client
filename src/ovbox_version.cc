@@ -21,10 +21,19 @@
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
+#include <sys/utsname.h>
 
 int main(int argc, char** argv)
 {
-  std::cout << get_libov_version() << "\n";
+  struct utsname buffer;
+  errno = 0;
+  if(uname(&buffer) != 0) {
+    perror("uname");
+    exit(EXIT_FAILURE);
+  }
+  std::cout << get_libov_version() << " " << buffer.sysname << " "
+            << buffer.release << " (" << buffer.machine << ")"
+            << "\n";
   return 0;
 }
 
