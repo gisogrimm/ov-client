@@ -106,7 +106,9 @@ while true; do
         if test "$OSREL" = "buster"; then
             OSRELHTCH=bionic
         fi
-        (echo "";echo "deb [arch=armhf] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
+        # identify OS architecture:
+        OSARCH=`dpkg-architecture | grep -e 'DEB_BUILD_ARCH='|sed 's/[^=]*=//1'`
+        (echo "";echo "deb [arch=${OSARCH]´}] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
         sudo apt update --assume-yes
         sudo apt install --no-install-recommends --assume-yes ov-client
     fi
