@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-12
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Fetch git tags
       run: git fetch --unshallow --tags
     - name: Install submodules
@@ -21,7 +21,7 @@ jobs:
       run: make lib libtest && make
     - name: packaging
       run: make packaging
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: ovbox-macOS-12
         path: packaging/Darwin/*.tgz
