@@ -6,7 +6,7 @@ COMMITVER=$(shell cat ../../libov/.ov_commitver)
 PACKCNT=$(shell git rev-list --count $(shell git log --follow -1 --pretty=%H ../../libov)..HEAD)
 FULLVERSION=$(VERSION).$(MINORVERSION)-$(PACKCNT)-$(COMMITVER)
 #FULLVERSION=$(shell cat ../../libov/.ov_full_version)
-PACKVER:=$(FULLVERSION)_$(shell uname -s)_$(shell uname -m)
+PACKVER:=$(FULLVERSION)_$(shell sw_vers -productName)-$(shell sw_vers -productVersion)_$(shell uname -m)
 
 .PHONY : pack
 
