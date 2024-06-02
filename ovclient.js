@@ -194,41 +194,50 @@ socket.on("vertexpos", function(name, x, y, z, path){
 });
 socket.on("newfader", function(faderno,val){
     // remove effect bus from mixer:
-    if( val.startsWith('bus.') )
+    if( val.startsWith('bus.') ){
         return;
+    }
     fader="/touchosc/fader"+faderno;
     levelid="/touchosc/level"+faderno;
     muteid="/touchosc/mute"+faderno;
-    let el_div = document.createElement("div");
     let el_mixer=document.getElementById("mixer");
     if( el_mixer ){
+        orig_val = val;
         let classname = "mixerstrip";
         val = val.replace('.'+deviceid,'');
         val = val.replace(deviceid+'.','');
         val = val.replace('bus.','');
         if( val.startsWith("ego.")||(val == "monitor") ){
-	          classname = classname + " mixerego";
+	    classname = classname + " mixerego";
             val = val.replace('ego.','');
         }
         if( (val == "main") || (val == "reverb") )
-	          classname = classname + " mixerother";
-        el_div.setAttribute("class",classname);
-        let el_lab=document.createElement("label");
+	    classname = classname + " mixerother";
+        // create main mixer strip element:
+        let el_mixerstrip = el_mixer.appendChild(document.createElement("div"));
+        el_mixerstrip.setAttribute("class",classname);
+        el_mixerstrip.setAttribute("id","mixerstrip_"+orig_val);
+        let el_row1 = el_mixerstrip.appendChild(document.createElement("div"));
+        el_row1.setAttribute("class","mixerrow");
+        let el_row2 = el_mixerstrip.appendChild(document.createElement("div"));
+        el_row2.setAttribute("class","mixerrow");
+        let el_row3 = el_mixerstrip.appendChild(document.createElement("div"));
+        el_row3.setAttribute("class","mixerrow");
+        let el_lab = el_row1.appendChild(document.createElement("label"));
         el_lab.setAttribute("for",fader);
         el_lab.setAttribute("class","mixerlabel");
         el_lab.append(val);
-        let el_mutebuttondiv = document.createElement("div");
+        let el_mutebuttondiv = el_row1.appendChild(document.createElement("div"));
         el_mutebuttondiv.setAttribute("class", "mutebuttondiv");
         let el_span = el_mutebuttondiv.appendChild(document.createElement("span"));
         el_span.setAttribute("class", "mutebuttonlabel");
         el_span.appendChild(document.createTextNode("mute "));
-        let el_mutebutton = document.createElement("input");
-        el_mutebuttondiv.appendChild(el_mutebutton);
+        let el_mutebutton = el_mutebuttondiv.appendChild(document.createElement("input"));
         el_mutebutton.setAttribute("class", "mutebutton");
         el_mutebutton.setAttribute("type", "checkbox");
         el_mutebutton.setAttribute("id", muteid);
         //el_mutebutton.onchange = upload_session_gains;
-        let el_fader=document.createElement("input");
+        let el_fader=el_row2.appendChild(document.createElement("input"));
         el_fader.setAttribute("class","fader");
         el_fader.setAttribute("type","range");
         el_fader.setAttribute("min","-30");
@@ -237,14 +246,14 @@ socket.on("newfader", function(faderno,val){
         el_fader.setAttribute("step","0.1");
         el_fader.setAttribute("id",fader);
         el_fader.onchange = upload_session_gains;
-        let el_gaintext=document.createElement("input");
+        let el_gaintext=el_row2.appendChild(document.createElement("input"));
         el_gaintext.setAttribute("type","number");
         el_gaintext.setAttribute("class","gaintxtfader");
         el_gaintext.setAttribute("min","-30");
         el_gaintext.setAttribute("max","10");
         el_gaintext.setAttribute("step","0.1");
         el_gaintext.setAttribute("id","txt"+fader);
-        let el_meter=document.createElement("meter");
+        let el_meter = el_row3.appendChild(document.createElement("meter"));
         el_meter.setAttribute("class","level");
         el_meter.setAttribute("min","0");
         el_meter.setAttribute("max","94");
@@ -252,20 +261,17 @@ socket.on("newfader", function(faderno,val){
         el_meter.setAttribute("high","84");
         el_meter.setAttribute("optimum","54");
         el_meter.setAttribute("id",levelid);
-        let el_metertext=document.createElement("input");
+        let el_metertext = el_row3.appendChild(document.createElement("input"));
         el_metertext.setAttribute("type","text");
         el_metertext.setAttribute("readonly","true");
         el_metertext.setAttribute("class","gaintxtfader");
         el_metertext.setAttribute("id","txt"+levelid);
-        el_mixer.appendChild(el_div);
-        el_div.appendChild(el_lab);
-        el_div.appendChild(el_mutebuttondiv);
-        el_div.appendChild(document.createElement("br"));
-        el_div.appendChild(el_fader);
-        el_div.appendChild(el_gaintext);
-        el_div.appendChild(document.createElement("br"));
-        el_div.appendChild(el_meter);
-        el_div.appendChild(el_metertext);
+        //el_mixerstrip.appendChild(el_lab);
+        //el_mixerstrip.appendChild(el_mutebuttondiv);
+        //el_mixerstrip.appendChild(document.createElement("br"));
+        //el_mixerstrip.appendChild(document.createElement("br"));
+        //el_mixerstrip.appendChild(el_meter);
+        //el_mixerstrip.appendChild(el_metertext);
     }
 });
 socket.on("updatefader", function(fader,val){
