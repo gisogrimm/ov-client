@@ -1,4 +1,4 @@
-name: MacOS make
+name: MacOS make 12
 
 on:
   push:
