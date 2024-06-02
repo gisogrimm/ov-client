@@ -1,3 +1,8 @@
+2024-05-27, version 0.23.1
+ - add lab streaming layer support
+ - additional plugins, e.g., for level metering and LTC generation
+ - minor bugfixes
+
 2024-02-19, version 0.21.1
  - object-based mixing interface
  - optional high-frequency ping measurements

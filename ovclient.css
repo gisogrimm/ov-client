@@ -2,20 +2,20 @@ body {
     color: #fff;
     background-color: #282828;
     font-family: Helvetica,Arial,sans-serif;
-    font-size: 28px;
+    font-size: 22px;
     margin: 0; 
     margin-left: auto;
     margin-right: auto;
     padding: 0;
-    width: 90%;
+    width: 93%;
     background-position:center top;
     background-repeat: no-repeat;
 }
 .mixerstrip {
     width: 100%;
     background-color: #a0a0ff40;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding: 8px;
     border-radius: 15px;
 }
@@ -24,6 +24,12 @@ body {
 }
 .mixerother {
     background-color: #ffffff40;
+}
+.mixerrow {
+    display: block;
+    padding-top: 0px;
+    padding-bottom: 6px;
+    overflow: visible;
 }
 .gaintxtfader {
     -webkit-appearance: none;
@@ -36,7 +42,8 @@ body {
 .fader {
     -webkit-appearance: none;
     width: 88%;
-    height: 35px;
+    height: 25px;
+    margin-bottom: 0px;
     border-radius: 5px;  
     background: #d3d3d3;
     outline: none;
@@ -53,16 +60,16 @@ body {
 .fader::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 55px;
-    height: 55px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%; 
     background: #4CAF50;
     cursor: pointer;
 }
 
 .fader::-moz-range-thumb {
-    width: 55px;
-    height: 55px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;
@@ -79,7 +86,7 @@ button {
 }
 .level {
     width: 88%;
-    height: 35px;
+    height: 25px;
     border-radius: 5px;  
     background: #d3d3d3;
     outline: none;

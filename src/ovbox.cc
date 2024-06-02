@@ -79,7 +79,7 @@ public:
   void runclient();
 
   std::string zitapath = "";
-  std::string ui_url = "http://box.orlandoviols.com/";
+  std::string ui_url = "http://login.ovbox.de/";
   int pinglogport = 0;
   bool allowsystemmods = false;
   std::string cli_deviceid = "";
@@ -208,7 +208,7 @@ void ovboxgui_t::runclient()
       std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
       std::string lobby(ovstrrep(
           js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
-      ui_url = ovstrrep(js_cfg.value("ui", "http://box.orlandoviols.com/"),
+      ui_url = ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"),
                         "\\/", "/");
       std::string protocol(js_cfg.value("protocol", "ov"));
       frontend_t frontend(FRONTEND_OV);
