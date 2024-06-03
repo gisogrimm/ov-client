@@ -1,0 +1,27 @@
+name: MacOS make 13
+
+on:
+  push:
+    branches: [ master, development ]
+
+jobs:
+  build:
+
+    runs-on: macos-13
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Fetch git tags
+      run: git fetch --unshallow --tags
+    - name: Install submodules
+      run: git submodule update --init --recursive
+    - name: Install dependencies
+      run: brew install pkgconfig glibmm jack liblo libsndfile gtkmm3 eigen boost gsl fftw libsamplerate cpprestsdk nlohmann-json openssl coreutils libsoundio xerces-c jpeg libmatio libltc
+    - name: make
+      run: make lib libtest && make
+    - name: packaging
+      run: make packaging
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ovbox-macOS-13
+        path: packaging/Darwin/*.tgz
