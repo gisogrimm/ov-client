@@ -32,27 +32,69 @@ pipeline {
         stage("build") {
             parallel {
                 stage(                        "jammy && x86_64 && tascardev") {
-                    agent {label              "jammy && x86_64 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-11"
+                            label "docker_x86_64"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("jammy && x86_64 && tascardev")}
                 }
 		stage(                        "focal && x86_64 && tascardev") {
-                    agent {label              "focal && x86_64 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-9"
+                            label "docker_x86_64"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("focal && x86_64 && tascardev")}
                 }
 		stage(                        "bionic && x86_64 && tascardev") {
-                    agent {label              "bionic && x86_64 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-7"
+                            label "docker_x86_64"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("bionic && x86_64 && tascardev")}
                 }
 		stage(                        "bionic && armv7 && tascardev") {
-                    agent {label              "bionic && armv7 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_armv7-linux-gcc-7"
+                            label "docker_qemu"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("bionic && armv7 && tascardev")}
                 }
                 stage(                        "bullseye && armv7 && tascardev") {
-                    agent {label              "bullseye && armv7 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_aarch64-linux-gcc-10"
+                            label "docker_qemu"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("bullseye && armv7 && tascardev")}
                 }
                 stage(                        "bullseye && aarch64 && tascardev") {
-                    agent {label              "bullseye && aarch64 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:mha_aarch64-linux-gcc-10"
+                            label "docker_qemu"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
                     steps {tascar_build_steps("bullseye && aarch64 && tascardev")}
                 }
 	    }
