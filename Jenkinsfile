@@ -89,7 +89,7 @@ pipeline {
                 stage(                        "bullseye && aarch64 && tascardev") {
                     agent {
                         docker {
-                            image "hoertech/docker-buildenv:mha_aarch64-linux-gcc-10"
+                            image "hoertech/docker-buildenv:tascar_aarch64-linux-gcc-10"
                             label "docker_qemu"
                             alwaysPull true
                             args "-v /home/u:/home/u --hostname docker"
