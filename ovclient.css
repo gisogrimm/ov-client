@@ -2,7 +2,7 @@ body {
     color: #fff;
     background-color: #282828;
     font-family: Helvetica,Arial,sans-serif;
-    font-size: 22px;
+    font-size: 18px;
     margin: 0; 
     margin-left: auto;
     margin-right: auto;
@@ -12,11 +12,11 @@ body {
     background-repeat: no-repeat;
 }
 .mixerstrip {
-    width: 100%;
+    width: calc(100% - 12px);
     background-color: #a0a0ff40;
     margin-top: 5px;
     margin-bottom: 5px;
-    padding: 8px;
+    padding: 6px;
     border-radius: 15px;
 }
 .mixerego {
@@ -41,7 +41,7 @@ body {
 }
 .fader {
     -webkit-appearance: none;
-    width: 88%;
+    width: calc(88% - 5px);
     height: 25px;
     margin-bottom: 0px;
     border-radius: 5px;  
@@ -82,7 +82,7 @@ button {
     border-radius:11px;
     padding:17px 24px;
     margin:0px 140px 70px 0px;
-    font-size: 28px;
+    font-size: 100%;
 }
 .level {
     width: 88%;
@@ -106,7 +106,7 @@ button {
     margin-top: 30px;
     padding: 10px;
     display: block;
-    width: 100%;
+    width: calc(100%-20px);
     border-radius: 15px;
 }
 .jackrecctl {
@@ -138,7 +138,7 @@ button {
     margin: 10px;
 }
 .ctlbutton {
-    font-size: 28px;
+    font-size: 100%;
 }
 .jackport {
     padding: 10px;
@@ -219,4 +219,35 @@ button {
 }
 a {
     color: #fff;
+}
+.tabhide {
+    display: none;
+}
+.tabshow {
+    display: block;
+}
+.nav {
+}
+.navbutton {
+    font-size: 100%;
+    min-width:15vw;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    background-color: #777;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid #999;
+}
+.tabact {
+    background-color: #ffffff;
+}
+.elemframe {
+    padding: 5px;
+    border: 1px solid #999;
+}
+h1 {
+    font-weight: normal;
+    font-size: 100%;
 }
