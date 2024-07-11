@@ -132,6 +132,8 @@ clangformat:
 clean:
 	rm -Rf build src/*~ ovclient*.deb
 	$(MAKE) -C libov clean
+	-cd zita-njbridge && git clean -ffdx
+	-cd zita-njbridge/zita-resampler && git clean -ffdx
 
 .PHONY: packaging
 
