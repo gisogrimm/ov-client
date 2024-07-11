@@ -103,15 +103,15 @@ pipeline {
                     steps {tascar_build_steps("bullseye && armv7 && tascardev")}
                 }
                 stage(                        "bullseye && aarch64 && tascardev") {
-                    agent {
-                        docker {
-                            image "hoertech/docker-buildenv:tascar_aarch64-linux-gcc-10"
-                            label "docker_qemu"
-                            alwaysPull true
-                            //args "-v /home/u:/home/u --hostname docker"
-                        }
-                    }
-                    //agent {label              "bullseye && aarch64 && tascardev"}
+                    //agent {
+                    //    docker {
+                    //        image "hoertech/docker-buildenv:tascar_aarch64-linux-gcc-10"
+                    //        label "docker_qemu"
+                    //        alwaysPull true
+                    //        //args "-v /home/u:/home/u --hostname docker"
+                    //    }
+                    //}
+                    agent {label              "bullseye && aarch64 && tascardev"}
                     steps {tascar_build_steps("bullseye && aarch64 && tascardev")}
                 }
             }
