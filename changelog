@@ -1,3 +1,8 @@
+2024-07-12, version 0.24.7
+ - improve web mixer interface
+ - correct pre-compiled builds on x86_64
+ - monitor system temperature
+
 2024-06-12, version 0.24.2
  - improve webmixer mute states
  - add MIDI DAW controller support on Linux
