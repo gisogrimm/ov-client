@@ -38,5 +38,39 @@
     echo "install new debian packages:"
     sudo -E apt-get install --assume-yes --no-install-recommends ./ov-client/packaging/deb/debian/*/ovbox-cli_*.deb
 
+    echo "install rtirq-init:"
+    sudo -E apt-get install --assume-yes --no-install-recommends rtirq-init
+
+    echo "update real-time priority priviledges:"
+    sudo sed -i -e '/.audio.*rtprio/ d' -e '/.audio.*memlock/ d' /etc/security/limits.conf
+    echo "@audio - rtprio 99"|sudo tee -a /etc/security/limits.conf
+    echo "@audio - memlock unlimited"|sudo tee -a /etc/security/limits.conf
+
+    echo "install user to run the scripts - do not provide root priviledges:"
+    sudo useradd -m -G audio,dialout ov || echo "user ov already exists."
+
+    echo "register autorun script in /etc/rc.local:"
+    sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local
+    echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a /etc/rc.local
+    echo "exit 0"|sudo tee -a /etc/rc.local
+
+    echo "setup host name:"
+    HOSTN=$(ov-client_hostname)
+    echo "ovbox${HOSTN}" | sudo tee /etc/hostname
+    sudo sed -i "s/127\.0\.1\.1.*/127.0.1.1\tovbox${HOSTN}/g" /etc/hosts
+    sync
+
+    echo "configure country code and prepare WiFi config:"
+    sudo touch /boot/ovclient-wifi.txt
+    sync
+
+    echo "activate overlay image to avoid damage of the SD card upon power off:"
+    sudo raspi-config nonint enable_overlayfs
+    sync
+
+    echo "ready, reboot:"
+    sudo shutdown -r now
+
+    sync
     echo "successfully installed ovbox system!"
 )
