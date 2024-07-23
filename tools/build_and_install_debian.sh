@@ -49,6 +49,11 @@
     echo "install user to run the scripts - do not provide root priviledges:"
     sudo useradd -m -G audio,dialout ov || echo "user ov already exists."
 
+    echo "install autorun script:"
+    sudo cp ov-client/tools/pi/autorun /home/pi/
+    sudo chmod a+x /home/pi/autorun
+    sudo chown pi:pi /home/pi/autorun
+
     echo "register autorun script in /etc/rc.local:"
     sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local
     echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a /etc/rc.local

@@ -26,9 +26,18 @@ echo "----------"
 echo "mounting $1 ($DEVNAME) on $2"
 # Mount boot partition:
 sudo mount ${DEVNAME}p1 "$2"
-cat "$2"/firmware/cmdline.txt | grep -e 'init=.*/init_resize.sh' -e 'init=.*/firstboot' || (echo "The image was booted already."; ls "/$2";cat "$2"/firmware/cmdline.txt;exit 1;)
+USEFIRMW=""
+SEDFIRMW=""
+if test -e "$2"/firmware/cmdline.txt; then
+    USEFIRMW="/firmware"
+    SEDFIRMW="\/firmware"
+fi
+cat "$2"/"${USEFIRMW}"/cmdline.txt | grep -e 'init=.*/init_resize.sh' -e 'init=.*/firstboot' || (echo "The image was booted already."; ls "/$2";cat "$2"/"${USEFIRMW}"/cmdline.txt;exit 1;)
+
+# set password:
 echo 'pi:$6$BfzNyd/.tlSynCad$HX/TpdQ35vqP2ahCHIrQbUXxzc8ld3CSW.Nb6pwIqP5/vSIxtO3IunfIiI/mmgzSulbbDwIO9jORU6n/wdbsB0' | sudo tee "$2"/userconf.txt
 sudo umount "$2"
+
 # Now mount rootfs partition:
 sudo mount ${DEVNAME}p2 "$2"
 SRCPATH=`dirname $0`
@@ -39,10 +48,10 @@ SRCPATH=`dirname $0`
     sudo chmod a+x "$2/usr/lib/raspi-config/install_ovclient.sh"
     if test -e "$2/usr/lib/raspi-config/init_resize.sh"; then
         # In /mnt/usr/lib/raspi-config/init_resize.sh line 187 modify line
-        sudo sed -i -e "\+init=/usr/lib/raspi-config/init_resize+ s/.*/sed -i \'s| init=\/usr\/lib\/raspi-config\/init_resize\\\.sh| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot\/firmware\/cmdline.txt/1" "$2/usr/lib/raspi-config/init_resize.sh"
+        sudo sed -i -e "\+init=/usr/lib/raspi-config/init_resize+ s/.*/sed -i \'s| init=\/usr\/lib\/raspi-config\/init_resize\\\.sh| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspi-config/init_resize.sh"
     fi
     if test -e "$2/usr/lib/raspberrypi-sys-mods/firstboot"; then
-        sudo sed -i -e "\+init=/usr/lib/raspberrypi-sys-mods/firstboot+ s/.*/sed -i \'s| init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot\/firmware\/cmdline.txt/1" "$2/usr/lib/raspberrypi-sys-mods/firstboot"
+        sudo sed -i -e "\+init=/usr/lib/raspberrypi-sys-mods/firstboot+ s/.*/sed -i \'s| init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspberrypi-sys-mods/firstboot"
     fi
 )
 sudo umount "$2"
