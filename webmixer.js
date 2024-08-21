@@ -55,6 +55,7 @@ httpserver = http.createServer(function (req, res) {
         }
     }
     var sdir = path.dirname(process.argv[1]);
+    console.log(sdir);
     if( sdir.length > 0 )
         sdir = sdir + '/';
     var hosjs = fs.readFileSync(sdir+'ovclient.js');
@@ -87,32 +88,16 @@ httpserver = http.createServer(function (req, res) {
     //deviceid = devnames[0];
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('<!DOCTYPE HTML>\n');
-    res.write('<html><head><style>');
+    res.write('<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>');
     res.write(hoscss);
     res.write('</style><title>ov-client web mixer</title>\n</head><body>\n');
-    res.write('<h1>'+devname+'</h1>\n<div id="mixer">mixer</div><div id="plugpars"></div>\n');
+    res.write('<h1>'+devname+'</h1>\n');
+    res.write(jackrec);
     res.write('<script src="http://'+ipaddr+':8080/socket.io/socket.io.js"></script>\n');
     res.write('<script>\n');
     res.write('var socket = io("http://'+ipaddr+':8080");\n');
     res.write(hosjs);
     res.write('</script>\n');
-    if( req.url.startsWith('/objmix') ){
-        res.write('<div id="objmix" class="objmix">\n');
-        res.write('<canvas id="objmixer">object mixer</canvas>\n');
-        res.write('<br/>\n');
-        res.write('<div class="objmixctl">\n');
-        res.write('<input class="ctlbutton" type="button" value="store positions and gains" onclick="objmix_upload_posandgains();">\n');
-        res.write('</div>\n');
-        res.write('</div>\n');
-        res.write('<div class="objmixctl">\n');
-        res.write('<a href="/">channel mixer + audio recorder</a>\n');
-        res.write('</div>\n');
-    }else{
-        res.write(jackrec);
-        res.write('<div class="objmixctl">\n');
-        res.write('<a href="/objmix">object-based mixer</a>\n');
-        res.write('</div>\n');
-    }
     res.end('</body></html>');
 });
 

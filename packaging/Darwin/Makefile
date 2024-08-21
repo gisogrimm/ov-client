@@ -18,8 +18,9 @@ plug:
 	echo $(PLUGS)
 
 portable:
-	rm -Rf bin;mkdir -p bin ;for i in $(BINS); do cp ../../build/$$i bin/ ;./mkport.sh ./bin/$$i; done; \
-	mkdir -p bin/lib ;for i in $(LIBS); do cp ../../libov/tascar/libtascar/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i; done; \
+	rm -Rf bin;mkdir -p bin/lib ;\
+	for i in $(BINS); do cp ../../build/$$i bin/ ;./mkport.sh ./bin/$$i; done; \
+	for i in $(LIBS); do cp ../../libov/tascar/libtascar/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i; done; \
 	for i in $(PLUGS); do cp ../../libov/tascar/plugins/build/$$i bin/lib/ ;./mkport.sh ./bin/lib/$$i ./bin/lib/; done; \
 	mv bin/ovbox bin/ovbox.bin; \
 	cp ovboxwrapper bin/ovbox; \

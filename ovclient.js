@@ -107,6 +107,8 @@ function objmix_draw()
     const canvas = document.getElementById("objmixer");
     if( !canvas )
         return;
+    canvas.width = canvas.parentElement.clientWidth-2;
+    canvas.height = 0.5*canvas.width;
     const ctx = canvas.getContext("2d");
     //ctx.globalCompositeOperation = "destination-over";
     ctx.fillStyle = '#153d17';
@@ -140,7 +142,7 @@ function objmix_draw()
         const colrgb = HSVtoRGB(k/inchannelpos.length, 0.65, 0.8 );
         ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2, true); // Outer circle
+        ctx.arc(pos.x, pos.y, 20*Math.sqrt(canvas.width/1000), 0, Math.PI * 2, true); // Outer circle
         ctx.fill();
         ctx.fillText(vertex.name, pos.x+24, pos.y-5);
     }
@@ -570,3 +572,25 @@ function jackrec_selectallfiles() {
 	ports[k].checked = ischecked;
     }
 }
+
+function showtab( name ) {
+    names = ['mixer','plugpars','jackrec','objmix'];
+    for( var k=0;k<names.length;k++){
+        var el = document.getElementById(names[k]);
+        var elinp = document.getElementById('tabact'+names[k]);
+        if( names[k] == name ){
+            el.classList.add("tabshow");
+            el.classList.remove("tabhide");
+            elinp.classList.add("tabact");
+        }else{
+            el.classList.remove("tabshow");
+            el.classList.add("tabhide");
+            elinp.classList.remove("tabact");
+        }
+    }
+    objmix_draw();
+}
+
+window.addEventListener('resize', function(event) {
+    objmix_draw();
+}, true);

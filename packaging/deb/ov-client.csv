@@ -20,6 +20,7 @@ libov/tascar/plugins/build/ovclienttascar_hossustain.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_jackrec.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_lightctl.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_ltcgen.so,usr/lib/
+libov/tascar/plugins/build/ovclienttascar_midi*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_mask_fig8.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_mask_multibeam.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_mask_sampledgain.so,usr/lib/

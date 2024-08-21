@@ -1,3 +1,7 @@
+2024-06-12, version 0.24.2
+ - improve webmixer mute states
+ - add MIDI DAW controller support on Linux
+
 2024-05-27, version 0.23.1
  - add lab streaming layer support
  - additional plugins, e.g., for level metering and LTC generation
