@@ -1,3 +1,6 @@
+2024-09-24, version 0.25.1
+ - add simple MIDI synth
+
 2024-07-12, version 0.24.7
  - improve web mixer interface
  - correct pre-compiled builds on x86_64
