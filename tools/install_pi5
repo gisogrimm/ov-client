@@ -1,21 +1,32 @@
 #!/bin/bash
+
+# This script will compile and install the ovbox software from
+# source. It expects to be running on a Raspberry Pi, with the user
+# "pi" in the home folder "/home/pi". It will create an additional
+# user "ov" to run the actual ovbox process.
+#
+# Important: Do not run this script on a system that is not intended
+# to be used solely as an ovbox.
+
 (
     # minimal error handling:
     trap "echo An error occured.;exit 1" ERR
 
+    cd
+
     export DEBIAN_FRONTEND=noninteractive
 
     echo "update apt database:"
-    sudo -E apt-get update --assume-yes
+    sudo -E apt-get update --assume-yes || sudo -E apt-get update --assume-yes
 
     echo "Install CA certificates:"
-    sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates
+    sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates  || sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates
 
     echo "install git, build-essential and other basic stuff:"
-    sudo -E apt-get install --no-install-recommends --assume-yes git build-essential xxd gettext-base lsb-release
+    sudo -E apt-get install --no-install-recommends --assume-yes git build-essential cmake xxd gettext-base lsb-release || sudo -E apt-get install --no-install-recommends --assume-yes git build-essential cmake xxd gettext-base lsb-release
 
     echo "install dependencies of cli tool:"
-    sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev
+    sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev
 
     echo "clone or update git repo:"
     (cd ov-client && git clean -ffx && git pull) || git clone https://github.com/gisogrimm/ov-client
@@ -30,7 +41,7 @@
     make -C ov-client clean
 
     echo "build tools:"
-    make -j 5 -C ov-client
+    make -j `nproc` -C ov-client
 
     echo "package tools:"
     make -C ov-client packaging
@@ -50,7 +61,7 @@
     sudo useradd -m -G audio,dialout ov || echo "user ov already exists."
 
     echo "install autorun script:"
-    sudo cp ov-client/tools/pi/autorun /home/pi/
+    sudo cp ov-client/tools/pi/autorun_pi5 /home/pi/autorun
     sudo chmod a+x /home/pi/autorun
     sudo chown pi:pi /home/pi/autorun
 
@@ -69,12 +80,12 @@
     sudo touch /boot/ovclient-wifi.txt
     sync
 
-    echo "activate overlay image to avoid damage of the SD card upon power off:"
-    sudo raspi-config nonint enable_overlayfs
-    sync
-
-    echo "ready, reboot:"
-    sudo shutdown -r now
+    #echo "activate overlay image to avoid damage of the SD card upon power off:"
+    #sudo raspi-config nonint enable_overlayfs
+    #sync
+    #
+    #echo "ready, reboot:"
+    #sudo shutdown -r now
 
     sync
     echo "successfully installed ovbox system!"

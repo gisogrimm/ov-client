@@ -43,16 +43,27 @@ sudo mount ${DEVNAME}p2 "$2"
 SRCPATH=`dirname $0`
 (
     cd ${SRCPATH}
-    sudo cp build_and_install_debian.sh "$2/home/pi/install"
-    sudo cp install_ovclient.sh "$2/usr/lib/raspi-config/install_ovclient.sh"
-    sudo chmod a+x "$2/usr/lib/raspi-config/install_ovclient.sh"
-    if test -e "$2/usr/lib/raspi-config/init_resize.sh"; then
-        # In /mnt/usr/lib/raspi-config/init_resize.sh line 187 modify line
-        sudo sed -i -e "\+init=/usr/lib/raspi-config/init_resize+ s/.*/sed -i \'s| init=\/usr\/lib\/raspi-config\/init_resize\\\.sh| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspi-config/init_resize.sh"
-    fi
-    if test -e "$2/usr/lib/raspberrypi-sys-mods/firstboot"; then
-        sudo sed -i -e "\+init=/usr/lib/raspberrypi-sys-mods/firstboot+ s/.*/sed -i \'s| init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspberrypi-sys-mods/firstboot"
-    fi
+    sudo cp install_pi5 "$2/home/pi/install"
+    sudo chmod a+x "$2/home/pi/install"
+    #if test -e "$2/usr/lib/raspi-config/init_resize.sh"; then
+    #    # In /mnt/usr/lib/raspi-config/init_resize.sh line 187 modify line
+    #    sudo sed -i -e "\+init=/usr/lib/raspi-config/init_resize+ s/.*/sed -i \'s| init=\/usr\/lib\/raspi-config\/init_resize\\\.sh| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspi-config/init_resize.sh"
+    #fi
+    #if test -e "$2/usr/lib/raspberrypi-sys-mods/firstboot"; then
+    #    sudo sed -i -e "\+init=/usr/lib/raspberrypi-sys-mods/firstboot+ s/.*/sed -i \'s| init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot| init=\/usr\/lib\/raspi-config\/install_ovclient\\\.sh|\' \/boot${SEDFIRMW}\/cmdline.txt/1" "$2/usr/lib/raspberrypi-sys-mods/firstboot"
+    #fi
+
+    echo "install autorun script:"
+    sudo cp pi/autorun_pi5 "$2/home/pi/autorun"
+    sudo chmod a+x  "$2/home/pi/autorun"
+    sudo chown pi:pi "$2/home/pi/autorun"
+
+    echo "register autorun script in /etc/rc.local:"
+    sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i "$2/etc/rc.local"
+    echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a "$2/etc/rc.local"
+    echo "exit 0"|sudo tee -a  "$2/etc/rc.local"
+
+    
 )
 sudo umount "$2"
 if [ "${DIGITALSTAGE}" = "yes" ]; then
