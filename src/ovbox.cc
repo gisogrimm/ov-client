@@ -1,7 +1,7 @@
 /*
  * This file is part of the ovbox software tool, see <http://orlandoviols.com/>.
  *
- * Copyright (c) 2020 2022 Giso Grimm
+ * Copyright (c) 2020-2024 Giso Grimm
  */
 /*
  * ov-client is free software: you can redistribute it and/or modify
@@ -312,7 +312,7 @@ int main(int argc, char** argv)
          "Version 3 along with ov-client. If not, see "
          "<http://www.gnu.org/licenses/>.\n"
          "\n"
-         "Copyright (c) 2020-2022 Giso Grimm\n\nversion: "
+         "Copyright (c) 2020-2024 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
 
   // update search path to contain directory of this binary:
