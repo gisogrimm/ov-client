@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#BOOTFS=/boot
+BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
+
 # deactivate power saving:
 for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
                                                       | sudo tee $cpu/cpufreq/scaling_governor; done
@@ -32,14 +35,14 @@ killall dbus-launch
 rfkill block all
 
 # activate WiFi if required:
-if test -e /boot/ovclient-wifi.txt; then
+if test -e ${BOOTFS}/ovclient-wifi.txt; then
     # remove DOS line ends:  -e 's/\r//1'
     # the first line contains the SSID:
-    SSID=$(cat /boot/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
+    SSID=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
     # the second line the WIFI password:
-    PW=$(cat /boot/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
+    PW=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
     COUNTRYCODE=DE
-    test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
+    test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
     echo "connecting to WiFi ${SSID}"
     if test -n "${SSID}"; then
         sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
@@ -51,7 +54,7 @@ if test -e /boot/ovclient-wifi.txt; then
     fi
 fi
 
-if test ! -e /boot/ovclient-noupdate; then
+if test ! -e ${BOOTFS}/ovclient-noupdate; then
     # if not on overlayfs then update/reinstall:
     if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
         echo "overlay fs, not updating"
@@ -59,8 +62,8 @@ if test ! -e /boot/ovclient-noupdate; then
         # get the latest installer script:
         ./install 2>&1 | tee -a ${HOME}/install.log
         # test for openMHA install request:
-        if test -e /boot/ov-client-instmha; then
-            rm -f /boot/ov-client-instmha
+        if test -e ${BOOTFS}/ov-client-instmha; then
+            rm -f ${BOOTFS}/ov-client-instmha
             sudo apt install --no-install-recommends --assume-yes openmha openmha-examples
         fi
         # activate overlay image in case the installation script failed, and try the best we can:
@@ -77,7 +80,7 @@ while true; do
     sudo su -l ov -c "ov-client"
     # test for modified configuration:
     if test -e ~ov/ov-client.cfg; then
-        sudo mv ~ov/ov-client.cfg /boot/
+        sudo mv ~ov/ov-client.cfg ${BOOTFS}/
         sync
     fi
     # test for firmware update:
@@ -91,7 +94,7 @@ while true; do
     if test -e ~ov/ov-client.installopenmha; then
         # firmware update requested: disable overlayfs and restart
         sudo rm -f ~ov/ov-client.installopenmha
-        sudo touch /boot/ov-client-instmha
+        sudo touch ${BOOTFS}/ov-client-instmha
         sudo raspi-config nonint disable_overlayfs
         sudo shutdown -r now
     fi
@@ -114,16 +117,16 @@ while true; do
     fi
     if test -e ~ov/ov-client.wificfg; then
         echo "switching wifi"
-        sudo mv ~ov/ov-client.wificfg /boot/ovclient-wifi.txt
+        sudo mv ~ov/ov-client.wificfg ${BOOTFS}/ovclient-wifi.txt
         sync
         # activate WiFi if required:
         # remove DOS line ends:  -e 's/\r//1'
         # the first line contains the SSID:
-        SSID=$(cat /boot/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
+        SSID=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
         # the second line the WIFI password:
-        PW=$(cat /boot/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
+        PW=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
         COUNTRYCODE=DE
-        test -e /boot/ovclient-country.txt && COUNTRYCODE=$(cat /boot/ovclient-country.txt)
+        test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
         echo "connecting to WiFi ${SSID}"
         if test -n "${SSID}"; then
             sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
@@ -137,15 +140,15 @@ while true; do
     if test -e ~ov/ov-client.hifiberry; then
         HBERRY=$(cat ~ov/ov-client.hifiberry)
         sudo rm -f ~ov/ov-client.hifiberry
-        sudo sed -i -e 's/[^#]*hifiberry-/#&/g' /boot/config.txt|| echo "unable to disable hifiberry modules"
+        sudo sed -i -e 's/[^#]*hifiberry-/#&/g' ${BOOTFS}/config.txt|| echo "unable to disable hifiberry modules"
         if test "${HBERRY}" != "none"; then
-            sudo sed -i -e "/dtoverlay*.hifiberry-${HBERRY}/ d" /boot/config.txt|| echo "unable to add new hifiberry entry"
+            sudo sed -i -e "/dtoverlay*.hifiberry-${HBERRY}/ d" ${BOOTFS}/config.txt|| echo "unable to add new hifiberry entry"
             (
                 echo ""
                 echo "dtoverlay=hifiberry-${HBERRY}"
-            ) | sudo tee -a /boot/config.txt
+            ) | sudo tee -a ${BOOTFS}/config.txt
         fi
-        sudo sed -i -e '/^$/N;/^\n$/D' /boot/config.txt||echo "unable to remove multiple empty lines"
+        sudo sed -i -e '/^$/N;/^\n$/D' ${BOOTFS}/config.txt||echo "unable to remove multiple empty lines"
         sync
         sudo shutdown -r now
     fi

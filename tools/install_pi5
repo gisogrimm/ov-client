@@ -28,16 +28,25 @@
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-	sudo -E apt update && cnt=-1 || ( sleep 7; let cnt=$cnt-1 )
+	sudo -E apt update && cnt=-1 || sleep 7; let cnt=$cnt-1
 	sync
     done
-    #sudo -E apt-get update --assume-yes || sudo -E apt-get update --assume-yes
+
+    echo "upgrade system:"
+    # install dependencies:
+    # retry 10 times because the raspios servers are not very stable:
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+	sudo -E apt upgrade && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sync
+    done
 
     echo "Install CA certificates:"
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-        sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates && cnt=-1  || ( sleep 7; let cnt=$cnt-1)
+        sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates && cnt=-1  || sleep 7; let cnt=$cnt-1
         sync
     done
 
@@ -45,7 +54,7 @@
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-        sudo -E apt-get install --no-install-recommends --assume-yes git build-essential cmake xxd gettext-base lsb-release && cnt=-1   || ( sleep 7; let cnt=$cnt-1 )
+        sudo -E apt-get install --no-install-recommends --assume-yes git build-essential cmake xxd gettext-base lsb-release && cnt=-1   || sleep 7; let cnt=$cnt-1
         sync
     done
 
@@ -53,7 +62,7 @@
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev && cnt=-1 || ( sleep 7; let cnt=$cnt-1 )
+        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
         sync
     done
 
@@ -92,7 +101,6 @@
     echo "install autorun script:"
     sudo cp ov-client/tools/pi/autorun_pi5 /home/pi/autorun
     sudo chmod a+x /home/pi/autorun
-    # the next line needs a fix because it works only on the correct system:
     sudo chown pi:pi /home/pi/autorun
 
     echo "register autorun script in /etc/rc.local:"
