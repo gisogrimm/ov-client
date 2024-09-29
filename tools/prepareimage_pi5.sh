@@ -56,7 +56,8 @@ SRCPATH=`dirname $0`
     echo "install autorun script:"
     sudo cp pi/autorun_pi5 "$2/home/pi/autorun"
     sudo chmod a+x  "$2/home/pi/autorun"
-    sudo chown pi:pi "$2/home/pi/autorun"
+    # The next line does not work on host system:
+    #sudo chown pi:pi "$2/home/pi/autorun"
 
     echo "register autorun script in /etc/rc.local:"
     sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i "$2/etc/rc.local"

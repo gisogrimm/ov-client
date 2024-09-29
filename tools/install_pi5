@@ -28,7 +28,7 @@
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-	sudo -E apt update && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sudo -E apt update --assume-yes && cnt=-1 || sleep 7; let cnt=$cnt-1
 	sync
     done
 
@@ -38,7 +38,7 @@
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-	sudo -E apt upgrade && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sudo -E apt upgrade --assume-yes && cnt=-1 || sleep 7; let cnt=$cnt-1
 	sync
     done
 
