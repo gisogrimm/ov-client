@@ -57,7 +57,7 @@ if test ! -e /boot/ovclient-noupdate; then
         echo "overlay fs, not updating"
     else
         # get the latest installer script:
-        ./install
+        ./install 2>&1 | tee -a ${HOME}/install.log
         # test for openMHA install request:
         if test -e /boot/ov-client-instmha; then
             rm -f /boot/ov-client-instmha
@@ -143,7 +143,7 @@ while true; do
             (
                 echo ""
                 echo "dtoverlay=hifiberry-${HBERRY}"
-            ) | sudo tee /boot/config.txt
+            ) | sudo tee -a /boot/config.txt
         fi
         sudo sed -i -e '/^$/N;/^\n$/D' /boot/config.txt||echo "unable to remove multiple empty lines"
         sync
