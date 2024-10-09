@@ -122,6 +122,7 @@ pipeline {
             when { anyOf { branch 'master'; branch 'development' } }
             steps {
                 // receive all deb packages from tascarpro build
+                unstash "x86_64_noble"
                 unstash "x86_64_jammy"
                 unstash "x86_64_focal"
                 //unstash "x86_64_bionic"
