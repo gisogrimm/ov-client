@@ -73,6 +73,7 @@ int main(int argc, char** argv)
          "Copyright (c) 2020-2024 Giso Grimm\n\nversion: "
       << get_libov_version() << "\n";
 
+#ifndef WIN32
   // update search path to contain directory of this binary:
   char* rpath = realpath(argv[0], NULL);
   std::string rdir = dirname(rpath);
@@ -85,6 +86,7 @@ int main(int argc, char** argv)
     epaths += ":";
   epaths += rdir;
   setenv("PATH", epaths.c_str(), 1);
+#endif
 
   try {
     // test for config file on raspi:

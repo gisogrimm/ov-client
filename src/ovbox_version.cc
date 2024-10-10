@@ -21,10 +21,14 @@
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
+
+#ifndef WIN32
 #include <sys/utsname.h>
+#endif
 
 int main(int argc, char** argv)
 {
+  #ifndef WIN32
   struct utsname buffer;
   errno = 0;
   if(uname(&buffer) != 0) {
@@ -34,6 +38,11 @@ int main(int argc, char** argv)
   std::cout << get_libov_version() << " " << buffer.sysname << " "
             << buffer.release << " (" << buffer.machine << ")"
             << "\n";
+  #else
+  std::cout << get_libov_version() << " " << "WIN32" << " "
+            << "?" << " (" << "?" << ")"
+            << "\n";
+  #endif
   return 0;
 }
 
