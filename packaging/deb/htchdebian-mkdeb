@@ -92,7 +92,8 @@ chmod -R a+r "$colldir"
     cd "$colldir"/
     mkdir debian
     touch debian/control
-    SHLIBBINS="$(find ./usr/lib/ -type f -print||true) $(find ./usr/bin/ -type f -print||true)"
+    SHLIBBINSCAND="$(find ./usr/lib/ -type f -print||true) $(find ./usr/bin/ -type f -print||true)"
+    SHLIBBINS=$(for f in $SHLIBBINSCAND; do file $f | grep -q ELF && echo $f; done)
     dpkg-shlibdeps -l../libtascar/build/ -l../libov/tascar/libtascar/build/ --ignore-missing-info ${SHLIBBINS} || true
     rm -f debian/control
     test -e debian/substvars && mv debian/substvars DEBIAN/
