@@ -294,6 +294,7 @@ void ovboxgui_t::update_display() {}
 
 int main(int argc, char** argv)
 {
+  TASCAR::console_log_show(true);
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);

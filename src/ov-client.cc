@@ -52,6 +52,7 @@ void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
 
 int main(int argc, char** argv)
 {
+  TASCAR::console_log_show(true);
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
