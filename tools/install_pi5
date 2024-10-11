@@ -8,6 +8,8 @@
 # Important: Do not run this script on a system that is not intended
 # to be used solely as an ovbox.
 
+BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
+
 (
     # minimal error handling:
     trap "echo An error occured.;sleep 20;exit 1" ERR
@@ -115,8 +117,12 @@
     sync
 
     echo "configure country code and prepare WiFi config:"
-    sudo touch /boot/ovclient-wifi.txt
+    sudo touch ${BOOTFS}/ovclient-wifi.txt
     sync
+
+    echo "cleaning up apt:"
+    sudo -E apt update --assume-yes || true
+    sudo -E apt autoremove --assume-yes || true
 
     #echo "activate overlay image to avoid damage of the SD card upon power off:"
     #sudo raspi-config nonint enable_overlayfs
