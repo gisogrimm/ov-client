@@ -9,7 +9,7 @@ BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
--ggdb -fno-finite-math-only
+-ggdb -fno-finite-math-only -Wno-psabi
 
 CFLAGS = -Wall -Wno-deprecated-declarations
 
@@ -137,6 +137,8 @@ clangformat:
 clean:
 	rm -Rf build src/*~ ovclient*.deb
 	$(MAKE) -C libov clean
+	-cd zita-njbridge && git clean -ffdx
+	-cd zita-njbridge/zita-resampler && git clean -ffdx
 
 .PHONY: packaging
 

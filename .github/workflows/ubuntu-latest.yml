@@ -20,7 +20,7 @@ jobs:
            sudo apt-add-repository 'deb http://apt.hoertech.de/ focal universe'
     - name: dependencies
       run: sudo apt update &&
-           sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev mhamakedeb libboost-all-dev libcpprest-dev nlohmann-json3-dev libsoundio-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev
+           sudo apt install --assume-yes git zita-njbridge liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev mhamakedeb libboost-all-dev libcpprest-dev nlohmann-json3-dev libsoundio-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev
     - name: make
       run: make lib libtest && make
     - name: packaging
@@ -31,7 +31,7 @@ jobs:
       run: dpkg-query -l ov-client
     - name: test-run
       run: ov-client --deviceid=000000000000 & sleep 20;killall ov-client
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: ov-client-ubuntu-20.04
         path: packaging/deb/debian/*/*.deb

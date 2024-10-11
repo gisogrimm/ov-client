@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# This script will compile and install the ovbox software from
+# source. It expects to be running on a Raspberry Pi, with the user
+# "pi" in the home folder "/home/pi". It will create an additional
+# user "ov" to run the actual ovbox process.
+#
+# Important: Do not run this script on a system that is not intended
+# to be used solely as an ovbox.
+
+(
+    # minimal error handling:
+    trap "echo An error occured.;sleep 20;exit 1" ERR
+
+    # start in home directory:
+    cd
+
+    export DEBIAN_FRONTEND=noninteractive
+
+    # update main system
+    # in case someone powered off during installation we need to fix unconfigured packages:
+    sudo dpkg --configure -a
+    sync
+
+    echo "update apt database:"
+    # install dependencies:
+    # retry 10 times because the raspios servers are not very stable:
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+	sudo -E apt update --assume-yes && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sync
+    done
+
+    echo "upgrade system:"
+    # install dependencies:
+    # retry 10 times because the raspios servers are not very stable:
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+	sudo -E apt upgrade --assume-yes && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sync
+    done
+
+    echo "Install CA certificates:"
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+        sudo -E apt-get install --no-install-recommends --assume-yes ca-certificates && cnt=-1  || sleep 7; let cnt=$cnt-1
+        sync
+    done
+
+    echo "install git, build-essential and other basic stuff:"
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+        sudo -E apt-get install --no-install-recommends --assume-yes git build-essential cmake xxd gettext-base lsb-release && cnt=-1   || sleep 7; let cnt=$cnt-1
+        sync
+    done
+
+    echo "install dependencies of cli tool:"
+    cnt=10
+    while test $cnt -gt 0; do
+        echo counter: $cnt
+        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
+        sync
+    done
+
+    echo "clone or update git repo:"
+    (cd ov-client && git clean -ffx && git pull) || git clone https://github.com/gisogrimm/ov-client
+
+    echo "move to development version:"
+    (cd ov-client && git clean -ffx && git checkout development && git pull)
+
+    echo "update submodules:"
+    make -C ov-client gitupdate
+
+    echo "clean repo:"
+    make -C ov-client clean
+
+    echo "build tools:"
+    make -j `nproc` -C ov-client
+
+    echo "package tools:"
+    make -C ov-client packaging
+
+    echo "install new debian packages:"
+    sudo -E apt-get install --assume-yes --no-install-recommends ./ov-client/packaging/deb/debian/*/ovbox-cli_*.deb
+
+    echo "install rtirq-init:"
+    sudo -E apt-get install --assume-yes --no-install-recommends rtirq-init
+
+    echo "update real-time priority priviledges:"
+    sudo sed -i -e '/.audio.*rtprio/ d' -e '/.audio.*memlock/ d' /etc/security/limits.conf
+    echo "@audio - rtprio 99"|sudo tee -a /etc/security/limits.conf
+    echo "@audio - memlock unlimited"|sudo tee -a /etc/security/limits.conf
+
+    echo "install user to run the scripts - do not provide root priviledges:"
+    sudo useradd -m -G audio,dialout ov || echo "user ov already exists."
+
+    echo "install autorun script:"
+    sudo cp ov-client/tools/pi/autorun_pi5 /home/pi/autorun
+    sudo chmod a+x /home/pi/autorun
+    sudo chown pi:pi /home/pi/autorun
+
+    echo "register autorun script in /etc/rc.local:"
+    sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local
+    echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a /etc/rc.local
+    echo "exit 0"|sudo tee -a /etc/rc.local
+
+    echo "setup host name:"
+    HOSTN=$(ov-client_hostname)
+    echo "ovbox${HOSTN}" | sudo tee /etc/hostname
+    sudo sed -i "s/127\.0\.1\.1.*/127.0.1.1\tovbox${HOSTN}/g" /etc/hosts
+    sync
+
+    echo "configure country code and prepare WiFi config:"
+    sudo touch /boot/ovclient-wifi.txt
+    sync
+
+    #echo "activate overlay image to avoid damage of the SD card upon power off:"
+    #sudo raspi-config nonint enable_overlayfs
+    #sync
+    #
+    #echo "ready, reboot:"
+    #sudo shutdown -r now
+
+    sync
+    echo "successfully installed ovbox system!"
+)

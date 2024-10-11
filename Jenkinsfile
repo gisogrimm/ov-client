@@ -13,7 +13,10 @@ def tascar_build_steps(stage_name) {
     // Update submodules
     sh "git submodule update --init --recursive"
 
-    // Autodetect libs/compiler
+    // Clean up down to submodules
+    sh "make clean"
+
+    // Compile binaries
     sh "make"
 
     // Package debians
@@ -31,6 +34,17 @@ pipeline {
     stages {
         stage("build") {
             parallel {
+                stage(                        "noble && x86_64 && tascardev") {
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-13"
+                            label "docker_x86_64"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
+                    steps {tascar_build_steps("noble && x86_64 && tascardev")}
+                }
                 stage(                        "jammy && x86_64 && tascardev") {
                     agent {
                         docker {
@@ -42,7 +56,7 @@ pipeline {
                     }
                     steps {tascar_build_steps("jammy && x86_64 && tascardev")}
                 }
-		stage(                        "focal && x86_64 && tascardev") {
+                stage(                        "focal && x86_64 && tascardev") {
                     agent {
                         docker {
                             image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-9"
@@ -53,56 +67,81 @@ pipeline {
                     }
                     steps {tascar_build_steps("focal && x86_64 && tascardev")}
                 }
-		stage(                        "bionic && x86_64 && tascardev") {
+                //stage(                        "bionic && x86_64 && tascardev") {
+                //    agent {
+                //        docker {
+                //            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-7"
+                //            label "docker_x86_64"
+                //            alwaysPull true
+                //            args "-v /home/u:/home/u --hostname docker"
+                //        }
+                //    }
+                //    steps {tascar_build_steps("bionic && x86_64 && tascardev")}
+                //}
+                stage(                        "bionic && armv7 && tascardev") {
                     agent {
                         docker {
-                            image "hoertech/docker-buildenv:tascar_x86_64-linux-gcc-7"
-                            label "docker_x86_64"
+                            image "hoertech/docker-buildenv:tascar_armv7-linux-gcc-7"
+                            label "docker_qemu"
                             alwaysPull true
                             args "-v /home/u:/home/u --hostname docker"
                         }
                     }
-                    steps {tascar_build_steps("bionic && x86_64 && tascardev")}
-                }
-		stage(                        "bionic && armv7 && tascardev") {
-                    agent {label              "bionic && armv7 && tascardev"}
+                    //agent {label              "bionic && armv7 && tascardev"}
                     steps {tascar_build_steps("bionic && armv7 && tascardev")}
                 }
                 stage(                        "bullseye && armv7 && tascardev") {
-                    agent {label              "bullseye && armv7 && tascardev"}
+                    agent {
+                        docker {
+                            image "hoertech/docker-buildenv:tascar_armv7-linux-gcc-10"
+                            label "docker_qemu"
+                            alwaysPull true
+                            args "-v /home/u:/home/u --hostname docker"
+                        }
+                    }
+                    //agent {label              "bullseye && armv7 && tascardev"}
                     steps {tascar_build_steps("bullseye && armv7 && tascardev")}
                 }
                 stage(                        "bullseye && aarch64 && tascardev") {
+                    //agent {
+                    //    docker {
+                    //        image "hoertech/docker-buildenv:tascar_aarch64-linux-gcc-10"
+                    //        label "docker_qemu"
+                    //        alwaysPull true
+                    //        //args "-v /home/u:/home/u --hostname docker"
+                    //    }
+                    //}
                     agent {label              "bullseye && aarch64 && tascardev"}
                     steps {tascar_build_steps("bullseye && aarch64 && tascardev")}
                 }
-	    }
-	}
-	stage("artifacts") {
-	    agent {label "aptly"}
-	    // do not publish packages for any branches except these
-	    when { anyOf { branch 'master'; branch 'development' } }
-	    steps {
+            }
+        }
+        stage("artifacts") {
+            agent {label "aptly"}
+            // do not publish packages for any branches except these
+            when { anyOf { branch 'master'; branch 'development' } }
+            steps {
                 // receive all deb packages from tascarpro build
+                unstash "x86_64_noble"
                 unstash "x86_64_jammy"
                 unstash "x86_64_focal"
-                unstash "x86_64_bionic"
+                //unstash "x86_64_bionic"
                 unstash "armv7_bullseye"
                 unstash "aarch64_bullseye"
                 unstash "armv7_bionic"
-	
+
                 // Copies the new debs to the stash of existing debs,
                 sh "make -f htchstorage.mk storage"
-	
+
                 build job: "/Packaging/hoertech-aptly/$BRANCH_NAME", quietPeriod: 300, wait: false
-	    }
-	}
+            }
+        }
     }
     post {
         failure {
-	    mail to: 'giso.grimm@vegri.net',
-	    subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-	    body: "Something is wrong with ${env.BUILD_URL} ($GIT_URL)"
+            mail to: 'giso.grimm@vegri.net',
+            subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+            body: "Something is wrong with ${env.BUILD_URL} ($GIT_URL)"
         }
     }
 }
