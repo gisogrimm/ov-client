@@ -1,6 +1,7 @@
 LICENSE,
 # core binaries:
 build/ovbox.exe,bin/
+build/ov-client.exe,bin/
 build/ovzita*.exe,bin/
 # add TASCAR plugins:
 libov/tascar/libtascar/build/libovclienttascar*.dll,bin/
@@ -26,9 +27,6 @@ src/ovbox256.png,bin/usr/share/icons/hicolor/256x256/apps/
 src/ovbox48.png,bin/usr/share/icons/hicolor/48x48/apps/
 /ucrt64/bin/gdbus.exe,bin/
 /ucrt64/bin/broadwayd.exe,bin/
-# make portable package:
-$(cygcheck packaging/win/ov-client/bin/* packaging/win/ov-client/lib/gdk-pixbuf-2.0/*/*.dll|grep msys64|sort -bu),bin/
-$(glib-compile-schemas packaging/win/ov-client/bin/share/glib-2.0/schemas)
 
 # Local Variables:
 # mode: shell-script
