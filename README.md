@@ -1,7 +1,11 @@
 # ov-client
 
-![Ubuntu make](https://github.com/gisogrimm/ov-client/workflows/Ubuntu%20make/badge.svg?branch=master)
-![MacOS make](https://github.com/gisogrimm/ov-client/workflows/MacOS%20make/badge.svg?branch=master)
+[![Ubuntu 20.04 make](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-latest.yml)
+[![Ubuntu 22.04 make](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-2204.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-2204.yml)
+[![Ubuntu 24.04 make](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-2404.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/ubuntu-2404.yml)
+[![MacOS make 12](https://github.com/gisogrimm/ov-client/actions/workflows/macos-12.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/macos-12.yml)
+[![MacOS make 13](https://github.com/gisogrimm/ov-client/actions/workflows/macos-13.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/macos-13.yml)
+[![MacOS make 14](https://github.com/gisogrimm/ov-client/actions/workflows/macos-14.yml/badge.svg)](https://github.com/gisogrimm/ov-client/actions/workflows/macos-14.yml)
 
 ## The OVBOX system
 
@@ -13,9 +17,7 @@ The source code of the configuration server can be found [here](https://github.c
 
 ## Installation instructions and user manual
 
-For installation instructions see [Wiki pages](https://github.com/gisogrimm/ovbox/wiki/Installation). 
-A user manual for the ORLANDOviols configuration server can be found
-on the [wiki](https://github.com/gisogrimm/ovbox/wiki).
+Installation instructions can be found on the [wiki pages](https://github.com/gisogrimm/ovbox/wiki/Installation). A user manual for the ORLANDOviols configuration server can also be found on the [wiki](https://github.com/gisogrimm/ovbox/wiki).
 
 The client software can run on Raspberry Pi (models 4B and 3B+), Ubuntu Linux and on MacOS. See installation instructions for details. A desktop client for Windows is currently under development.
 
