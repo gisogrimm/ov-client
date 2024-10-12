@@ -68,6 +68,15 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
         sync
     done
 
+    echo "install liblsl:"
+    (
+        git clone -b v1.16.2 https://github.com/sccn/liblsl.git || true
+        cd liblsl
+        ./standalone_compilation_linux.sh
+        sudo cp liblsl.so /usr/lib/
+        sudo cp -r include/* /usr/include/
+    ) || true
+
     echo "clone or update git repo:"
     (cd ov-client && git clean -ffx && git pull) || git clone https://github.com/gisogrimm/ov-client
 

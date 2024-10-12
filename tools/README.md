@@ -39,7 +39,7 @@ unxz 2024-07-04-raspios-bookworm-arm64-lite.img.xz
 ./prepareimage_pi5.sh 2024-07-04-raspios-bookworm-arm64-lite.img /mnt
 ```
 
-Tested on Ubuntu 20.04 host system, and Raspberry Pi 4B. Installation takes at least 23 minutes due to compilation and installation of all packages required for compilation. Currently no LSL support. Compilation may fail on hardware with low memory.
+Tested on Ubuntu 20.04 host system, and Raspberry Pi 4B. Installation takes at least 25 minutes due to compilation and installation of all packages required for compilation. Compilation may fail on hardware with low memory.
 
 Currently not working on Raspberry Pi 5B (ov-client crashes with "Bus error").
 
