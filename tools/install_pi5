@@ -131,15 +131,17 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
     echo "install and activate NTP:"
     sudo -E apt install --assume-yes ntp
-    sudo systemctl stop systemd-timesyncd
-    sudo sed -i -e 's/^pool.*/#&/1' -e '/ptbtime/ d' /etc/ntp.conf
-    sudo sed -i -e "/^driftfile/ c driftfile ${BOOTFS}\/ntp.drift" /etc/ntp.conf
+    #sudo systemctl stop systemd-timesyncd
+    NTPCONF=$(find /etc -name ntp.conf  2>/dev/null) || true
+    sudo sed -i -e 's/^pool.*/#&/1' -e '/ptbtime/ d' $NTPCONF
+    sudo sed -i -e "/^driftfile/ c driftfile ${BOOTFS}\/ntp.drift" $NTPCONF
     (
         echo ""
         for k in {1..4}; do
             echo "pool ptbtime${k}.ptb.de"
         done
-    ) | sudo tee -a  /etc/ntp.conf
+    ) | sudo tee -a $NTPCONF
+    sudo sed -i -e "/^IGNORE_DHCP/ c IGNORE_DHCP=\"yes\"" /etc/default/ntp*
     sudo systemctl restart ntp
 
     echo "cleaning up apt:"
