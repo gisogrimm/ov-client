@@ -129,6 +129,19 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     sudo touch ${BOOTFS}/ovclient-wifi.txt
     sync
 
+    echo "install and activate NTP:"
+    sudo -E apt install --assume-yes ntp
+    sudo systemctl stop systemd-timesyncd
+    sudo sed -i -e 's/^pool.*/#&/1' -e '/ptbtime/ d' /etc/ntp.conf
+    sudo sed -i -e "/^driftfile/ c driftfile ${BOOTFS}\/ntp.drift" /etc/ntp.conf
+    (
+        echo ""
+        for k in {1..4}; do
+            echo "pool ptbtime${k}.ptb.de"
+        done
+    ) | sudo tee -a  /etc/ntp.conf
+    sudo systemctl restart ntp
+
     echo "cleaning up apt:"
     sudo -E apt update --assume-yes || true
     sudo -E apt autoremove --assume-yes || true
