@@ -329,7 +329,11 @@ int main(int argc, char** argv)
   epaths += rdir;
   setenv("PATH", epaths.c_str(), 1);
 #ifdef __APPLE__
+#ifndef HOMEBREW_OVBOX_TAG
   TASCAR::set_libdir(rdir + "/lib/");
+#else
+  DEBUG(HOMEBREW_OVBOX_TAG);
+#endif
   bindir = rdir;
 #endif
   char dtemp[1024];
