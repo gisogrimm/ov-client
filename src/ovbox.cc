@@ -133,13 +133,21 @@ void ovboxgui_t::on_hide()
 
 void ovboxgui_t::on_uiurl_clicked()
 {
+#ifdef __APPLE__
+  TASCAR::system("open "+ui_url,false);
+#else
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 }
 
 void ovboxgui_t::on_mixer_clicked()
 {
   std::string url("http://" + ep2ipstr(getipaddr()) + ":8080/");
+#ifdef __APPLE__
+  TASCAR::system("open "+url,false);
+#else
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 }
 
 bool ovboxgui_t::on_timeout()
