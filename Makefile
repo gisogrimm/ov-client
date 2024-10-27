@@ -42,7 +42,7 @@ CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 CFLAGS = -Wall -Wno-deprecated-declarations
 
 ifneq ($(HOMEBREW_OVBOX_TAG),)
-  CXXFLAGS+=-DHOMEBREW_OVBOX_TAG=$(HOMEBREW_OVBOX_TAG)
+  CXXFLAGS+=-DHOMEBREW_OVBOX_TAG=\"$(HOMEBREW_OVBOX_TAG)\"
 endif
 
 ifeq "$(ARCH)" "x86_64"
