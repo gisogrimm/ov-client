@@ -228,7 +228,7 @@ endif
 gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
 
-install:
+install: all
 	$(CMD_INSTALL) -D libov/tascar/libtascar/build/lib*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
 	$(CMD_INSTALL) -D libov/tascar/plugins/build/*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
 	$(CMD_INSTALL) -D build/ovbox -t $(DESTDIR)$(BINDIR)
