@@ -20,6 +20,8 @@ ifeq ($(UNAME_S),Darwin)
 	CMD_LD=
 endif
 
+
+
 BIN_OLD_CLI = ov-client
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
 ovrealpath ovbox_version
@@ -38,6 +40,10 @@ CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only -Wno-psabi
 
 CFLAGS = -Wall -Wno-deprecated-declarations
+
+ifneq ($(HOMEBREW_OVBOX_TAG),)
+  CXXFLAGS+=-DHOMEBREW_OVBOX_TAG=$(HOMEBREW_OVBOX_TAG)
+endif
 
 ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
