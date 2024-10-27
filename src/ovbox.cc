@@ -17,6 +17,7 @@
  * Version 3 along with ov-client. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../libov/tascar/libtascar/include/tascar_os.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
@@ -134,7 +135,7 @@ void ovboxgui_t::on_hide()
 void ovboxgui_t::on_uiurl_clicked()
 {
 #ifdef __APPLE__
-  TASCAR::system("open "+ui_url,false);
+  TASCAR::system("open " + ui_url, false);
 #else
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
 #endif
@@ -144,7 +145,7 @@ void ovboxgui_t::on_mixer_clicked()
 {
   std::string url("http://" + ep2ipstr(getipaddr()) + ":8080/");
 #ifdef __APPLE__
-  TASCAR::system("open "+url,false);
+  TASCAR::system("open " + url, false);
 #else
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
 #endif
@@ -204,8 +205,8 @@ void ovboxgui_t::runclient()
       std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
       std::string lobby(ovstrrep(
           js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
-      ui_url = ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"),
-                        "\\/", "/");
+      ui_url =
+          ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"), "\\/", "/");
       std::string protocol(js_cfg.value("protocol", "ov"));
       frontend_t frontend(FRONTEND_OV);
       if(protocol == "ov")
