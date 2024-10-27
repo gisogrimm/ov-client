@@ -238,6 +238,7 @@ install: all
 	$(CMD_INSTALL) -D ovclient.css -t $(DESTDIR)$(SHAREDIR)
 	$(CMD_INSTALL) -D ovclient.js -t $(DESTDIR)$(SHAREDIR)
 	$(CMD_INSTALL) -D webmixer.js -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D jackrec.html -t $(DESTDIR)$(SHAREDIR)
 	$(CMD_INSTALL) -D sounds/2138735723541465742.flac -t $(DESTDIR)$(SHAREDIR)/sounds
 	$(CMD_INSTALL) -D sounds/4180150583.flac -t $(DESTDIR)$(SHAREDIR)/sounds
 	$(CMD_LD)
