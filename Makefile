@@ -1,6 +1,24 @@
+PREFIX=/usr/local
+LIBDIR=$(PREFIX)/lib
+BINDIR=$(PREFIX)/bin
+SHAREDIR=$(PREFIX)/share/ovclient
+DESTDIR=
+
 all: build lib binaries
 cli: build lib clibinaries
 gui: build lib guibinaries
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CMD_INSTALL=install
+	LIB_EXT=so
+	CMD_LD=ldconfig -n $(DESTDIR)$(LIBDIR)
+endif
+ifeq ($(UNAME_S),Darwin)
+	CMD_INSTALL=ginstall
+	LIB_EXT=dylib
+	CMD_LD=
+endif
 
 BIN_OLD_CLI = ov-client
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
@@ -211,5 +229,22 @@ gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
 
 install:
-	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
+	$(CMD_INSTALL) -D libov/tascar/libtascar/build/lib*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
+	$(CMD_INSTALL) -D libov/tascar/plugins/build/*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
+	$(CMD_INSTALL) -D build/ovbox -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovbox_cli -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovzita* -t $(DESTDIR)$(BINDIR)
+	mkdir -p  $(DESTDIR)$(SHAREDIR) && cp -r node_modules $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D ovclient.css -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D ovclient.js -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D webmixer.js -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D sounds/2138735723541465742.flac -t $(DESTDIR)$(SHAREDIR)/sounds
+	$(CMD_INSTALL) -D sounds/4180150583.flac -t $(DESTDIR)$(SHAREDIR)/sounds
+	$(CMD_LD)
 
+
+#install:
+#	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
+
+homebrew:
+	$(MAKE) -C packaging/homebrew install

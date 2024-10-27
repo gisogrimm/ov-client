@@ -50,3 +50,6 @@ announce.flac
 *.firmwareupdate
 
 ds-config
+
+# homebrew build directory:
+homebrew-build-dir
