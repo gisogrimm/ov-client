@@ -1,11 +1,19 @@
 all: build lib binaries
+cli: build lib clibinaries
+gui: build lib guibinaries
 
-BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox	\
-  ovrealpath ovbox_cli ovbox_version
+BIN_OLD_CLI = ov-client
+BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
+ovrealpath ovbox_version
+BIN_GUI = ovbox
+
+BINARIES = $(BIN_OLD_CLI) $(BIN_CLI) $(BIN_GUI)
 
 EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
+BUILD_CLI = $(patsubst %,build/%,$(BIN_CLI))
+BUILD_GUI = $(patsubst %,build/%,$(BIN_GUI))
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
@@ -87,7 +95,7 @@ endif
 
 CXXFLAGS += $(OSFLAG)
 
-build/ov-client build/ovbox: $(ZITATARGET)
+build/ov-client build/ovbox build/ovbox_cli: $(ZITATARGET)
 
 lib: build
 	$(MAKE) -C libov all
@@ -106,6 +114,8 @@ build: build/.directory
 	mkdir -p $* && touch $@
 
 binaries: $(BUILD_BINARIES)
+guibinaries: $(BUILD_GUI) $(BUILD_CLI)
+clibinaries: $(BUILD_CLI)
 
 $(BUILD_BINARIES): libov/build/libov.a
 
@@ -140,6 +150,8 @@ clean:
 ifeq ($(UNAME_S),Linux)
 packaging:
 	$(MAKE) -C packaging/deb pack
+clipackaging:
+	$(MAKE) -C packaging/deb clipack
 endif
 ifeq ($(UNAME_S),Darwin)
 packaging:
