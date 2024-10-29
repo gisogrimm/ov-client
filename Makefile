@@ -94,14 +94,13 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation -headerpad_max_install_names
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
-		CXXFLAGS += -I`brew --prefix libsoundio`/include
-		LDFLAGS += -L`brew --prefix libsoundio`/lib
-		OPENSSL_ROOT=$(shell brew --prefix openssl)
-		CPPREST_ROOT=$(shell brew --prefix cpprestsdk)
+		SOUNDIO_ROOT:=$(shell brew --prefix libsoundio)
+		OPENSSL_ROOT:=$(shell brew --prefix openssl)
+		CPPREST_ROOT:=$(shell brew --prefix cpprestsdk)
 		BOOST_ROOT=$(shell brew --prefix boost)
 		NLOHMANN_JSON_ROOT=$(shell brew --prefix nlohmann-json)
-		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
-		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
+		CXXFLAGS += -I$(SOUNDIO_ROOT)/include -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
+		LDFLAGS += -L$(SOUNDIO_ROOT)/lib -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
 #		EXTERNALS += nlohmann-json
 		ZITATARGET = zita
 	endif
