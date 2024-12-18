@@ -212,24 +212,29 @@ int main(int argc, char** argv)
       throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
       break;
     }
-    if(verbose)
-      std::cout << "starting services\n";
-    ovclient->start_service();
-    while(!quit_app) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      if(ovclient->is_going_to_stop()) {
-        quit_app = true;
+    try {
+      if(verbose)
+        std::cout << "starting services\n";
+      ovclient->start_service();
+      while(!quit_app) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if(ovclient->is_going_to_stop()) {
+          quit_app = true;
+        }
       }
+      if(verbose)
+        std::cout << "stopping services\n";
+      ovclient->stop_service();
+      delete ovclient;
     }
-    if(verbose)
-      std::cout << "stopping services\n";
-    ovclient->stop_service();
-    delete ovclient;
+    catch(...) {
+      if(ovclient)
+        delete ovclient;
+      throw;
+    }
   }
   catch(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
-    if(ovclient)
-      delete ovclient;
   }
   return 0;
 }
