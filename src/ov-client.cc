@@ -10,7 +10,7 @@
  *
  * ov-client is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License, version 3 for more details.
  *
  * You should have received a copy of the GNU General Public License,
@@ -228,6 +228,8 @@ int main(int argc, char** argv)
   }
   catch(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
+    if(ovclient)
+      delete ovclient;
   }
   return 0;
 }
