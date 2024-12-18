@@ -1,3 +1,14 @@
+2024-12-18, version 0.26.3
+ - add expert settings option to configure realtime priority
+
+2024-12-11, version 0.26.2
+ - improve synthesizer
+
+2024-11-18, version 0.26.1
+ - improve reverb
+ - improve synthesizer
+ - add homebrew packaging for MacOS
+
 2024-09-24, version 0.25.1
  - add simple MIDI synth
 
