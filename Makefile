@@ -1,17 +1,49 @@
-all: build lib binaries
+PREFIX=/usr/local
+LIBDIR=$(PREFIX)/lib
+BINDIR=$(PREFIX)/bin
+SHAREDIR=$(PREFIX)/share/ovclient
+DESTDIR=
 
-BINARIES = ov-client ov-client_hostname ov-client_listsounddevs ovbox	\
-  ovrealpath ovbox_cli ovbox_version
+all: build lib binaries
+cli: build lib clibinaries
+gui: build lib guibinaries
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CMD_INSTALL=install
+	LIB_EXT=so
+	CMD_LD=ldconfig -n $(DESTDIR)$(LIBDIR)
+endif
+ifeq ($(UNAME_S),Darwin)
+	CMD_INSTALL=ginstall
+	LIB_EXT=dylib
+	CMD_LD=
+endif
+
+
+
+BIN_OLD_CLI = ov-client
+BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
+ovrealpath ovbox_version
+BIN_GUI = ovbox
+
+BINARIES = $(BIN_OLD_CLI) $(BIN_CLI) $(BIN_GUI)
 
 EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
+BUILD_CLI = $(patsubst %,build/%,$(BIN_CLI))
+BUILD_GUI = $(patsubst %,build/%,$(BIN_GUI))
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only -Wno-psabi
 
 CFLAGS = -Wall -Wno-deprecated-declarations
+
+ifneq ($(HOMEBREW_OVBOX_TAG),)
+  CXXFLAGS+=-DHOMEBREW_OVBOX_TAG=\"$(HOMEBREW_OVBOX_TAG)\"
+endif
 
 ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
@@ -67,14 +99,13 @@ else
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation -headerpad_max_install_names
 		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
-		CXXFLAGS += -I`brew --prefix libsoundio`/include
-		LDFLAGS += -L`brew --prefix libsoundio`/lib
-		OPENSSL_ROOT=$(shell brew --prefix openssl)
-		CPPREST_ROOT=$(shell brew --prefix cpprestsdk)
+		SOUNDIO_ROOT:=$(shell brew --prefix libsoundio)
+		OPENSSL_ROOT:=$(shell brew --prefix openssl)
+		CPPREST_ROOT:=$(shell brew --prefix cpprestsdk)
 		BOOST_ROOT=$(shell brew --prefix boost)
 		NLOHMANN_JSON_ROOT=$(shell brew --prefix nlohmann-json)
-		CXXFLAGS += -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
-		LDFLAGS += -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
+		CXXFLAGS += -I$(SOUNDIO_ROOT)/include -I$(OPENSSL_ROOT)/include/openssl -I$(OPENSSL_ROOT)/include -I$(BOOST_ROOT)/include -I$(NLOHMANN_JSON_ROOT)/include
+		LDFLAGS += -L$(SOUNDIO_ROOT)/lib -L$(OPENSSL_ROOT)/lib -L$(CPPREST_ROOT)/lib -L$(BOOST_ROOT)/lib
 #		EXTERNALS += nlohmann-json
 		ZITATARGET = zita
 	endif
@@ -92,7 +123,7 @@ endif
 
 CXXFLAGS += $(OSFLAG)
 
-build/ov-client build/ovbox: $(ZITATARGET)
+build/ov-client build/ovbox build/ovbox_cli: $(ZITATARGET)
 
 lib: build
 	$(MAKE) -C libov all
@@ -111,6 +142,8 @@ build: build/.directory
 	mkdir -p $* && touch $@
 
 binaries: $(BUILD_BINARIES)
+guibinaries: $(BUILD_GUI) $(BUILD_CLI)
+clibinaries: $(BUILD_CLI)
 
 $(BUILD_BINARIES): libov/build/libov.a
 
@@ -145,6 +178,8 @@ clean:
 ifeq ($(UNAME_S),Linux)
 packaging:
 	$(MAKE) -C packaging/deb pack
+clipackaging:
+	$(MAKE) -C packaging/deb clipack
 endif
 ifeq ($(UNAME_S),Darwin)
 packaging:
@@ -211,6 +246,25 @@ endif
 gitupdate:
 	git fetch --recurse-submodules ; git submodule update --init --recursive
 
-install:
-	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
+install: all
+	$(CMD_INSTALL) -D libov/tascar/libtascar/build/lib*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
+	$(CMD_INSTALL) -D libov/tascar/plugins/build/*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
+	$(CMD_INSTALL) -D build/ovbox -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovbox_version -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovbox_cli -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovzita* -t $(DESTDIR)$(BINDIR)
+	mkdir -p  $(DESTDIR)$(SHAREDIR) && cp -r node_modules $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D ovclient.css -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D ovclient.js -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D webmixer.js -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D jackrec.html -t $(DESTDIR)$(SHAREDIR)
+	$(CMD_INSTALL) -D sounds/2138735723541465742.flac -t $(DESTDIR)$(SHAREDIR)/sounds
+	$(CMD_INSTALL) -D sounds/4180150583.flac -t $(DESTDIR)$(SHAREDIR)/sounds
+	$(CMD_LD)
 
+
+#install:
+#	cat packaging/deb/*.csv |sed -e 's/,usr/,$${PREFIX}/1' | PREFIX=$(PREFIX) envsubst |sed -e 's/.*,//1' | sort -u | xargs -L 1 -- mkdir -p && cat packaging/deb/*.csv |sed -e 's/,usr/ $${PREFIX}/1' | PREFIX=$(PREFIX) envsubst | xargs -L 1 -I % sh -c "cp --preserve=links -r %"
+
+homebrew:
+	$(MAKE) -C packaging/homebrew install

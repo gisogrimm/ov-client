@@ -10,7 +10,7 @@
  *
  * ov-client is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License, version 3 for more details.
  *
  * You should have received a copy of the GNU General Public License,
@@ -52,6 +52,7 @@ void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
 
 int main(int argc, char** argv)
 {
+  TASCAR::console_log_show(true);
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
@@ -214,19 +215,26 @@ int main(int argc, char** argv)
       throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
       break;
     }
-    if(verbose)
-      std::cout << "starting services\n";
-    ovclient->start_service();
-    while(!quit_app) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      if(ovclient->is_going_to_stop()) {
-        quit_app = true;
+    try {
+      if(verbose)
+        std::cout << "starting services\n";
+      ovclient->start_service();
+      while(!quit_app) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if(ovclient->is_going_to_stop()) {
+          quit_app = true;
+        }
       }
+      if(verbose)
+        std::cout << "stopping services\n";
+      ovclient->stop_service();
+      delete ovclient;
     }
-    if(verbose)
-      std::cout << "stopping services\n";
-    ovclient->stop_service();
-    delete ovclient;
+    catch(...) {
+      if(ovclient)
+        delete ovclient;
+      throw;
+    }
   }
   catch(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;

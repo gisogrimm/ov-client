@@ -24,5 +24,17 @@ pack:
 	mkdir -p $(STORAGE) && \
 	for p in $(DEBS); do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); ./packaging/deb/htchdebian-mkdeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done
 
+clipack:
+	@test -n "$(VERSION)" && \
+	test -n "$(MINORVERSION)" && \
+	test -n "$(COMMITVER)" && \
+	test -n "$(FULLVERSION)" && \
+	echo "Packaging:" && \
+	echo " - Package version: $(PACKVER)" && \
+	echo " - Packages: $(DEBS)" && \
+	rm -Rf debian && \
+	mkdir -p $(STORAGE) && \
+	for p in ovbox-cli; do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); ./packaging/deb/htchdebian-mkdeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done
+
 testallpackaged:
 	rm -f $@; (cd ../.. && for i in libov/tascar/plugins/build/ovclienttascar*.so; do grep -q -e $$i packaging/deb/*.csv || (touch packaging/deb/$@;echo "$$i is not packaged");done); ! (test -e $@ && rm -f $@)

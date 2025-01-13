@@ -1,4 +1,4 @@
-name: MacOS make 12
+name: MacOS make 15
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 jobs:
   build:
 
-    runs-on: macos-12
+    runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
@@ -23,5 +23,5 @@ jobs:
       run: make packaging
     - uses: actions/upload-artifact@v4
       with:
-        name: ovbox-macOS-12
+        name: ovbox-macOS-15
         path: packaging/Darwin/*.tgz

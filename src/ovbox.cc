@@ -17,6 +17,7 @@
  * Version 3 along with ov-client. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../libov/tascar/libtascar/include/tascar_os.h"
 #include "ov_client_orlandoviols.h"
 #include "ov_render_tascar.h"
 #include <fstream>
@@ -140,7 +141,11 @@ void ovboxgui_t::on_uiurl_clicked()
 #ifdef _WIN32
   ShellExecute(NULL, "open", ui_url.c_str(), NULL, NULL, 0);
 #else
+#ifdef __APPLE__
+  TASCAR::system(std::string("open " + ui_url).c_str(), false);
+#else
   gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 #endif
 }
 
@@ -150,7 +155,11 @@ void ovboxgui_t::on_mixer_clicked()
 #ifdef _WIN32
   ShellExecute(NULL, "open", url.c_str(), NULL, NULL, 0);
 #else
+#ifdef __APPLE__
+  TASCAR::system(std::string("open " + url).c_str(), false);
+#else
   gtk_show_uri(NULL, url.c_str(), GDK_CURRENT_TIME, NULL);
+#endif
 #endif
 }
 
@@ -208,8 +217,8 @@ void ovboxgui_t::runclient()
       std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
       std::string lobby(ovstrrep(
           js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
-      ui_url = ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"),
-                        "\\/", "/");
+      ui_url =
+          ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"), "\\/", "/");
       std::string protocol(js_cfg.value("protocol", "ov"));
       frontend_t frontend(FRONTEND_OV);
       if(protocol == "ov")
@@ -306,6 +315,7 @@ void ovboxgui_t::update_display() {}
 
 int main(int argc, char** argv)
 {
+  TASCAR::console_log_show(true);
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);
@@ -346,7 +356,11 @@ int main(int argc, char** argv)
   setenv("PATH", epaths.c_str(), 1);
 #endif
 #ifdef __APPLE__
+#ifndef HOMEBREW_OVBOX_TAG
   TASCAR::set_libdir(rdir + "/lib/");
+#else
+  DEBUG(HOMEBREW_OVBOX_TAG);
+#endif
   bindir = rdir;
 #endif
 #ifndef _WIN32
