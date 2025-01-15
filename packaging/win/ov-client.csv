@@ -18,6 +18,9 @@ $(which node),bin/
 $(which node.exe),bin/
 # add node modules:
 node_modules,bin/
+# starter:
+packaging/win/ovbox.bat,
+src/ovbox.png,
 # gtk stuff:
 /ucrt64/lib/gdk-pixbuf-2.0,lib/
 /ucrt64/share/glib-2.0/schemas,bin/share/glib-2.0/
