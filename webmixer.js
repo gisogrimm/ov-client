@@ -12,7 +12,13 @@ const homedir = require('os').homedir();
 var deviceid = '';
 
 {
-    var devname = os.hostname();
+    var devname = 'localhost';
+    try{
+        devname = os.hostname();
+    }
+    catch( ex ) {
+        console.log(ex.message);
+    }
     if( process.argv.length > 3 )
         devname = process.argv[3];
     try{
@@ -55,10 +61,22 @@ httpserver = http.createServer(function (req, res) {
     var hosjs = fs.readFileSync(sdir+'ovclient.js');
     var hoscss = fs.readFileSync(sdir+'ovclient.css');
     var jackrec = fs.readFileSync(sdir+'jackrec.html');
-    var ipaddr = os.hostname();
+    var ipaddr = '127.0.0.1';
+    try{
+        ipaddr = os.hostname();
+    }
+    catch( ex ){
+        console.log(ex.message);
+    }
     if( process.argv.length > 2 )
         ipaddr = process.argv[2];
-    var devname = os.hostname();
+    var devname = 'localhost';
+    try{
+        devname = os.hostname();
+    }
+    catch( ex ){
+        console.log(ex.message);
+    }
     if( process.argv.length > 3 )
         devname = process.argv[3];
     try{

@@ -1,0 +1,37 @@
+name: Windows/MSYS2 make
+
+on:
+  push:
+    branches: [ master, development, feature/windows ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: git vim zip mingw-w64-ucrt-x86_64-gcc make mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-eigen3 mingw-w64-ucrt-x86_64-jack2 mingw-w64-ucrt-x86_64-liblo mingw-w64-ucrt-x86_64-libsndfile mingw-w64-ucrt-x86_64-gtkmm3 mingw-w64-ucrt-x86_64-gsl mingw-w64-ucrt-x86_64-fftw mingw-w64-ucrt-x86_64-libsamplerate mingw-w64-ucrt-x86_64-xerces-c mingw-w64-ucrt-x86_64-gtksourceviewmm3 mingw-w64-ucrt-x86_64-dlfcn mingw-w64-ucrt-x86_64-matio mingw-w64-ucrt-x86_64-adwaita-icon-theme mingw-w64-ucrt-x86_64-nlohmann-json mingw-w64-ucrt-x86_64-curl-winssl mingw-w64-ucrt-x86_64-portaudio mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-nodejs msys2-runtime-devel mingw-w64-ucrt-x86_64-nghttp2 mingw-w64-ucrt-x86_64-nghttp3 mingw-w64-ucrt-x86_64-cunit mingw-w64-ucrt-x86_64-libmysofa
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: submods
+      run: git submodule init && git submodule update --init --recursive && (cd libov && git submodule update --init)
+    - name: lineendings
+      run: git config --global core.autocrlf true
+    - name: build
+      run: make lib && make
+    - name: packaging
+      run: make -C packaging/win
+    - name: checkpackage
+      run: cygcheck packaging/win/ov-client/bin/*|grep msys64|sort -bu||true
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ov-client-windows
+        path: packaging/win/*.zip

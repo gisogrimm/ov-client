@@ -1,0 +1,36 @@
+LICENSE,
+# core binaries:
+build/ovbox.exe,bin/
+build/ov-client.exe,bin/
+build/ovzita*.exe,bin/
+# add TASCAR plugins:
+libov/tascar/libtascar/build/libovclienttascar*.dll,bin/
+libov/tascar/plugins/build/ovclienttascar*.dll,bin/
+# node files for web mixer:
+ovclient.css,bin/
+ovclient.js,bin/
+webmixer.js,bin/
+jackrec.html,bin/
+# add msys binaries:
+$(which jackd),bin/
+/ucrt64/lib/jack,lib/
+$(which node),bin/
+$(which node.exe),bin/
+# add node modules:
+node_modules,bin/
+# starter:
+packaging/win/ovbox.bat,
+src/ovbox.png,
+# gtk stuff:
+/ucrt64/lib/gdk-pixbuf-2.0,lib/
+/ucrt64/share/glib-2.0/schemas,bin/share/glib-2.0/
+/ucrt64/share/icons/Adwaita,bin/share/icons/
+/ucrt64/share/icons/hicolor,bin/share/icons/
+src/ovbox256.png,bin/usr/share/icons/hicolor/256x256/apps/
+src/ovbox48.png,bin/usr/share/icons/hicolor/48x48/apps/
+/ucrt64/bin/gdbus.exe,bin/
+/ucrt64/bin/broadwayd.exe,bin/
+
+# Local Variables:
+# mode: shell-script
+# End:

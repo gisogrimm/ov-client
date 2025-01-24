@@ -82,6 +82,11 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
 		OSFLAG += -D IA32
 	endif
+	EXTERNALS += portaudio-2.0
+
+	LDLIBS += -lrpcrt4 -lole32 -lshell32
+	ZITATARGET = zita
+
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
@@ -222,11 +227,19 @@ zita: build/.directory
 	cp zita-njbridge/source/zita-n2j build/ovzita-n2j && \
 	cp zita-njbridge/source/zita-j2n build/ovzita-j2n
 else
+ifeq ($(OS),Windows_NT)
+zita: build/.directory
+	$(MAKE) -C zita-njbridge/zita-resampler/source libzita-resampler.a && \
+	$(MAKE) -C zita-njbridge/source CXXFLAGS+="-I../zita-resampler/source" LDFLAGS+="-L../zita-resampler/source" -f Makefile-win && \
+	cp zita-njbridge/source/zita-n2j.exe build/ovzita-n2j.exe && \
+	cp zita-njbridge/source/zita-j2n.exe build/ovzita-j2n.exe
+else
 zita: build/.directory
 	$(MAKE) -C zita-njbridge/zita-resampler/source libzita-resampler.a && \
 	$(MAKE) -C zita-njbridge/source CXXFLAGS+="$(shell pkg-config --cflags jack) -I../zita-resampler/source" LDFLAGS+="$(shell pkg-config --libs jack) -L../zita-resampler/source" -f Makefile-linux && \
 	cp zita-njbridge/source/zita-n2j build/ovzita-n2j && \
 	cp zita-njbridge/source/zita-j2n build/ovzita-j2n
+endif
 endif
 #	(cd build && cmake ../zita-njbridge && make)
 

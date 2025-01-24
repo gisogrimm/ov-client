@@ -33,5 +33,5 @@ jobs:
       run: ov-client --deviceid=000000000000 & sleep 20;killall ov-client
     - uses: actions/upload-artifact@v4
       with:
-        name: debian
+        name: ov-client-ubuntu-20.04
         path: packaging/deb/debian/*/*.deb
