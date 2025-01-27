@@ -108,7 +108,9 @@ while true; do
         fi
         # identify OS architecture:
         OSARCH=`dpkg-architecture | grep -e 'DEB_BUILD_ARCH='|sed 's/[^=]*=//1'`
-        (echo "";echo "deb [arch=${OSARCH]´}] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
+        echo $OSARCH
+        echo "deb [arch=${OSARCH}] http://aptdev.hoertech.de ${OSRELHTCH} universe"
+        (echo "";echo "deb [arch=${OSARCH}] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
         sudo apt update --assume-yes
         sudo apt install --no-install-recommends --assume-yes ov-client
     fi
