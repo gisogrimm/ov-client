@@ -23,12 +23,12 @@ jobs:
     - name: packaging
       run: make packaging
     - name: test-install
-      run: sudo apt install --assume-yes ./packaging/deb/debian/*/ov-client_*.deb
+      run: sudo apt install --assume-yes ./packaging/deb/debian/*/ovbox-cli_*.deb
     - name: showversion
-      run: dpkg-query -l ov-client
+      run: dpkg-query -l ovbox-cli
     - name: test-run
-      run: ov-client --deviceid=000000000000 & sleep 20;killall ov-client
+      run: ovbox_cli --deviceid=000000000000 & sleep 20;killall ovbox_cli
     - uses: actions/upload-artifact@v4
       with:
-        name: debian
+        name: ov-client-ubuntu-24.04
         path: packaging/deb/debian/*/*.deb
