@@ -77,7 +77,7 @@ fi
 # start client:
 while true; do
     
-    sudo su -l ov -c "ov-client"
+    sudo su -l ov -c "ovbox_cli"
     # test for modified configuration:
     if test -e ~ov/ov-client.cfg; then
         sudo mv ~ov/ov-client.cfg ${BOOTFS}/
