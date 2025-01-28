@@ -268,3 +268,6 @@ install: all
 
 homebrew:
 	$(MAKE) -C packaging/homebrew install
+
+testendianess:
+	$(MAKE) -C libov build/test_endianess && ./libov/build/test_endianess
