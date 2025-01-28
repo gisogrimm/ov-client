@@ -270,4 +270,6 @@ homebrew:
 	$(MAKE) -C packaging/homebrew install
 
 testendianess:
-	$(MAKE) build/test_endianess && (cd ./build/ && ./test_endianess)
+	$(MAKE) build/test_endianess && ./start_env.sh ./build/test_endianess
+
+#	$(MAKE) build/test_endianess && (cd ./build/ && ./test_endianess)
