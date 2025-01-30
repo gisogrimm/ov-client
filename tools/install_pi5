@@ -8,6 +8,12 @@
 # Important: Do not run this script on a system that is not intended
 # to be used solely as an ovbox.
 
+BRANCH=master
+if ! test -z "$1"; then
+    BRANCH="$1"
+fi
+echo $BRANCH
+
 BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
 (
@@ -81,7 +87,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     (cd ov-client && git clean -ffx && git pull) || git clone https://github.com/gisogrimm/ov-client
 
     echo "move to development version:"
-    (cd ov-client && git clean -ffx && git checkout development && git pull)
+    (cd ov-client && git clean -ffx && git checkout $BRANCH && git pull)
 
     echo "update submodules:"
     make -C ov-client gitupdate
