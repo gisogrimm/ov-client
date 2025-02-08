@@ -60,10 +60,14 @@ SRCPATH=`dirname $0`
     #sudo chown pi:pi "$2/home/pi/autorun"
 
     echo "register autorun script in /etc/rc.local:"
+    sudo touch "$2/etc/rc.local"
+    sudo sed -i -e '/.*bin.sh.*/ d' "$2/etc/rc.local"
+    sudo echo "" | sudo tee -a "$2/etc/rc.local" 
+    sudo sed -i '1s/^/#!\/bin\/sh\n/' "$2/etc/rc.local"
     sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i "$2/etc/rc.local"
     echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a "$2/etc/rc.local"
     echo "exit 0"|sudo tee -a  "$2/etc/rc.local"
-
+    sudo chmod a+x "$2/etc/rc.local"
     
 )
 sudo umount "$2"

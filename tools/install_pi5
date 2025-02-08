@@ -124,6 +124,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local
     echo "test -x /home/pi/autorun && su -l pi /home/pi/autorun &"|sudo tee -a /etc/rc.local
     echo "exit 0"|sudo tee -a /etc/rc.local
+    sudo chmod a+x /etc/rc.local
 
     echo "setup host name:"
     HOSTN=$(ov-client_hostname)
