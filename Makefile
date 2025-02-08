@@ -29,7 +29,7 @@ BIN_GUI = ovbox
 
 BINARIES = $(BIN_OLD_CLI) $(BIN_CLI) $(BIN_GUI)
 
-EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c
+EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c libsodium
 
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 BUILD_CLI = $(patsubst %,build/%,$(BIN_CLI))
@@ -98,7 +98,7 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG += -D OSX
 		LDFLAGS += -framework IOKit -framework CoreFoundation -headerpad_max_install_names
-		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lboost_filesystem -lsoundio
+		LDLIBS += -lfftw3f -lsamplerate -lc++ -lcpprest -lcrypto -lssl -lsoundio
 		SOUNDIO_ROOT:=$(shell brew --prefix libsoundio)
 		OPENSSL_ROOT:=$(shell brew --prefix openssl)
 		CPPREST_ROOT:=$(shell brew --prefix cpprestsdk)

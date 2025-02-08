@@ -17,7 +17,7 @@ jobs:
       run: git submodule init && git submodule update --init --recursive && (cd libov && git submodule update --init)
     - name: dependencies
       run: sudo apt update &&
-           sudo apt install --assume-yes git liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev libboost-all-dev nlohmann-json3-dev libsoundio-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev
+           sudo apt install --assume-yes git liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev  nlohmann-json3-dev libsoundio-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev libsodium-dev
     - name: make
       run: make lib libtest && make
     - name: packaging
