@@ -1,3 +1,7 @@
+2025-02-09, version 0.28.1
+ - bugfix of peer-to-peer mode, which was broken since version 0.27.9
+ - input level analysis
+
 2024-12-18, version 0.26.3
  - add expert settings option to configure realtime priority
 
