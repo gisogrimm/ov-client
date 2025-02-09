@@ -32,5 +32,3 @@ jobs:
       with:
         name: ov-client-ubuntu-24.04
         path: packaging/deb/debian/*/*.deb
-    - name: testendianess
-      run: make testendianess

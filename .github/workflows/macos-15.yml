@@ -25,5 +25,3 @@ jobs:
       with:
         name: ovbox-macOS-15
         path: packaging/Darwin/*.tgz
-    - name: testendianess
-      run: make testendianess

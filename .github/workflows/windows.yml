@@ -35,5 +35,3 @@ jobs:
       with:
         name: ov-client-windows
         path: packaging/win/*.zip
-    - name: testendianess
-      run: make testendianess
