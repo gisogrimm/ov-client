@@ -70,7 +70,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
+        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev libsodium-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
         sync
     done
 
