@@ -54,3 +54,5 @@ sudo chown $USER ovbox_ready.img
 
 See 
 https://superuser.com/questions/1373289/how-do-i-shrink-the-partition-of-an-img-file-made-from-dd
+https://softwarebakery.com/shrinking-images-on-linux
+https://unix.stackexchange.com/questions/44234/clear-unused-space-with-zeros-ext3-ext4
