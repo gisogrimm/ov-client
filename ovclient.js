@@ -35,14 +35,14 @@ function HSVtoRGB(h, s, v) {
 
 function objmix_getscale( w, h )
 {
-    return 0.22*Math.min(w,h);
+    return 0.11*Math.min(w,h);
 }
 
 function pos2scr( pos )
 {
     const canvas = document.getElementById("objmixer");
     const scale = objmix_getscale(canvas.width, canvas.height);
-    return {x:(0.5*canvas.width-scale*pos[1]),y:0.9*canvas.height-scale*pos[0]};
+    return {x:(0.5*canvas.width-scale*pos[1]),y:0.5*canvas.height-scale*pos[0]};
 }
 
 function scr2pos( pos )
@@ -50,7 +50,7 @@ function scr2pos( pos )
     const canvas = document.getElementById("objmixer");
     const scale = objmix_getscale(canvas.width, canvas.height);
     return {y:-(pos.x-0.5*canvas.width)/scale,
-            x:(-pos.y+0.9*canvas.height)/scale};
+            x:(-pos.y+0.5*canvas.height)/scale};
 }
 
 function on_canvas_click( e )
@@ -108,7 +108,7 @@ function objmix_draw()
     if( !canvas )
         return;
     canvas.width = canvas.parentElement.clientWidth-2;
-    canvas.height = 0.5*canvas.width;
+    canvas.height = canvas.width;
     const ctx = canvas.getContext("2d");
     //ctx.globalCompositeOperation = "destination-over";
     ctx.fillStyle = '#153d17';
@@ -127,10 +127,10 @@ function objmix_draw()
     ctx.moveTo(p0.x,p0.y);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(p0.x,p0.y,Math.abs(p1.x-p0.x),0,Math.PI,true);
+    ctx.arc(p0.x,p0.y,Math.abs(p1.x-p0.x),0,2.0*Math.PI,true);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(p0.x,p0.y,0.25*Math.abs(p1.x-p0.x),0,Math.PI,true);
+    ctx.arc(p0.x,p0.y,0.25*Math.abs(p1.x-p0.x),0,2.0*Math.PI,true);
     ctx.stroke();
     ctx.restore();
     ctx.save();
