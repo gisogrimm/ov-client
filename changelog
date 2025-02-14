@@ -1,3 +1,8 @@
+2025-02-14, version 0.29.1
+ - end-to-end encryption
+ - serial port based head tracker support
+ - real-time visualization of source / receiver position and orientation in webmixer
+
 2025-02-09, version 0.28.1
  - bugfix of peer-to-peer mode, which was broken since version 0.27.9
  - input level analysis
