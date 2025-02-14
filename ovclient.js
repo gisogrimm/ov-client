@@ -289,6 +289,7 @@ socket.on("connect", function() {
     inchannelpos = {};
     objmix_sel = null;
     objmix_drag = false;
+    recpos = {'x':0,'y':0,'z':0,'rz':0,'ry':0,'rx':0};
     socket.emit("config",{});
 });
 
@@ -342,12 +343,22 @@ socket.on("vertexposrot", function(vertexid, name, x, y, z, rz, ry, rx, path){
 	    objmix_draw();
     }else{
 	if( name === 'main' ){
+	    var need_update = false;
+	    if( (x!=recpos.x) ||
+		(y!=recpos.y) ||
+		(z!=recpos.z) ||
+		(rx!=recpos.rx) ||
+		(ry!=recpos.ry) ||
+		(rz!=recpos.rz) )
+		need_update = true;
 	    recpos.x = x;
 	    recpos.y = y;
 	    recpos.z = z;
 	    recpos.rx = rx;
 	    recpos.ry = ry;
 	    recpos.rz = rz;
+	    if( need_update )
+		objmix_draw();
 	}
     }
     //inchannelpos[vertexid] = {'name':name,'x':x, 'y':y, 'z': z, 'path' : path};
@@ -438,11 +449,11 @@ socket.on("newfader", function(faderno,val){
 socket.on("updatefader", function(fader,val){
     let fad=document.getElementById(fader);
     if( fad!=null ){
-	      fad.value=val;
+	fad.value=val;
     }
     let fadt=document.getElementById("txt"+fader);
     if( fadt!=null ){
-	      fadt.value=val.toFixed(1);
+	fadt.value=val.toFixed(1);
     }
 });
 
