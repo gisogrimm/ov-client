@@ -55,7 +55,6 @@ httpserver = http.createServer(function (req, res) {
         }
     }
     var sdir = path.dirname(process.argv[1]);
-    console.log(sdir);
     if( sdir.length > 0 )
         sdir = sdir + '/';
     var hosjs = fs.readFileSync(sdir+'ovclient.js');
@@ -155,20 +154,27 @@ io.on('connection', function (socket) {
                 var vpname = vpvars[2] + '.' + vpvars[3];
                 if( vpvars[2] == 'ego' )
                     vpname = vpvars[3];
-                vpvars.splice(4);
+                vpvars[2] = vpvars[2] + '.' + vpvars[3];
+                vpvars.splice(3);
                 const vertexid = vpvars.join("/");
                 socket.emit('vertexpos', vertexid, vpname, msg[2], msg[3], msg[4], msg[1] );
             }
             if( msg[0] == '/tascarpos' ){
                 var vpvars = msg[1].split('/');
-                var vpname = vpvars[2] + '.' + vpvars[3];
+		
+                var vpname = vpvars[2];
+		if( vpvars.length > 3 )
+		    vpname = vpvars[2] + '.' + vpvars[3];
                 if( vpvars[2] == 'ego' )
                     vpname = vpvars[3];
                 vpvars.splice(4);
                 const vertexid = vpvars.join("/");
                 if( (vpvars[2] != 'reverb') && (vpvars[2] != 'room') ){
                     // forward data
-                    socket.emit('vertexposrot', vertexid, vpname, msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[1] );
+                    socket.emit('vertexposrot', vertexid, vpname,
+				msg[2], msg[3], msg[4],
+				msg[5]*Math.PI/180, msg[6]*Math.PI/180, msg[7]*Math.PI/180,
+				msg[1] );
                 }
             }
             if( msg[0] == '/jackrec/start' )

@@ -200,7 +200,7 @@ button {
     border: 1px solid #888;
 }
 .objmix {
-    width: 100%;
+    width: min(90vw,90vh);
     padding: 0px;
     margin: 0px;
     border: 1px solid #666;

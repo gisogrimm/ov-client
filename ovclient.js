@@ -2,6 +2,7 @@ var deviceid = '';
 var inchannelpos = {};
 var objmix_sel = -1;
 var objmix_drag = false;
+var recpos = {'x':0,'y':0,'z':0,'rz':0,'ry':0,'rx':0};
 
 /* accepts parameters
  * h  Object = {h:x, s:y, v:z}
@@ -38,11 +39,44 @@ function objmix_getscale( w, h )
     return 0.11*Math.min(w,h);
 }
 
+function euler_rotz( pos, a )
+{
+    return {x:Math.cos(a) * pos.x - Math.sin(a) * pos.y,
+	    y:Math.cos(a) * pos.y + Math.sin(a) * pos.x,
+	    z:pos.z};
+}
+
+function euler_roty( pos, a )
+{
+    return {x:Math.cos(a) * pos.x + Math.sin(a) * pos.z,
+	    y:pos.y,
+	    z:Math.cos(a) * pos.z - Math.sin(a) * pos.x};
+}
+
+function euler_rotx( pos, a )
+{
+    return {x:pos.x,
+	    y:Math.cos(a) * pos.y - Math.sin(a) * pos.z,
+	    z:Math.cos(a) * pos.z + Math.sin(a) * pos.y};
+}
+
+function euler( pos, rz, ry, rx )
+{
+    return euler_rotx(euler_roty(euler_rotz(pos,rz),ry),rx);
+}
+
+function euler_loc( pos, rz, ry, rx )
+{
+    return euler_rotz(euler_roty(euler_rotx(pos,rx),ry),rz);
+}
+
 function pos2scr( pos )
 {
     const canvas = document.getElementById("objmixer");
     const scale = objmix_getscale(canvas.width, canvas.height);
-    return {x:(0.5*canvas.width-scale*pos[1]),y:0.5*canvas.height-scale*pos[0]};
+    if( Array.isArray(pos) )
+	return {x:(0.5*canvas.width-scale*pos[1]),y:0.5*canvas.height-scale*pos[0]};
+    return {x:(0.5*canvas.width-scale*pos.y),y:0.5*canvas.height-scale*pos.x};
 }
 
 function scr2pos( pos )
@@ -109,6 +143,72 @@ function on_canvas_move( e )
     }
 }
 
+function draw_receiver( ctx, pos, rz, ry, rx )
+{
+    const scale = 0.1;
+    const msize = 2;
+    // calculate positions:
+    var p1 = {x:1.8 * msize * scale, y:-0.6 * msize * scale, z:0};
+    var p2 = {x:2.9 * msize * scale, y:0, z:0};
+    var p3 = {x:1.8 * msize * scale, y:0.6 * msize * scale, z:0};
+    var p4 = {x:-0.5 * msize * scale, y:2.3 * msize * scale, z:0};
+    var p5 = {x:0, y:1.7 * msize * scale, z:0};
+    var p6 = {x:0.5 * msize * scale, y:2.3 * msize * scale, z:0};
+    var p7 = {x:-0.5 * msize * scale, y:-2.3 * msize * scale, z:0};
+    var p8 = {x:0, y:-1.7 * msize * scale, z:0};
+    var p9 = {x:0.5 * msize * scale, y:-2.3 * msize * scale, z:0};
+    p1 = euler( p1, rz, ry, rx );
+    p2 = euler( p2, rz, ry, rx );
+    p3 = euler( p3, rz, ry, rx );
+    p4 = euler( p4, rz, ry, rx );
+    p5 = euler( p5, rz, ry, rx );
+    p6 = euler( p6, rz, ry, rx );
+    p7 = euler( p7, rz, ry, rx );
+    p8 = euler( p8, rz, ry, rx );
+    p9 = euler( p9, rz, ry, rx );
+    p1.x += pos.x; p1.y += pos.y; p1.z += pos.z;
+    p2.x += pos.x; p2.y += pos.y; p2.z += pos.z;
+    p3.x += pos.x; p3.y += pos.y; p3.z += pos.z;
+    p4.x += pos.x; p4.y += pos.y; p4.z += pos.z;
+    p5.x += pos.x; p5.y += pos.y; p5.z += pos.z;
+    p6.x += pos.x; p6.y += pos.y; p6.z += pos.z;
+    p7.x += pos.x; p7.y += pos.y; p7.z += pos.z;
+    p8.x += pos.x; p8.y += pos.y; p8.z += pos.z;
+    p9.x += pos.x; p9.y += pos.y; p9.z += pos.z;
+    pos = pos2scr(pos);
+    p1 = pos2scr(p1);
+    p2 = pos2scr(p2);
+    p3 = pos2scr(p3);
+    p4 = pos2scr(p4);
+    p5 = pos2scr(p5);
+    p6 = pos2scr(p6);
+    p7 = pos2scr(p7);
+    p8 = pos2scr(p8);
+    p9 = pos2scr(p9);
+    const msizescr1 = pos2scr([0,0]);
+    const msizescr2 = pos2scr([scale*msize,scale*msize]);
+    const msizescr = Math.sqrt(Math.pow(msizescr2.x-msizescr1.x,2) + Math.pow(msizescr2.y-msizescr1.y,2));
+    // start drawing:
+    ctx.save();
+    const ls = ctx.lineWidth;
+    ctx.lineWidth = 2*msize;
+    ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+    ctx.moveTo(pos.x + 1.4*msizescr, pos.y);
+    ctx.arc(pos.x, pos.y, 1.4*msizescr, 0, 2.0*Math.PI);
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.moveTo(p4.x, p4.y);
+    ctx.lineTo(p5.x, p5.y);
+    ctx.lineTo(p6.x, p6.y);
+    ctx.moveTo(p7.x, p7.y);
+    ctx.lineTo(p8.x, p8.y);
+    ctx.lineTo(p9.x, p9.y);
+    ctx.stroke();
+    ctx.lineWidth = ls;
+    ctx.restore();
+}
+
 function objmix_draw()
 {
     const canvas = document.getElementById("objmixer");
@@ -146,15 +246,29 @@ function objmix_draw()
     var k = 0;
     var N = Object.entries(inchannelpos).length;
     for( [key,vertex] of Object.entries(inchannelpos) ){
-        const pos = pos2scr([vertex.x,vertex.y,vertex.z]);
+	var px = euler({x:0.5,y:0,z:0}, vertex.rz, vertex.ry, vertex.rx );
+	px.x += vertex.x;
+	px.y += vertex.y;
+	px.z += vertex.z;
+        const pos = pos2scr(vertex);
+	const pos_x = pos2scr(px);
         const colrgb = HSVtoRGB(k/N, 0.65, 0.8 );
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
         ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
+	ctx.beginPath();
+	ctx.moveTo(pos.x,pos.y);
+	ctx.lineTo(pos_x.x,pos_x.y);
+	ctx.stroke();
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 20*Math.sqrt(canvas.width/1000), 0, Math.PI * 2, true); // Outer circle
+        ctx.arc(pos.x, pos.y, 20*Math.sqrt(canvas.width/1000), 0, Math.PI * 2);
         ctx.fill();
         ctx.fillText(vertex.name, pos.x+24, pos.y-5);
         k = k+1;
     }
+    ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+    draw_receiver(ctx,recpos, recpos.rz, recpos.ry, recpos.rx );
+    ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
     ctx.restore();
 }
 
@@ -191,19 +305,53 @@ socket.on("scene", function(scene){
         el.appendChild(elgainstore);
     }
 });
+
 socket.on("vertexpos", function(vertexid, name, x, y, z, path){
-    // add an input channel for object-based mixing.
-    // if the provided object is already in list, then clear list:
-    //var needclear = false;
-    //for( var k=0; k<inchannelpos.length;k++){
-    //    if( inchannelpos[k].name == name )
-    //        needclear = true;
-    //}
-    //if( needclear )
-    //    inchannelpos = [];
-    // append object:
-    inchannelpos[vertexid] = {'name':name,'x':x, 'y':y, 'z': z, 'path' : path};
+    if( Reflect.has(inchannelpos,vertexid) ){
+	inchannelpos[vertexid].name = name;
+	inchannelpos[vertexid].x = x;
+	inchannelpos[vertexid].y = y;
+	inchannelpos[vertexid].z = z;
+	inchannelpos[vertexid].path = path;
+    }else{
+	inchannelpos[vertexid] = {'name':name,
+				  'x':x, 'y':y, 'z':z,
+				  'rz':0,'ry':0,'rx':0,
+				  'path' : path};
+    }
     update_objmix_sounds();
+});
+
+socket.on("vertexposrot", function(vertexid, name, x, y, z, rz, ry, rx, path){
+    if( Reflect.has(inchannelpos,vertexid) ){
+	var need_update = false;
+	if( (x!=inchannelpos[vertexid].x) ||
+	    (y!=inchannelpos[vertexid].y) ||
+	    (z!=inchannelpos[vertexid].z) ||
+	    (rx!=inchannelpos[vertexid].rx) ||
+	    (ry!=inchannelpos[vertexid].ry) ||
+	    (rz!=inchannelpos[vertexid].rz) )
+	    need_update = true;
+	inchannelpos[vertexid].x = x;
+	inchannelpos[vertexid].y = y;
+	inchannelpos[vertexid].z = z;
+	inchannelpos[vertexid].rx = rx;
+	inchannelpos[vertexid].ry = ry;
+	inchannelpos[vertexid].rz = rz;
+	if( need_update )
+	    objmix_draw();
+    }else{
+	if( name === 'main' ){
+	    recpos.x = x;
+	    recpos.y = y;
+	    recpos.z = z;
+	    recpos.rx = rx;
+	    recpos.ry = ry;
+	    recpos.rz = rz;
+	}
+    }
+    //inchannelpos[vertexid] = {'name':name,'x':x, 'y':y, 'z': z, 'path' : path};
+    //update_objmix_sounds();
 });
 socket.on("newfader", function(faderno,val){
     // remove effect bus from mixer:
