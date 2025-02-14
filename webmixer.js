@@ -151,11 +151,25 @@ io.on('connection', function (socket) {
                 socket.emit('updatefader', msg[0], msg[1] );
             }
             if( msg[0] == '/vertexpos' ){
-                const vpvars = msg[1].split('/');
+                var vpvars = msg[1].split('/');
                 var vpname = vpvars[2] + '.' + vpvars[3];
                 if( vpvars[2] == 'ego' )
                     vpname = vpvars[3];
-                socket.emit('vertexpos', vpname, msg[2], msg[3], msg[4], msg[1] );
+                vpvars.splice(4);
+                const vertexid = vpvars.join("/");
+                socket.emit('vertexpos', vertexid, vpname, msg[2], msg[3], msg[4], msg[1] );
+            }
+            if( msg[0] == '/tascarpos' ){
+                var vpvars = msg[1].split('/');
+                var vpname = vpvars[2] + '.' + vpvars[3];
+                if( vpvars[2] == 'ego' )
+                    vpname = vpvars[3];
+                vpvars.splice(4);
+                const vertexid = vpvars.join("/");
+                if( (vpvars[2] != 'reverb') && (vpvars[2] != 'room') ){
+                    // forward data
+                    socket.emit('vertexposrot', vertexid, vpname, msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[1] );
+                }
             }
             if( msg[0] == '/jackrec/start' )
                 socket.emit('jackrecstart', '');

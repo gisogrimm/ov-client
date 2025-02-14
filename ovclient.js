@@ -1,5 +1,5 @@
 var deviceid = '';
-var inchannelpos = [];
+var inchannelpos = {};
 var objmix_sel = -1;
 var objmix_drag = false;
 
@@ -57,18 +57,27 @@ function on_canvas_click( e )
 {
     const canvas = document.getElementById("objmixer");
     var rect = canvas.getBoundingClientRect();
-    var ksel = -1;
-    for( var k=0; k<inchannelpos.length;k++){
-        const vertex = inchannelpos[k];
+    var ksel = null;
+    for( [key,vertex] of Object.entries(inchannelpos) ){
         var pos = pos2scr([vertex.x,vertex.y,vertex.z]);
         pos.x = pos.x - e.clientX + rect.left;
         pos.y = pos.y - e.clientY + rect.top;
         const d = Math.sqrt(pos.x*pos.x + pos.y*pos.y);
+        // click is not more than 24 pixels away:
         if( d < 24 )
-            ksel = k;
+            ksel = key;
     }
+    //for( var k=0; k<inchannelpos.length;k++){
+    //    const vertex = inchannelpos[k];
+    //    var pos = pos2scr([vertex.x,vertex.y,vertex.z]);
+    //    pos.x = pos.x - e.clientX + rect.left;
+    //    pos.y = pos.y - e.clientY + rect.top;
+    //    const d = Math.sqrt(pos.x*pos.x + pos.y*pos.y);
+    //    if( d < 24 )
+    //        ksel = k;
+    //}
     objmix_sel = ksel;
-    if( ksel >= 0 ){
+    if( ksel ){
         objmix_drag = true;
     }
 }
@@ -93,11 +102,9 @@ function on_canvas_move( e )
         inchannelpos[objmix_sel].x = np.x;
         inchannelpos[objmix_sel].y = np.y;
         objmix_draw();
-        //console.log(inchannelpos[objmix_sel].path);
-        //socket.emit("msg",{path:'/'+deviceid+'/ego/'+inchannelpos[objmix_sel].name+'/pos',
-        //                   value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
-        socket.emit("msg",{path:inchannelpos[objmix_sel].path,
-                           value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]});
+        var obj = {path:inchannelpos[objmix_sel].path,
+               value:[inchannelpos[objmix_sel].x,inchannelpos[objmix_sel].y,inchannelpos[objmix_sel].z]}
+        socket.emit("msg",obj);
         e.preventDefault();
     }
 }
@@ -136,15 +143,17 @@ function objmix_draw()
     ctx.save();
     ctx.font = "24px sans";
     //canvas.width = canvas.width;
-    for( var k=0; k<inchannelpos.length;k++){
-        const vertex = inchannelpos[k];
+    var k = 0;
+    var N = Object.entries(inchannelpos).length;
+    for( [key,vertex] of Object.entries(inchannelpos) ){
         const pos = pos2scr([vertex.x,vertex.y,vertex.z]);
-        const colrgb = HSVtoRGB(k/inchannelpos.length, 0.65, 0.8 );
+        const colrgb = HSVtoRGB(k/N, 0.65, 0.8 );
         ctx.fillStyle = `rgb(${colrgb.r},${colrgb.g},${colrgb.b})`;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, 20*Math.sqrt(canvas.width/1000), 0, Math.PI * 2, true); // Outer circle
         ctx.fill();
         ctx.fillText(vertex.name, pos.x+24, pos.y-5);
+        k = k+1;
     }
     ctx.restore();
 }
@@ -163,7 +172,9 @@ function update_objmix_sounds()
 }
 
 socket.on("connect", function() {
-    inchannelpos = [];
+    inchannelpos = {};
+    objmix_sel = null;
+    objmix_drag = false;
     socket.emit("config",{});
 });
 
@@ -180,18 +191,18 @@ socket.on("scene", function(scene){
         el.appendChild(elgainstore);
     }
 });
-socket.on("vertexpos", function(name, x, y, z, path){
+socket.on("vertexpos", function(vertexid, name, x, y, z, path){
     // add an input channel for object-based mixing.
     // if the provided object is already in list, then clear list:
-    var needclear = false;
-    for( var k=0; k<inchannelpos.length;k++){
-        if( inchannelpos[k].name == name )
-            needclear = true;
-    }
-    if( needclear )
-        inchannelpos = [];
+    //var needclear = false;
+    //for( var k=0; k<inchannelpos.length;k++){
+    //    if( inchannelpos[k].name == name )
+    //        needclear = true;
+    //}
+    //if( needclear )
+    //    inchannelpos = [];
     // append object:
-    inchannelpos.push({'name':name,'x':x, 'y':y, 'z': z, 'path' : path});
+    inchannelpos[vertexid] = {'name':name,'x':x, 'y':y, 'z': z, 'path' : path};
     update_objmix_sounds();
 });
 socket.on("newfader", function(faderno,val){
