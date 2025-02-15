@@ -63,6 +63,8 @@ if test ! -e /boot/ovclient-noupdate; then
             rm -f /boot/ov-client-instmha
             sudo apt install --no-install-recommends --assume-yes openmha openmha-examples
         fi
+        # expand filesystem if possible:
+        #sudo raspi-config --expand-rootfs || true
         # activate overlay image in case the installation script failed, and try the best we can:
         sudo raspi-config nonint enable_overlayfs
         # ready, reboot:

@@ -48,11 +48,42 @@ Currently not working on Raspberry Pi 5B (ov-client crashes with "Bus error").
 First, completely install an ovbox system using a method from above. Then remove the SD card from the Raspberry Pi and copy the disk image (make sure to replace `/dev/disk` by the name of the SD card drive):
 
 ```
-sudo dd if=/dev/disk of=ovbox_ready.img status=progress bs=16M oflag=sync
+sudo dd if=/dev/disk of=ovbox_ready.img status=progress bs=128M oflag=sync
 sudo chown $USER ovbox_ready.img
 ```
 
-See 
+Then set up loopback device, in order to clear zeros and shrink it:
+
+```
+sudo losetup -f -P ovbox_ready.img
+DEVNAME=$(losetup -l|grep -F -e "ovbox_ready"|tail -1|sed -e 's/[[:blank:]].*//1')
+echo $DEVNAME
+```
+
+Now shrink filesystem with
+```
+sudo gparted $DEVNAME
+```
+
+Then clear zeros:
+
+```
+sudo zerofree ${DEVNAME}p2
+```
+
+Now list partitions:
+
+```
+sudo fdisk -l $DEVNAME
+```
+Identify the end sector, and follow (this)[https://softwarebakery.com/shrinking-images-on-linux] to truncate:
+
+```
+```
+
+
+
+See also:
 https://superuser.com/questions/1373289/how-do-i-shrink-the-partition-of-an-img-file-made-from-dd
 https://softwarebakery.com/shrinking-images-on-linux
 https://unix.stackexchange.com/questions/44234/clear-unused-space-with-zeros-ext3-ext4
