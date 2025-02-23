@@ -31,7 +31,7 @@ clipack:
 	test -n "$(FULLVERSION)" && \
 	echo "Packaging:" && \
 	echo " - Package version: $(PACKVER)" && \
-	echo " - Packages: $(DEBS)" && \
+	echo " - Packages: ovbox-cli" && \
 	rm -Rf debian && \
 	mkdir -p $(STORAGE) && \
 	for p in ovbox-cli; do rm -f $(REPO)/$${p}*.deb; (cd $(REPO); ./packaging/deb/htchdebian-mkdeb packaging/deb/$${p}.csv $(PACKVER)) && mv $(REPO)/$${p}*.deb $(STORAGE)/;done

@@ -4,9 +4,15 @@ BINDIR=$(PREFIX)/bin
 SHAREDIR=$(PREFIX)/share/ovclient
 DESTDIR=
 
+# build all tools:
 all: build lib binaries
-cli: build lib clibinaries
+
+# build only command line tools, should work without gtkmm and cairomm:
+cli: build libcli clibinaries
+
+# build only GUI tools:
 gui: build lib guibinaries
+
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -20,20 +26,21 @@ ifeq ($(UNAME_S),Darwin)
 	CMD_LD=
 endif
 
-
-
 BIN_OLD_CLI = ov-client
+
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
-ovrealpath ovbox_version
+  ovrealpath ovbox_version
+
 BIN_GUI = ovbox
 
 BINARIES = $(BIN_OLD_CLI) $(BIN_CLI) $(BIN_GUI)
 
-EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c libsodium
-
 BUILD_BINARIES = $(patsubst %,build/%,$(BINARIES))
 BUILD_CLI = $(patsubst %,build/%,$(BIN_CLI))
 BUILD_GUI = $(patsubst %,build/%,$(BIN_GUI))
+
+# external library dependencies:
+EXTERNALS = jack liblo sndfile libcurl gsl samplerate fftw3f xerces-c libsodium
 
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
@@ -49,7 +56,7 @@ ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
 endif
 
-CPPFLAGS = -std=c++11
+#CPPFLAGS = -std=c++17
 PREFIX = /usr/local
 BUILD_DIR = build
 SOURCE_DIR = src
@@ -128,10 +135,13 @@ build/ov-client build/ovbox build/ovbox_cli: $(ZITATARGET)
 lib: build
 	$(MAKE) -C libov all
 
+libcli: build
+	$(MAKE) -C libov cli
+
 libtest:
 	$(MAKE) -C libov unit-tests
 
-libov/build/libov.a: lib
+libov/build/libov.a: libcli
 
 libov/Makefile:
 	git submodule update --init --recursive
