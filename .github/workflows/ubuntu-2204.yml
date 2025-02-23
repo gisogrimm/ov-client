@@ -19,7 +19,7 @@ jobs:
       run: sudo apt update &&
            sudo apt install --assume-yes git liblo-dev nodejs libcurl4-openssl-dev build-essential libasound2-dev libeigen3-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev  nlohmann-json3-dev libsoundio-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev libsodium-dev
     - name: make
-      run: make lib libtest && make
+      run: make -j $(nproc) lib && make libtest && make -j $(nproc)
     - name: packaging
       run: make packaging
     - name: test-install

@@ -26,7 +26,7 @@ jobs:
     - name: lineendings
       run: git config --global core.autocrlf true
     - name: build
-      run: make lib && make
+      run: make -j $(nproc) lib && make -j $(nproc)
     - name: packaging
       run: make -C packaging/win
     - name: checkpackage
