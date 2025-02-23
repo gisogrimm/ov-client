@@ -132,7 +132,7 @@ CXXFLAGS += $(OSFLAG)
 
 build/ov-client build/ovbox build/ovbox_cli: $(ZITATARGET)
 
-lib: build
+lib: libcli
 	$(MAKE) -C libov all
 
 libcli: build
