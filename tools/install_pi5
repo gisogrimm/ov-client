@@ -70,7 +70,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libgtkmm-3.0-dev libcairomm-1.0-dev libcunit1-dev libsodium-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
+        sudo -E apt-get install --no-install-recommends --assume-yes liblo-dev libcurl4-openssl-dev libasound2-dev libeigen3-dev libfftw3-dev libfftw3-single3 libgsl-dev libjack-jackd2-dev libltc-dev libmatio-dev libsndfile1-dev libsamplerate0-dev nlohmann-json3-dev libxerces-c-dev libcunit1-dev libsodium-dev && cnt=-1 || sleep 7; let cnt=$cnt-1
         sync
     done
 
@@ -96,10 +96,10 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     make -C ov-client clean
 
     echo "build tools:"
-    make -j `nproc` -C ov-client
+    make -j $(nproc) -C ov-client cli
 
     echo "package tools:"
-    make -C ov-client packaging
+    make -C ov-client/packaging/deb clipack
 
     echo "install new debian packages:"
     sudo -E apt-get install --assume-yes --no-install-recommends ./ov-client/packaging/deb/debian/*/ovbox-cli_*.deb
@@ -155,12 +155,13 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     sudo -E apt update --assume-yes || true
     sudo -E apt autoremove --assume-yes || true
 
-    #echo "activate overlay image to avoid damage of the SD card upon power off:"
-    #sudo raspi-config nonint enable_overlayfs
-    #sync
-    #
-    #echo "ready, reboot:"
-    #sudo shutdown -r now
+    echo "wait 10 s, then activate overlay image to avoid damage of the SD card upon power off:"
+    sleep 10
+    sudo raspi-config nonint enable_overlayfs
+    sync
+
+    echo "ready, reboot:"
+    sudo shutdown -r now
 
     sync
     echo "successfully installed ovbox system!"
