@@ -10,6 +10,7 @@ jackrec.html,usr/share/ovclient/
 libov/tascar/libtascar/build/libovclienttascar.so.*,usr/lib/
 libov/tascar/libtascar/build/libovclienttascardmx.so.*,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_*osc*.so,usr/lib/
+libov/tascar/plugins/build/ovclienttascar_*lsl*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_ap_*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_echoc.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_epicycles.so,usr/lib/
