@@ -105,17 +105,6 @@ while true; do
         sudo rm -f ~ov/ov-client.usedevversion
         # build latest version:
         ./install development 2>&1 | tee -a ${HOME}/install.log
-        # identify OS release code name:
-        #OSREL=`lsb_release -a|grep Codename|sed 's/Codename:[[:blank:]]*//1'`
-        #OSRELHTCH="$OSREL"
-        #if test "$OSREL" = "buster"; then
-        #    OSRELHTCH=bionic
-        #fi
-        ## identify OS architecture:
-        #OSARCH=`dpkg-architecture | grep -e 'DEB_BUILD_ARCH='|sed 's/[^=]*=//1'`
-        #(echo "";echo "deb [arch=${OSARCH]´}] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
-        #sudo apt update --assume-yes
-        #sudo apt install --no-install-recommends --assume-yes ov-client
     fi
     if test -e ~ov/ov-client.wificfg; then
         echo "switching wifi"

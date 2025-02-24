@@ -45,7 +45,7 @@ Currently not working on Raspberry Pi 5B (ov-client crashes with "Bus error").
 
 ## Preparation of ready-to-use image
 
-First, completely install an ovbox system using a method from above. Then remove the SD card from the Raspberry Pi and copy the disk image (make sure to replace `/dev/disk` by the name of the SD card drive):
+First, completely install an ovbox system using a method from above. Then remove the SD card from the Raspberry Pi and copy the disk image (make sure to replace `/dev/disk` by the name of the SD card drive, e.g. `/dev/sdd`):
 
 ```
 sudo dd if=/dev/disk of=ovbox_ready.img status=progress bs=128M oflag=sync
@@ -76,9 +76,10 @@ Now list partitions:
 ```
 sudo fdisk -l $DEVNAME
 ```
-Identify the end sector, and follow (this)[https://softwarebakery.com/shrinking-images-on-linux] to truncate:
+Identify the end sector, and follow (this)[https://softwarebakery.com/shrinking-images-on-linux] to truncate (replace numbers by end sector):
 
 ```
+truncate --size=$[(9181183+1)*512] myimage.img
 ```
 
 
