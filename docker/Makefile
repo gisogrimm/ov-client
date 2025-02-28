@@ -8,7 +8,7 @@ gitbranch:
 	echo $(GITBRANCH)
 
 %.test:
-	docker container rm $* && docker build -t $* ./$*/ && docker run -v $(REPODIR):/build/ov-client --name=$* $* /entrypoint.sh $(GITBRANCH) && touch $@
+	(docker container rm $* || true) && docker build -t $* ./$*/ && docker run -v $(REPODIR):/build/ov-client --name=$* $* /entrypoint.sh $(GITBRANCH) && touch $@
 
 #docker cp $*:build/ov-client/packaging/deb/debian ./artifacts/ && docker container rm $* && touch $@
 
