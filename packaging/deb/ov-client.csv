@@ -3,6 +3,7 @@ build/ov-client,usr/bin/
 build/ov-client_hostname,usr/bin/
 build/ov-client_listsounddevs,usr/bin/
 build/ovbox_cli,usr/bin/
+build/ovbox_sendlog,usr/bin/
 build/ovbox_version,usr/bin/
 build/ovzita-j2n,usr/bin/
 build/ovzita-n2j,usr/bin/

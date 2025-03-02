@@ -2,6 +2,7 @@ LICENSE,usr/share/doc/ovclient/
 build/ov-client_hostname,usr/bin/
 build/ov-client_listsounddevs,usr/bin/
 build/ovbox_cli,usr/bin/
+build/ovbox_sendlog,usr/bin/
 build/ovbox_version,usr/bin/
 build/ovzita-j2n,usr/bin/
 build/ovzita-n2j,usr/bin/
@@ -9,8 +10,8 @@ installovclient.sh,usr/share/ovclient/tools/
 jackrec.html,usr/share/ovclient/
 libov/tascar/libtascar/build/libovclienttascar.so.*,usr/lib/
 libov/tascar/libtascar/build/libovclienttascardmx.so.*,usr/lib/
-libov/tascar/plugins/build/ovclienttascar_*osc*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_*lsl*.so,usr/lib/
+libov/tascar/plugins/build/ovclienttascar_*osc*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_ap_*.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_echoc.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_epicycles.so,usr/lib/

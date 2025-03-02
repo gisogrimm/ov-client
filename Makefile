@@ -29,7 +29,7 @@ endif
 BIN_OLD_CLI = ov-client
 
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
-  ovrealpath ovbox_version
+  ovrealpath ovbox_version ovbox_sendlog
 
 BIN_GUI = ovbox
 
@@ -261,6 +261,7 @@ install: all
 	$(CMD_INSTALL) -D libov/tascar/plugins/build/*.$(LIB_EXT) -t $(DESTDIR)$(LIBDIR)
 	$(CMD_INSTALL) -D build/ovbox -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovbox_version -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ovbox_sendlog -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovbox_cli -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovzita* -t $(DESTDIR)$(BINDIR)
 	mkdir -p  $(DESTDIR)$(SHAREDIR) && cp -r node_modules $(DESTDIR)$(SHAREDIR)
