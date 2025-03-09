@@ -19,22 +19,63 @@
 
 #include "../libov/tascar/libtascar/include/tascar_os.h"
 #include "../libov/tascar/libtascar/include/tictoctimer.h"
+#include "ov_tools.h"
 #include <chrono>
 #include <cstring>
 #include <curl/curl.h>
+#include <fstream>
 #include <mutex>
 #include <sstream>
 #include <thread>
 #include <udpsocket.h>
+#include <stdlib.h>
 
 #define GRACETIME 5
 
 std::mutex logmtx;
 std::string logstr;
 std::atomic_bool run_service;
-std::string host = "https://oldbox.orlandoviols.com/";
+std::string lobby = "https://oldbox.orlandoviols.com/";
 
 CURL* curl;
+
+std::string get_file_contents(const std::string& fname)
+{
+  std::ifstream t(fname);
+  std::string str((std::istreambuf_iterator<char>(t)),
+                  std::istreambuf_iterator<char>());
+  return str;
+}
+
+void update_config(std::string& deviceid, std::string& lobby)
+{
+  // test for config file on raspi:
+  std::string config(get_file_contents("/boot/ov-client.cfg"));
+  if(config.empty() && std::getenv("HOME"))
+    // we are not on a raspi, or no file was created, thus check in home
+    // directory
+    config = get_file_contents(std::string(std::getenv("HOME")) +
+                               std::string("/.ov-client.cfg"));
+  if(config.empty())
+    // we are not on a raspi, or no file was created, thus check in local
+    // directory
+    config = get_file_contents("ov-client.cfg");
+  nlohmann::json js_cfg({{"deviceid", getmacaddr()},
+                         {"url", "https://oldbox.orlandoviols.com/"}});
+  if(!config.empty()) {
+    try {
+      js_cfg = nlohmann::json::parse(config);
+    }
+    catch(const std::exception& err) {
+      DEBUG(config);
+      DEBUG(err.what());
+    }
+  }
+  deviceid = js_cfg.value("deviceid", deviceid);
+  lobby = ovstrrep(js_cfg.value("url", lobby), "\\/", "/");
+  if(deviceid.empty())
+    deviceid = getmacaddr();
+}
 
 namespace webCURL {
 
@@ -70,7 +111,7 @@ bool upload_log(const std::string& deviceid, const std::string& str, bool init)
       (char*)malloc(1); /* will be grown as needed by the realloc above */
   chunk.size = 0;       /* no data at this point */
   std::string url =
-      host + "?sendlog=" + deviceid + "&clear=" + std::to_string((int)init);
+      lobby + "?sendlog=" + deviceid + "&clear=" + std::to_string((int)init);
   curl_easy_reset(curl);
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_USERPWD, "device:device");
@@ -108,7 +149,7 @@ void service()
       deviceid = getmacaddr();
       if(!deviceid.empty()) {
         std::lock_guard<std::mutex> lk(logmtx);
-        std::cout << "Uploading log to " + host + " for device \"" + deviceid +
+        std::cout << "Uploading log to " + lobby + " for device \"" + deviceid +
                          "\".\n";
       }
     }
@@ -145,7 +186,7 @@ int main(int argc, char** argv)
       app_usage("ovbox_sendlog", long_options, "");
       return 0;
     case 's':
-      host = optarg;
+      lobby = optarg;
       break;
     }
   }

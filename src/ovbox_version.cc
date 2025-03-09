@@ -1,7 +1,7 @@
 /*
  * This file is part of the ovbox software tool, see <http://orlandoviols.com/>.
  *
- * Copyright (c) 2020-2024 Giso Grimm
+ * Copyright (c) 2020-2025 Giso Grimm
  */
 /*
  * ovbox_version is free software: you can redistribute it and/or modify
