@@ -59,12 +59,12 @@ if test ! -e ${BOOTFS}/ovclient-noupdate; then
     if (cat /proc/mounts | grep -e " / ")|grep -q -e overlay; then
         echo "overlay fs, not updating"
     else
-        # get the latest installer script:
+        # run the installer script:
         ./install 2>&1 | tee -a ${HOME}/install.log
         # test for openMHA install request:
         if test -e ${BOOTFS}/ov-client-instmha; then
             rm -f ${BOOTFS}/ov-client-instmha
-            #sudo apt install --no-install-recommends --assume-yes openmha openmha-examples
+            sudo apt install --no-install-recommends --assume-yes openmha openmha-examples
         fi
         # activate overlay image in case the installation script failed, and try the best we can:
         sudo raspi-config nonint enable_overlayfs
@@ -87,6 +87,14 @@ while true; do
     if test -e ~ov/ov-client.firmwareupdate; then
         # firmware update requested: disable overlayfs and restart
         sudo rm -f ~ov/ov-client.firmwareupdate
+        sudo raspi-config nonint disable_overlayfs
+        sudo shutdown -r now
+    fi
+    # test for firmware update via git:
+    if test -e ~ov/ov-client.firmwareupdategit; then
+        # firmware update requested: disable overlayfs and restart
+        sudo rm -f ~ov/ov-client.firmwareupdategit
+        sudo touch ${BOOTFS}/ovclient-firmwareupdate-git
         sudo raspi-config nonint disable_overlayfs
         sudo shutdown -r now
     fi
