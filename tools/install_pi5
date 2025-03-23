@@ -255,4 +255,4 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
     sync
     echo "successfully installed ovbox system!"
-) | (ovbox_sendlog || cat)
+) 2>&1 | (ovbox_sendlog || cat)

@@ -65,7 +65,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
         fi
     fi
 
-) | (ovbox_sendlog || cat)
+) 2>&1 | (ovbox_sendlog || cat)
 
 if test ! -e ${BOOTFS}/ovclient-noupdate; then
     # if not on overlayfs then update/reinstall:
