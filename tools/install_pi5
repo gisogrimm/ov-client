@@ -4,10 +4,10 @@
 # repository hosted by Hoerzentrum Oldenburg (apt.hoertech.de) or
 # compile and install from source. It expects to be running on a
 # Raspberry Pi, with the user "pi" in the home folder "/home/pi". It
-# will create an additional user "ov" to run the actual ovbox process.
+# will create an additional user "ov" to run the actual OVBOX process.
 #
 # Important: Do not run this script on a system that is not intended
-# to be used solely as an ovbox.
+# to be used solely as an OVBOX.
 
 BRANCH=master
 if ! test -z "$1"; then
@@ -25,7 +25,6 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     cd
 
     echo "Installing OVBOX $BRANCH"
-
     echo ""
 
     echo "BOOTS = ${BOOTFS}"
@@ -170,6 +169,9 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
         echo "Installing latest key"
 	wget -qO- http://apt.hoertech.de/openmha-packaging.pub | sudo apt-key add -
 	(echo "";echo "deb [arch=${OSARCH}] http://apt.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
+        if test "$BRANCH" = "development"; then
+	    (echo "";echo "deb [arch=${OSARCH}] http://aptdev.hoertech.de ${OSRELHTCH} universe")|sudo tee -a /etc/apt/sources.list
+        fi
 	sync
 
 	# in case someone powered off during installation we need to fix unconfigured packages:
@@ -245,14 +247,14 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     sudo -E apt update --assume-yes || true
     sudo -E apt autoremove --assume-yes || true
 
-    echo "wait 10 s, then activate overlay image to avoid damage of the SD card upon power off:"
-    sleep 10
-    sudo raspi-config nonint enable_overlayfs
-    sync
+    #echo "wait 10 s, then activate overlay image to avoid damage of the SD card upon power off:"
+    #sleep 10
+    #sudo raspi-config nonint enable_overlayfs
+    #sync
+    #
+    #echo "ready, reboot:"
+    #sudo shutdown -r now
 
-    echo "ready, reboot:"
-    sudo shutdown -r now
-
     sync
-    echo "successfully installed ovbox system!"
+    echo "Successfully installed OVBOX system!"
 ) 2>&1 | (ovbox_sendlog || cat)

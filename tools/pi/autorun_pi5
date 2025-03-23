@@ -7,9 +7,10 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
     echo "Starting OVBOX service"
     ovbox_version || true
+    echo ""
 
     # deactivate power saving:
-    echo "Switch CPU to performance mode:"
+    echo "Switching CPU to performance mode..."
     for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
                                                           | sudo tee $cpu/cpufreq/scaling_governor; done
     echo ""
@@ -120,9 +121,9 @@ while true; do
     fi
     # check for development version:
     if test -e ~ov/ov-client.usedevversion; then
+        sudo rm -f ~ov/ov-client.usedevversion
         echo "switching to development version"
         # switch to development version:
-        sudo rm -f ~ov/ov-client.usedevversion
         # build latest version:
         ./install development 2>&1 | tee -a ${HOME}/install.log
     fi
