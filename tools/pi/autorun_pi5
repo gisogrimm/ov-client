@@ -3,56 +3,67 @@
 #BOOTFS=/boot
 BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
-# deactivate power saving:
-for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
-                                                      | sudo tee $cpu/cpufreq/scaling_governor; done
+(
 
-## Stop the ntp service
-#sudo service ntp stop
+    echo "Starting OVBOX service"
+    ovbox_version || true
 
-## Stop the triggerhappy service
-sudo service triggerhappy stop
+    # deactivate power saving:
+    echo "Switch CPU to performance mode:"
+    for cpu in /sys/devices/system/cpu/cpu[0-9]*; do echo -n performance \
+                                                          | sudo tee $cpu/cpufreq/scaling_governor; done
 
-## Stop the dbus service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-sudo service dbus stop
+    ## Stop the ntp service
+    #sudo service ntp stop
 
-## Stop the console-kit-daemon service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-sudo killall console-kit-daemon
+    echo "Stop unneeded system services:"
+    ## Stop the triggerhappy service
+    sudo service triggerhappy stop
 
-## Stop the polkitd service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-sudo killall polkitd
+    ## Stop the dbus service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    sudo service dbus stop
 
-## Kill the usespace gnome virtual filesystem daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-killall gvfsd
+    ## Stop the console-kit-daemon service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    sudo killall console-kit-daemon
 
-## Kill the userspace D-Bus daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-killall dbus-daemon
+    ## Stop the polkitd service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    sudo killall polkitd
 
-## Kill the userspace dbus-launch daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-killall dbus-launch
+    ## Kill the usespace gnome virtual filesystem daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    killall gvfsd
 
-## Stop all wifi/bluetooth devices
-rfkill block all
+    ## Kill the userspace D-Bus daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    killall dbus-daemon
 
-# activate WiFi if required:
-if test -e ${BOOTFS}/ovclient-wifi.txt; then
-    # remove DOS line ends:  -e 's/\r//1'
-    # the first line contains the SSID:
-    SSID=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
-    # the second line the WIFI password:
-    PW=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
-    COUNTRYCODE=DE
-    test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
-    echo "connecting to WiFi ${SSID}"
-    if test -n "${SSID}"; then
-        sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
-        sleep 2
-        rfkill unblock wifi
-        sleep 10
-        sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
-        sleep 20
+    ## Kill the userspace dbus-launch daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
+    killall dbus-launch
+
+    ## Stop all wifi/bluetooth devices
+    rfkill block all
+
+    # activate WiFi if required:
+    if test -e ${BOOTFS}/ovclient-wifi.txt; then
+        # remove DOS line ends:  -e 's/\r//1'
+        # the first line contains the SSID:
+        SSID=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '1 ! d' -e 's/\r//1')
+        # the second line the WIFI password:
+        PW=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
+        COUNTRYCODE=DE
+        test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
+        echo "connecting to WiFi ${SSID}"
+        if test -n "${SSID}"; then
+            sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+            sleep 2
+            rfkill unblock wifi
+            echo "Waiting 10 seconds for the Wifi device to start..."
+            sleep 10
+            sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+            echo "Waiting 20 seconds for the Wifi device to connect..."
+            sleep 20
+        fi
     fi
-fi
+
+) | (ovbox_sendlog || cat)
 
 if test ! -e ${BOOTFS}/ovclient-noupdate; then
     # if not on overlayfs then update/reinstall:
@@ -72,7 +83,6 @@ if test ! -e ${BOOTFS}/ovclient-noupdate; then
         sudo shutdown -r now
     fi
 fi
-
 
 # start client:
 while true; do

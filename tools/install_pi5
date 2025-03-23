@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# This script will compile and install the ovbox software from
-# source. It expects to be running on a Raspberry Pi, with the user
-# "pi" in the home folder "/home/pi". It will create an additional
-# user "ov" to run the actual ovbox process.
+# This script will install the OVBOX software, either from the apt
+# repository hosted by Hoerzentrum Oldenburg (apt.hoertech.de) or
+# compile and install from source. It expects to be running on a
+# Raspberry Pi, with the user "pi" in the home folder "/home/pi". It
+# will create an additional user "ov" to run the actual ovbox process.
 #
 # Important: Do not run this script on a system that is not intended
 # to be used solely as an ovbox.
@@ -234,4 +235,4 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
     sync
     echo "successfully installed ovbox system!"
-)
+) | (ovbox_sendlog || cat)
