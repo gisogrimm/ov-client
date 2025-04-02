@@ -229,7 +229,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     sync
 
     echo "install and activate NTP:"
-    sudo -E apt install --assume-yes ntp
+    sudo -E apt install --assume-yes ntp ntpdate
     #sudo systemctl stop systemd-timesyncd
     NTPCONF=$(find /etc -name ntp.conf  2>/dev/null) || true
     sudo sed -i -e 's/^pool.*/#&/1' -e '/ptbtime/ d' $NTPCONF

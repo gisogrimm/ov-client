@@ -3,7 +3,16 @@
 #BOOTFS=/boot
 BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 
+
+echo "try to set the system clock to avoid invalid sever times"
+sudo service ntp stop || true
+sudo ntpdate pool.ntp.org || true
+sudo service ntp start || true
+
 (
+    echo "------------------------------------------------"
+    date
+    echo ""
 
     echo "Starting OVBOX service"
     ovbox_version || true
