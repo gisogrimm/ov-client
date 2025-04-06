@@ -92,7 +92,6 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     # - bookworm (no apt available)
     # - first install (ovbox_version not yet available)
     if test -e ${BOOTFS}/ovclient-firmwareupdate-git || test "bookworm" = "${OSREL}" || ( ! ovbox_version ); then
-	sudo rm -f ${BOOTFS}/ovclient-firmwareupdate-git || true
 	# install from git repo:
         echo "installing from git reposiroy"
 
