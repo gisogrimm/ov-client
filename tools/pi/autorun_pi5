@@ -109,14 +109,15 @@ while true; do
     fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
-        # firmware update requested: disable overlayfs and restart
+        # firmware update via apt requested: disable overlayfs and restart
         sudo rm -f ~ov/ov-client.firmwareupdate
+	sudo rm -f ${BOOTFS}/ovclient-firmwareupdate-git || true
         sudo raspi-config nonint disable_overlayfs
         sudo shutdown -r now
     fi
     # test for firmware update via git:
     if test -e ~ov/ov-client.firmwareupdategit; then
-        # firmware update requested: disable overlayfs and restart
+        # firmware update via git requested: disable overlayfs and restart
         sudo rm -f ~ov/ov-client.firmwareupdategit
         sudo touch ${BOOTFS}/ovclient-firmwareupdate-git
         sudo raspi-config nonint disable_overlayfs
