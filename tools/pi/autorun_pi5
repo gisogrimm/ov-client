@@ -53,6 +53,8 @@ sudo service ntp start || true
     ## Stop all wifi/bluetooth devices
     rfkill block all
 
+    ntpq -p
+
     # activate WiFi if required:
     if test -e ${BOOTFS}/ovclient-wifi.txt; then
         # remove DOS line ends:  -e 's/\r//1'
@@ -62,8 +64,8 @@ sudo service ntp start || true
         PW=$(cat ${BOOTFS}/ovclient-wifi.txt|sed -e '2 ! d' -e 's/\r//1')
         COUNTRYCODE=DE
         test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
-        echo "connecting to WiFi ${SSID}"
         if test -n "${SSID}"; then
+            echo "connecting to WiFi ${SSID}"
             sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
             sleep 2
             rfkill unblock wifi
