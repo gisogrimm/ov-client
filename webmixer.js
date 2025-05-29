@@ -129,7 +129,9 @@ io.on( 'connection', function( socket ) {
       }
       if ( msg[ 0 ].startsWith( '/touchosc/fader' ) && ( !msg[ 0 ]
           .endsWith( '/color' ) ) ) {
-        socket.emit( 'updatefader', msg[ 0 ], msg[ 1 ] );
+        if ( msg[ 1 ] != -Infinity ) socket.emit( 'updatefader',
+          msg[ 0 ], msg[ 1 ] );
+        else socket.emit( 'updatefader', msg[ 0 ], -80 );
       }
       if ( msg[ 0 ].startsWith( '/touchosc/level' ) ) {
         socket.emit( 'updatefader', msg[ 0 ], msg[ 1 ] );
@@ -180,7 +182,7 @@ io.on( 'connection', function( socket ) {
       if ( msg[ 0 ] == '/varlist/getval' ) {
         if ( varlist[ msg[ 1 ] ] !== null ) {
           socket.emit( 'updatevar', msg[ 1 ].replace(
-            /[^a-zA-Z0-9]/g, '' ), msg[ 2 ] );
+              /[^a-zA-Z0-9]/g, '' ), msg[ 2 ], varlist[msg[ 1 ]].type );
         }
       }
       if ( msg[ 0 ] == '/varlist/begin' ) varlist = {};
@@ -191,8 +193,20 @@ io.on( 'connection', function( socket ) {
             'path': msg[ 1 ],
             'range': msg[ 4 ],
             'comment': msg[ 5 ],
-            'label': msg[ 1 ]
+            'label': msg[ 1 ],
+            'type': 'float'
           };
+        } else {
+          if ( ( msg[ 2 ] == 'i' ) && ( msg[ 4 ] == 'bool' ) ) {
+            var grps = msg[ 1 ].split( '/' );
+            if ( grps.length > 3 ) varlist[ msg[ 1 ] ] = {
+              'path': msg[ 1 ],
+              'range': msg[ 4 ],
+              'comment': msg[ 5 ],
+              'label': msg[ 1 ],
+              'type': 'bool'
+            };
+          }
         }
       }
       if ( msg[ 0 ] == '/varlist/end' ) {
@@ -260,7 +274,6 @@ io.on( 'connection', function( socket ) {
     }
   } );
 } );
-
 /*
  * Local Variables:
  * c-basic-offset: 2

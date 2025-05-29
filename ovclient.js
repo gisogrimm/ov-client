@@ -609,14 +609,21 @@ socket.on( "updatemute", function( fader, val ) {
     fad.checked = ( val == 1 );
   }
 } );
-socket.on( 'updatevar', function( id, val ) {
-  if ( val != null ) {
-    let el = document.getElementById( id );
-    if ( el ) el.setAttribute( 'value', val );
-    let el2 = document.getElementById( id + '.disp' );
-    if ( el2 ) el2.setAttribute( 'value', parseFloat( val.toPrecision(
-      4 ) ) );
-  }
+socket.on( 'updatevar', function( id, val, vartype ) {
+    if ( (val != null) && (vartype == 'float') ) {
+        let el = document.getElementById( id );
+        if ( el ) el.setAttribute( 'value', val );
+        let el2 = document.getElementById( id + '.disp' );
+        if ( el2 ) el2.setAttribute( 'value', parseFloat( val.toPrecision(
+            4 ) ) );
+    }
+    if ( (val != null) && (vartype == 'bool') ) {
+        let el = document.getElementById( id );
+        if ( el ) el.checked = (val != 0);
+        //let el2 = document.getElementById( id + '.disp' );
+        //if ( el2 ) el2.setAttribute( 'value', parseFloat( val.toPrecision(
+        //    4 ) ) );
+    }
 } );
 socket.on( 'oscvarlist', function( parents, varlist ) {
   let el = document.getElementById( 'plugpars' );
@@ -648,44 +655,65 @@ socket.on( 'oscvarlist', function( parents, varlist ) {
       //dpluglab.setAttribute('value',v.label);
       dpluglab.setAttribute( 'title', v.comment );
       var inp = dplug.appendChild( document.createElement( 'input' ) );
+      var inp2 = dplug.appendChild( document.createElement( 'input' ) );
       inp.setAttribute( 'class', 'parstripctl' );
       inp.setAttribute( 'id', v.id );
       inp.setAttribute( 'title', v.comment );
-      var inp2 = dplug.appendChild( document.createElement( 'input' ) );
       inp2.setAttribute( 'class', 'parstripdisp' );
       inp2.setAttribute( 'id', v.id + '.disp' );
-      inp2.setAttribute( 'type', 'number' );
-      inp2.setAttribute( 'step', 'any' );
+      if ( v.type == 'float' ) {
+        inp2.setAttribute( 'type', 'number' );
+        inp2.setAttribute( 'step', 'any' );
+      }
+        if( v.type=='bool'){
+        inp2.setAttribute( 'style', 'display:none;' );
+        }
       inp2.setAttribute( 'title', v.comment );
-      var rg = v.range.split( ',' );
-      if ( rg.length == 2 ) {
-        var vmin = parseFloat( rg[ 0 ].replace( '[', '' ).replace( ']',
-          '' ) );
-        var vmax = parseFloat( rg[ 1 ].replace( '[', '' ).replace( ']',
-          '' ) );
-        const step = ( vmax - vmin ) / 256;
-        if ( rg[ 0 ].startsWith( ']' ) ) vmin += step;
-        if ( rg[ 1 ].endsWith( '[' ) ) vmax -= step;
-        inp.setAttribute( 'type', 'range' );
-        inp.setAttribute( 'min', vmin );
-        inp.setAttribute( 'max', vmax );
-        inp.setAttribute( 'step', step );
-      } else {
-        inp.setAttribute( 'type', 'number' );
-        inp.setAttribute( 'step', 'any' );
+      if ( v.type == 'float' ) {
+        var rg = v.range.split( ',' );
+        if ( rg.length == 2 ) {
+          var vmin = parseFloat( rg[ 0 ].replace( '[', '' ).replace( ']',
+            '' ) );
+          var vmax = parseFloat( rg[ 1 ].replace( '[', '' ).replace( ']',
+            '' ) );
+          const step = ( vmax - vmin ) / 256;
+          if ( rg[ 0 ].startsWith( ']' ) ) vmin += step;
+          if ( rg[ 1 ].endsWith( '[' ) ) vmax -= step;
+          inp.setAttribute( 'type', 'range' );
+          inp.setAttribute( 'min', vmin );
+          inp.setAttribute( 'max', vmax );
+          inp.setAttribute( 'step', step );
+        } else {
+          inp.setAttribute( 'type', 'number' );
+          inp.setAttribute( 'step', 'any' );
+        }
+      }
+      if ( v.type == 'bool' ) {
+        inp.setAttribute( 'type', 'checkbox' );
       }
       inp.onchange = function( e ) {
-        socket.emit( "msg", {
-          "path": v.path,
-          "value": e.target.valueAsNumber
-        } );
+        if ( v.type == 'float' ) {
+          socket.emit( "msg", {
+            "path": v.path,
+            "value": e.target.valueAsNumber
+          } );
+        } else if ( v.type == 'bool' ) {
+          if ( e.target.checked ) socket.emit( "msg", {
+            "path": v.path,
+            "value": 1
+          } );
+          else socket.emit( "msg", {
+            "path": v.path,
+            "value": 0
+          } );
+        }
         socket.emit( "msg", {
           "path": "/uploadpluginsettings",
           "value": null
         } );
         let inp = document.getElementById( v.id + '.disp' );
-        if ( inp ) inp.value = parseFloat( e.target.valueAsNumber
-          .toPrecision( 4 ) );
+        if ( inp && ( v.type == 'float' ) ) inp.value = parseFloat( e
+          .target.valueAsNumber.toPrecision( 4 ) );
       };
       inp2.onchange = function( e ) {
         socket.emit( "msg", {
