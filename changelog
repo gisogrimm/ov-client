@@ -1,5 +1,6 @@
-2025-06-16, version 0.30.6
+2025-06-16, version 0.30.7
  - add parametric equalizer
+ - multi-bank support in BCF2000 mixer interface
 
 2025-04-06, version 0.30.1
 
