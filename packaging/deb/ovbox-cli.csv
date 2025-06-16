@@ -29,6 +29,7 @@ libov/tascar/plugins/build/ovclienttascar_route.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_savegains.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_serialheadtracker.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_sleep.so,usr/lib/
+libov/tascar/plugins/build/ovclienttascar_snapangle.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_system.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_systime.so,usr/lib/
 libov/tascar/plugins/build/ovclienttascar_waitforjackport.so,usr/lib/
