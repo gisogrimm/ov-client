@@ -369,36 +369,41 @@ function objmix_draw() {
   ctx.save();
   ctx.font = "24px sans";
   Object.entries( inchannelpos ).forEach( ( [ key, vertex ], index ) => {
+    var gain = 0;
+    if ( "gain" in vertex )
+      gain = vertex.gain;
     // Calculate position on screen
     const pos = pos2scr( vertex );
     // Calculate color based on position
     const color = HSVtoRGB( index / Object.entries( inchannelpos ).length,
       0.65, 0.8 );
-    // Draw connection line
-    ctx.beginPath();
-    ctx.strokeStyle = `rgb(${color.r},${color.g},${color.b})`;
-    ctx.lineWidth = 3;
-    const rotatedPos = euler_loc( {
-      x: 0.5,
-      y: 0,
-      z: 0
-    }, vertex.rz, vertex.ry, vertex.rx );
-    rotatedPos.x += vertex.x;
-    rotatedPos.y += vertex.y;
-    rotatedPos.z += vertex.z;
-    const rotatedScreen = pos2scr( rotatedPos );
-    ctx.moveTo( pos.x, pos.y );
-    ctx.lineTo( rotatedScreen.x, rotatedScreen.y );
-    ctx.stroke();
-    // Draw channel marker
-    ctx.beginPath();
-    ctx.arc( pos.x, pos.y, 20 * Math.sqrt( canvas.width / 1000 ), 0, Math
-      .PI * 2 );
-    ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`;
-    ctx.fill();
-    // Draw channel label
-    ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`;
-    ctx.fillText( vertex.name, pos.x + 24, pos.y - 5 );
+    if ( gain > -29 ) {
+      // Draw connection line
+      ctx.beginPath();
+      ctx.strokeStyle = `rgb(${color.r},${color.g},${color.b})`;
+      ctx.lineWidth = 3;
+      const rotatedPos = euler_loc( {
+        x: 0.5,
+        y: 0,
+        z: 0
+      }, vertex.rz, vertex.ry, vertex.rx );
+      rotatedPos.x += vertex.x;
+      rotatedPos.y += vertex.y;
+      rotatedPos.z += vertex.z;
+      const rotatedScreen = pos2scr( rotatedPos );
+      ctx.moveTo( pos.x, pos.y );
+      ctx.lineTo( rotatedScreen.x, rotatedScreen.y );
+      ctx.stroke();
+      // Draw channel marker
+      ctx.beginPath();
+      ctx.arc( pos.x, pos.y, 20 * Math.sqrt( canvas.width / 1000 ), 0, Math
+        .PI * 2 );
+      ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`;
+      ctx.fill();
+      // Draw channel label
+      //ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`;
+      ctx.fillText( vertex.name, pos.x + 24, pos.y - 5 );
+    }
   } );
   // Draw receiver
   ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
@@ -720,6 +725,18 @@ socket.on( "scene", function( scene ) {
     el.appendChild( elgainstore );
   }
 } );
+socket.on( "vertexgain", function( vertexid, gain ) {
+  if ( vertexid in inchannelpos ) {
+    if ( 'gain' in inchannelpos[ vertexid ] ) {
+      if ( gain != inchannelpos[ vertexid ].gain ) {
+        inchannelpos[ vertexid ].gain = gain;
+        objmix_draw();
+      }
+    } else {
+      inchannelpos[ vertexid ].gain = gain;
+    }
+  }
+} );
 socket.on( "vertexpos", function( vertexid, name, x, y, z, path ) {
   if ( Reflect.has( inchannelpos, vertexid ) ) {
     inchannelpos[ vertexid ].name = name;
@@ -736,7 +753,8 @@ socket.on( "vertexpos", function( vertexid, name, x, y, z, path ) {
       'rz': 0,
       'ry': 0,
       'rx': 0,
-      'path': path
+      'path': path,
+      'gain': 0
     };
   }
   update_objmix_sounds();

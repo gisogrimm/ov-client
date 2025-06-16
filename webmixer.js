@@ -6,6 +6,7 @@ var iolib = require( 'socket.io' );
 var osc = require( 'node-osc' );
 var path = require( 'path' );
 const homedir = require( 'os' ).homedir();
+var vertexgain = {};
 var deviceid = ''; {
   var devname = 'localhost';
   try {
@@ -129,9 +130,18 @@ io.on( 'connection', function( socket ) {
       }
       if ( msg[ 0 ].startsWith( '/touchosc/fader' ) && ( !msg[ 0 ]
           .endsWith( '/color' ) ) ) {
+        Object.entries( vertexgain ).forEach( ( [ vertexid,
+          vgain ] ) => {
+          oscClient.send( vgain.path + '/get',
+            'osc.udp://localhost:9000/', '/soundgain' );
+        } );
         if ( msg[ 1 ] != -Infinity ) socket.emit( 'updatefader',
           msg[ 0 ], msg[ 1 ] );
         else socket.emit( 'updatefader', msg[ 0 ], -80 );
+        Object.entries( vertexgain ).forEach( ( [ vertexid,
+          vgain ] ) => {
+          socket.emit( 'vertexgain', vertexid, vgain.gain );
+        } );
       }
       if ( msg[ 0 ].startsWith( '/touchosc/level' ) ) {
         socket.emit( 'updatefader', msg[ 0 ], msg[ 1 ] );
@@ -145,6 +155,10 @@ io.on( 'connection', function( socket ) {
         const vertexid = vpvars.join( "/" );
         socket.emit( 'vertexpos', vertexid, vpname, msg[ 2 ], msg[
           3 ], msg[ 4 ], msg[ 1 ] );
+        var gainpath = msg[ 1 ].substring( 0, msg[ 1 ].length -
+          10 ) + '/gain/get';
+        oscClient.send( gainpath, 'osc.udp://localhost:9000/',
+          '/soundgain' );
       }
       if ( msg[ 0 ] == '/tascarpos' ) {
         var vpvars = msg[ 1 ].split( '/' );
@@ -161,6 +175,23 @@ io.on( 'connection', function( socket ) {
             msg[ 3 ], msg[ 4 ], msg[ 5 ] * Math.PI / 180, msg[
               6 ] * Math.PI / 180, msg[ 7 ] * Math.PI / 180,
             msg[ 1 ] );
+        }
+      }
+      if ( msg[ 0 ] == '/soundgain' ) {
+        var vpvars = msg[ 1 ].split( '/' );
+        var vpname = vpvars[ 2 ] + '.' + vpvars[ 3 ];
+        if ( vpvars[ 2 ] == 'ego' ) vpname = vpvars[ 3 ];
+        vpvars[ 2 ] = vpvars[ 2 ] + '.' + vpvars[ 3 ];
+        vpvars.splice( 3 );
+        const vertexid = vpvars.join( "/" );
+        if ( vertexid in vertexgain ) {
+          vertexgain[ vertexid ].gain = msg[ 2 ];
+          vertexgain[ vertexid ].path = msg[ 1 ];
+        } else {
+          vertexgain[ vertexid ] = {
+            'gain': msg[ 2 ],
+            'path': msg[ 1 ]
+          };
         }
       }
       if ( msg[ 0 ] == '/jackrec/start' ) socket.emit(
@@ -182,7 +213,8 @@ io.on( 'connection', function( socket ) {
       if ( msg[ 0 ] == '/varlist/getval' ) {
         if ( varlist[ msg[ 1 ] ] !== null ) {
           socket.emit( 'updatevar', msg[ 1 ].replace(
-              /[^a-zA-Z0-9]/g, '' ), msg[ 2 ], varlist[msg[ 1 ]].type );
+            /[^a-zA-Z0-9]/g, '' ), msg[ 2 ], varlist[ msg[
+            1 ] ].type );
         }
       }
       if ( msg[ 0 ] == '/varlist/begin' ) varlist = {};
