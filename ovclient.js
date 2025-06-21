@@ -377,7 +377,7 @@ function objmix_draw() {
     // Calculate color based on position
     const color = HSVtoRGB( index / Object.entries( inchannelpos ).length,
       0.65, 0.8 );
-    if ( gain > -29 ) {
+    if ( gain > -100 ) {
       // Draw connection line
       ctx.beginPath();
       ctx.strokeStyle = `rgb(${color.r},${color.g},${color.b})`;
@@ -565,15 +565,29 @@ socket.on( 'objmixredraw', function( p ) {
 let form = document.getElementById( "mixer" );
 if ( form ) form.oninput = handleChange;
 
+function gain_to_gui( dbGain ) {
+  guiGain = Math.pow( ( ( dbGain + 200.0 ) / 210.0 ), 6.0 );
+  return guiGain;
+}
+
+function gui_to_gain( guiGain ) {
+  dbGain = 210.0 * ( Math.pow( guiGain, 1 / 6 ) ) - 200.0;
+  return dbGain;
+}
+
+/**
+ * Upload gain values from mixer
+ */
 function handleChange( e ) {
   if ( e.target.id.substr( 0, 3 ) == "txt" ) {
+    // text field contains dB values, no conversion:
     socket.emit( "msg", {
       path: e.target.id.substr( 3 ),
       value: e.target.valueAsNumber
     } );
     let fad = document.getElementById( e.target.id.substr( 3 ) );
     if ( fad != null ) {
-      fad.value = e.target.valueAsNumber;
+      fad.value = gain_to_gui( e.target.valueAsNumber );
     }
   } else {
     if ( e.target.type == "checkbox" ) {
@@ -586,14 +600,16 @@ function handleChange( e ) {
         value: 0
       } );
     } else {
+      // range fader, conversion needed:
+      const new_gain = gui_to_gain( e.target.valueAsNumber );
       socket.emit( "msg", {
         path: e.target.id,
-        value: e.target.valueAsNumber
+        value: new_gain
       } );
-      let fadt = document.getElementById( e.target.id );
-      if ( fadt != null ) {
-        fadt.value = e.target.valueAsNumber.toFixed( 1 );
-      }
+      //let fadt = document.getElementById( e.target.id );
+      //  if ( fadt != null ) {
+      //  //fadt.value = new_gain.toFixed( 1 );
+      //}
     }
   }
 }
@@ -828,6 +844,17 @@ socket.on( "newfader", function( faderno, val ) {
     let el_row3 = el_mixerstrip.appendChild( document.createElement(
       "div" ) );
     el_row3.setAttribute( "class", "mixerrow" );
+    let datalist = document.createElement( "tickbox" );
+    datalist.setAttribute( "class", "fadertickbox" );
+    [ -40, -30, -20, -10, 0, 5, 10 ].forEach( function( item, index ) {
+      let opt = datalist.appendChild( document.createElement(
+        "div" ) );
+      opt.setAttribute( "style", "left: " + 100 * gain_to_gui( item ) +
+        "%;" );
+      opt.setAttribute( "class", "fadertick" );
+      opt.appendChild( document.createTextNode( item ) );
+    } );
+    el_row1.appendChild( datalist );
     let el_lab = el_row1.appendChild( document.createElement( "label" ) );
     el_lab.setAttribute( "for", fader );
     el_lab.setAttribute( "class", "mixerlabel" );
@@ -848,17 +875,18 @@ socket.on( "newfader", function( faderno, val ) {
     let el_fader = el_row2.appendChild( document.createElement( "input" ) );
     el_fader.setAttribute( "class", "fader" );
     el_fader.setAttribute( "type", "range" );
-    el_fader.setAttribute( "min", "-30" );
-    el_fader.setAttribute( "max", "10" );
+    el_fader.setAttribute( "min", "0" );
+    el_fader.setAttribute( "max", "1" );
     el_fader.setAttribute( "value", val );
-    el_fader.setAttribute( "step", "0.1" );
+    el_fader.setAttribute( "step", 1 / 127 );
     el_fader.setAttribute( "id", fader );
+    //el_fader.setAttribute("list","gainfadervals");
     el_fader.onchange = upload_session_gains;
     let el_gaintext = el_row2.appendChild( document.createElement(
       "input" ) );
     el_gaintext.setAttribute( "type", "number" );
     el_gaintext.setAttribute( "class", "gaintxtfader" );
-    el_gaintext.setAttribute( "min", "-30" );
+    el_gaintext.setAttribute( "min", "-200" );
     el_gaintext.setAttribute( "max", "10" );
     el_gaintext.setAttribute( "step", "0.1" );
     el_gaintext.setAttribute( "id", "txt" + fader );
@@ -887,7 +915,7 @@ socket.on( "newfader", function( faderno, val ) {
 socket.on( "updatefader", function( fader, val ) {
   let fad = document.getElementById( fader );
   if ( ( fad != null ) && ( val != null ) ) {
-    fad.value = val;
+    fad.value = gain_to_gui( val );
   }
   let fadt = document.getElementById( "txt" + fader );
   if ( ( fadt != null ) && ( val != null ) ) {
