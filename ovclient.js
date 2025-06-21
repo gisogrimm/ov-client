@@ -914,9 +914,12 @@ socket.on( "newfader", function( faderno, val ) {
 } );
 socket.on( "updatefader", function( fader, val ) {
   let fad = document.getElementById( fader );
-  if ( ( fad != null ) && ( val != null ) ) {
-    fad.value = gain_to_gui( val );
-  }
+  if ( ( fad != null ) && ( val != null ) )
+    if ( fader.startsWith( '/touchosc/level' ) ) {
+        fad.value = val;
+    } else {
+      fad.value = gain_to_gui( val );
+    }
   let fadt = document.getElementById( "txt" + fader );
   if ( ( fadt != null ) && ( val != null ) ) {
     fadt.value = val.toFixed( 1 );
