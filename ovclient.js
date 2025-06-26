@@ -240,6 +240,14 @@ function on_canvas_move( e ) {
   }
 }
 
+function transform( p, pos, rz, ry, rx ) {
+  var ps = euler( p, rz, ry, rx );
+  ps.x += pos.x;
+  ps.y += pos.y;
+  ps.z += pos.z;
+  return ps;
+}
+
 /**
  * Draws receiver object on canvas
  * @param {CanvasRenderingContext2D} ctx - Canvas context
@@ -289,16 +297,19 @@ function draw_receiver( ctx, pos, rz, ry, rx ) {
     y: -2.3 * msize * scale,
     z: 0
   } ];
+  const transPoints = points.map( p => transform( p, pos, rz, ry, rx ) );
   // Apply rotations and translate points
-  points.forEach( p => {
-    const rotated = euler( p, rz, ry, rx );
-    p.x += pos.x;
-    p.y += pos.y;
-    p.z += pos.z;
-  } );
-  // Convert points to screen coordinates
-  const screenPoints = points.map( p => pos2scr( p ) );
+  //points.forEach( p => {
+  //  p = euler( p, rz, ry, rx );
+  //  p.x += pos.x;
+  //  p.y += pos.y;
+  //  p.z += pos.z;
+  //} );
+
   const center = pos2scr( pos );
+  //// Convert points to screen coordinates
+  const screenPoints = transPoints.map( p => pos2scr( p ) );
+  //} );
   // Calculate size scale
   const sizeRef = pos2scr( [ 0, 0 ] );
   const sizeScale = Math.sqrt( Math.pow( sizeRef.x - pos2scr( [ scale * msize,
@@ -916,7 +927,7 @@ socket.on( "updatefader", function( fader, val ) {
   let fad = document.getElementById( fader );
   if ( ( fad != null ) && ( val != null ) )
     if ( fader.startsWith( '/touchosc/level' ) ) {
-        fad.value = val;
+      fad.value = val;
     } else {
       fad.value = gain_to_gui( val );
     }
