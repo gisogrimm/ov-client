@@ -1,3 +1,6 @@
+2025-08-25, version 0.31.1
+ - correct display of orientation in object mixer
+
 2025-06-16, version 0.30.7
  - add parametric equalizer
  - multi-bank support in BCF2000 mixer interface
