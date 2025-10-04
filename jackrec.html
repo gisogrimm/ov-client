@@ -1,5 +1,5 @@
 <div class="nav">
-  <input type="button" class="navbutton tabact" id="tabactmixer" value="mixer" onclick="showtab('mixer');"><input type="button" class="navbutton" id="tabactjackrec" value="recorder" onclick="showtab('jackrec');"><input type="button" class="navbutton" value="plugins" id="tabactplugpars" onclick="showtab('plugpars');"><input type="button" class="navbutton" value="object mixer" id="tabactobjmix" onclick="showtab('objmix');">
+  <input type="button" class="navbutton tabact" id="tabactmixer" value="mixer" onclick="showtab('mixer');"><input type="button" class="navbutton" id="tabactjackrec" value="recorder" onclick="showtab('jackrec');"><input type="button" class="navbutton" value="plugins" id="tabactplugpars" onclick="showtab('plugpars');"><input type="button" class="navbutton" value="object mixer" id="tabactobjmix" onclick="showtab('objmix');"><input type="button" class="navbutton" value="tuner" id="tabacttuner" onclick="showtab('tuner');">
 </div>
 <div class="elemframe">
   <!-- audio recorder: -->
@@ -35,5 +35,15 @@
     <div class="objmixctl">
       <input class="ctlbutton" type="button" value="store positions and gains" onclick="objmix_upload_posandgains();">
     </div>
+  </div>
+  <div id="tuner" class="tuner tabhide">
+    <input type="checkbox" id="tuner_active" onclick="tuner_set_isactive();" checked="false">
+    <div id="tuner_notedisplay" class="tuner_notedisplay">--</div>
+    <div id="tuner_freqdisplay" class="tuner_freqdisplay">--</div>
+    <meter id="tuner_delta_neg" min="0" max="50" low="10" optimum="5" value="0" class="tunerscale" style="float:left;direction:rtl;"></meter>
+    <meter id="tuner_delta_pos" min="0" max="50" low="10" optimum="5" value="0" class="tunerscale" style="float:right;"></meter>
+    &nbsp;<br/>
+    <canvas id="tunercanvas">tuner</canvas>
+    <br/>
   </div>
 </div>

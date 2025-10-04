@@ -116,6 +116,17 @@ io.on( 'connection', function( socket ) {
     var varlist = {};
     oscClient.send( '/status', socket.id + ' connected' );
     oscServer.on( 'message', async function( msg, rinfo ) {
+      // instrument tuner:
+      if ( msg[ 0 ] == '/tuner' ) {
+        // update tuner GUI (frequency, note, octave, delta, confidence):
+        socket.emit( 'tuner', msg[ 1 ], msg[ 2 ], msg[ 3 ], msg[
+          4 ], msg[ 5 ] );
+      }
+      if ( msg[ 0 ] == '/tunerisactive' ) {
+        // update tuner GUI (frequency, note, octave, delta, confidence):
+        socket.emit( 'tunerisactive', msg[ 1 ] );
+      }
+      // OSC gain control and level meter:
       if ( msg[ 0 ] == '/touchosc/scene' ) {
         socket.emit( 'scene', 'scene' );
       }
@@ -131,7 +142,8 @@ io.on( 'connection', function( socket ) {
       if ( msg[ 0 ].startsWith( '/touchosc/fader' ) && ( !msg[ 0 ]
           .endsWith( '/color' ) ) ) {
         Object.entries( vertexgain ).forEach( ( [ vertexid,
-          vgain ] ) => {
+          vgain
+        ] ) => {
           oscClient.send( vgain.path + '/get',
             'osc.udp://localhost:9000/', '/soundgain' );
         } );
@@ -139,7 +151,8 @@ io.on( 'connection', function( socket ) {
           msg[ 0 ], msg[ 1 ] );
         else socket.emit( 'updatefader', msg[ 0 ], -80 );
         Object.entries( vertexgain ).forEach( ( [ vertexid,
-          vgain ] ) => {
+          vgain
+        ] ) => {
           socket.emit( 'vertexgain', vertexid, vgain.gain );
         } );
       }
@@ -293,7 +306,8 @@ io.on( 'connection', function( socket ) {
       '/varlist', '/bus.' );
     //oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     oscClient.send( '/*/globalpos/get', 'osc.udp://localhost:9000/',
-      '/vertexpos' );
+                    '/vertexpos' );
+      oscClient.send('/tuner/isactive/get','osc.udp://localhost:9000/', '/tunerisactive');
   } );
   socket.on( 'message', function( obj ) {
     oscClient.send( obj );

@@ -92,6 +92,26 @@ button {
     outline: none;
     opacity: 0.7;
 }
+.tunerscale {
+    width: 50%;
+    height: 40px;
+    border-radius: 0px;  
+    background: #282828;
+    outline: none;
+    opacity: 0.7;
+    display: block;
+}
+.tuner_notedisplay {
+    font-size: 500%;
+    font-weight: bold;
+    color: #eee;
+    text-align: center;
+}
+.tuner_freqdisplay {
+    font-size: 200%;
+    color: #eee;
+    text-align: center;
+}
 
 .checkbox {
     width: 30px;

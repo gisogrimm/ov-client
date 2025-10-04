@@ -450,6 +450,33 @@ function update_objmix_sounds() {
   objmix_draw();
 }
 
+function tuner_draw() {
+  const canvas = document.getElementById( "tunercanvas" );
+  if ( !canvas ) return;
+  // Set canvas dimensions
+  canvas.width = canvas.parentElement.clientWidth - 2;
+  canvas.height = 0.1 * canvas.width;
+  const ctx = canvas.getContext( "2d" );
+  ctx.fillStyle = '#153d17';
+  ctx.fillRect( 0, 0, canvas.width, canvas.height );
+  ctx.save();
+  // Draw background elements
+  ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+  // Draw delta scale
+  ctx.restore();
+}
+
+function tuner_set_isactive() {
+  tuner_active = document.getElementById( 'tuner_active' );
+  if ( tuner_active.checked ) socket.emit( "msg", {
+    "path": '/tuner/isactive',
+    "value": 1
+  } )
+  else socket.emit( "msg", {
+    "path": '/tuner/isactive',
+    "value": 0
+  } );
+}
 
 function upload_session_gains() {
   socket.emit( "msg", {
@@ -700,7 +727,7 @@ function jackrec_selectallports() {
 }
 
 function showtab( name ) {
-  names = [ 'mixer', 'plugpars', 'jackrec', 'objmix' ];
+  names = [ 'mixer', 'plugpars', 'jackrec', 'objmix', 'tuner' ];
   for ( var k = 0; k < names.length; k++ ) {
     var el = document.getElementById( names[ k ] );
     var elinp = document.getElementById( 'tabact' + names[ k ] );
@@ -715,6 +742,7 @@ function showtab( name ) {
     }
   }
   objmix_draw();
+  tuner_draw();
 }
 
 
@@ -1062,6 +1090,34 @@ socket.on( 'oscvarlist', function( parents, varlist ) {
       };
     }
   }
+} );
+socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
+  v_confidence ) {
+  tuner_draw();
+  tuner_delta_neg = document.getElementById( 'tuner_delta_neg' );
+  tuner_delta_pos = document.getElementById( 'tuner_delta_pos' );
+  tuner_note = document.getElementById( 'tuner_notedisplay' );
+  tuner_freq = document.getElementById( 'tuner_freqdisplay' );
+  tuner_delta_neg.value = -v_delta;
+  tuner_delta_pos.value = v_delta;
+  tuner_delta_neg.style.opacity = v_confidence;
+  tuner_delta_pos.style.opacity = v_confidence;
+  tuner_note.style.opacity = Math.sqrt( v_confidence );
+  while ( tuner_note.firstChild )
+    tuner_note.removeChild( tuner_note.firstChild );
+  tuner_freq.style.opacity = Math.sqrt( v_confidence );
+  while ( tuner_freq.firstChild )
+    tuner_freq.removeChild( tuner_freq.firstChild );
+  v_labels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb',
+    'B'
+  ];
+  tuner_note.appendChild( document.createTextNode( v_labels[ v_note ] ) );
+  tuner_freq.appendChild( document.createTextNode( v_freq.toFixed( 1 ) +
+                                                   " Hz " + v_delta.toFixed( 1 ) + " Cent (oct. " + v_octave.toFixed( 0 ) + ")" ) );
+} );
+socket.on( 'tunerisactive', function( isactive ) {
+  tuner_active = document.getElementById( 'tuner_active' );
+    tuner_active.checked = (isactive > 0);
 } );
 window.addEventListener( 'resize', function( event ) {
   objmix_draw();
