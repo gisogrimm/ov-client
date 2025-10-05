@@ -1115,9 +1115,30 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   tuner_freq.appendChild( document.createTextNode( v_freq.toFixed( 1 ) +
                                                    " Hz " + v_delta.toFixed( 1 ) + " Cent (oct. " + v_octave.toFixed( 0 ) + ")" ) );
 } );
-socket.on( 'tunerisactive', function( isactive ) {
-  tuner_active = document.getElementById( 'tuner_active' );
-    tuner_active.checked = (isactive > 0);
+socket.on( 'tuner_getvar', function( path, val ) {
+    if( path == '/tuner/isactive' ){
+        tuner_active = document.getElementById( 'tuner_active' );
+        tuner_active.checked = (val > 0);
+    }
+    if( path == '/tuner/f0' ){
+        tuner_pitcha = document.getElementById( 'tuner_pitcha' );
+        while ( tuner_pitcha.firstChild )
+            tuner_pitcha.removeChild( tuner_pitcha.firstChild );
+        tuner_pitcha.appendChild(document.createTextNode('a = '+val.toFixed(1)+' Hz'));
+    }
+    if( path == '/tuner/tuning' ){
+        tuner_tuning = document.getElementById( 'tuner_tuning' );
+        while ( tuner_tuning.firstChild )
+            tuner_tuning.removeChild( tuner_tuning.firstChild );
+        switch( val ){
+        case "equal":val="equal temperament"; break;
+        case "werkmeister":val="Werckmeister 3"; break;
+        case "meantone4":val="1/4 comma meantone"; break;
+        case "meantone6":val="1/6 comma meantone"; break;
+        case "valotti":val="Vallotti"; break;
+        }
+        tuner_tuning.appendChild(document.createTextNode(val));
+    }
 } );
 window.addEventListener( 'resize', function( event ) {
   objmix_draw();

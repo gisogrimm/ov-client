@@ -122,9 +122,9 @@ io.on( 'connection', function( socket ) {
         socket.emit( 'tuner', msg[ 1 ], msg[ 2 ], msg[ 3 ], msg[
           4 ], msg[ 5 ] );
       }
-      if ( msg[ 0 ] == '/tunerisactive' ) {
+      if ( msg[ 0 ] == '/tuner_getvar' ) {
         // update tuner GUI (frequency, note, octave, delta, confidence):
-        socket.emit( 'tunerisactive', msg[ 1 ] );
+          socket.emit( 'tuner_getvar', msg[ 1 ], msg[ 2 ] );
       }
       // OSC gain control and level meter:
       if ( msg[ 0 ] == '/touchosc/scene' ) {
@@ -307,7 +307,9 @@ io.on( 'connection', function( socket ) {
     //oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     oscClient.send( '/*/globalpos/get', 'osc.udp://localhost:9000/',
                     '/vertexpos' );
-      oscClient.send('/tuner/isactive/get','osc.udp://localhost:9000/', '/tunerisactive');
+      oscClient.send('/tuner/isactive/get','osc.udp://localhost:9000/', '/tuner_getvar');
+      oscClient.send('/tuner/f0/get','osc.udp://localhost:9000/', '/tuner_getvar');
+      oscClient.send('/tuner/tuning/get','osc.udp://localhost:9000/', '/tuner_getvar');
   } );
   socket.on( 'message', function( obj ) {
     oscClient.send( obj );

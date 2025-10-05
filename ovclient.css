@@ -112,6 +112,11 @@ button {
     color: #eee;
     text-align: center;
 }
+.tuner_tuningdisplay {
+    font-size: 180%;
+    color: #aaa;
+    text-align: center;
+}
 
 .checkbox {
     width: 30px;
