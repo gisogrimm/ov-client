@@ -1113,32 +1113,56 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   ];
   tuner_note.appendChild( document.createTextNode( v_labels[ v_note ] ) );
   tuner_freq.appendChild( document.createTextNode( v_freq.toFixed( 1 ) +
-                                                   " Hz " + v_delta.toFixed( 1 ) + " Cent (oct. " + v_octave.toFixed( 0 ) + ")" ) );
+    " Hz " + v_delta.toFixed( 1 ) + " Cent (oct. " + v_octave.toFixed(
+      0 ) + ")" ) );
 } );
 socket.on( 'tuner_getvar', function( path, val ) {
-    if( path == '/tuner/isactive' ){
-        tuner_active = document.getElementById( 'tuner_active' );
-        tuner_active.checked = (val > 0);
+  if ( path == '/tuner/isactive' ) {
+    tuner_active = document.getElementById( 'tuner_active' );
+    tuner_active.checked = ( val > 0 );
+    if ( !tuner_active.checked ) {
+      tuner_note = document.getElementById( 'tuner_notedisplay' );
+      tuner_freq = document.getElementById( 'tuner_freqdisplay' );
+      tuner_note.style.opacity = 1.0;
+      while ( tuner_note.firstChild )
+        tuner_note.removeChild( tuner_note.firstChild );
+      tuner_freq.style.opacity = 1.0;
+      while ( tuner_freq.firstChild )
+        tuner_freq.removeChild( tuner_freq.firstChild );
+      tuner_note.appendChild( document.createTextNode( "--" ) );
+      tuner_freq.appendChild( document.createTextNode( "--" ) );
     }
-    if( path == '/tuner/f0' ){
-        tuner_pitcha = document.getElementById( 'tuner_pitcha' );
-        while ( tuner_pitcha.firstChild )
-            tuner_pitcha.removeChild( tuner_pitcha.firstChild );
-        tuner_pitcha.appendChild(document.createTextNode('a = '+val.toFixed(1)+' Hz'));
+  }
+  if ( path == '/tuner/f0' ) {
+    tuner_pitcha = document.getElementById( 'tuner_pitcha' );
+    while ( tuner_pitcha.firstChild )
+      tuner_pitcha.removeChild( tuner_pitcha.firstChild );
+    tuner_pitcha.appendChild( document.createTextNode( 'a = ' + val.toFixed(
+      1 ) + ' Hz' ) );
+  }
+  if ( path == '/tuner/tuning' ) {
+    tuner_tuning = document.getElementById( 'tuner_tuning' );
+    while ( tuner_tuning.firstChild )
+      tuner_tuning.removeChild( tuner_tuning.firstChild );
+    switch ( val ) {
+      case "equal":
+        val = "equal temperament";
+        break;
+      case "werkmeister3":
+        val = "Werckmeister 3";
+        break;
+      case "meantone4":
+        val = "1/4 comma meantone";
+        break;
+      case "meantone6":
+        val = "1/6 comma meantone";
+        break;
+      case "valotti":
+        val = "Vallotti";
+        break;
     }
-    if( path == '/tuner/tuning' ){
-        tuner_tuning = document.getElementById( 'tuner_tuning' );
-        while ( tuner_tuning.firstChild )
-            tuner_tuning.removeChild( tuner_tuning.firstChild );
-        switch( val ){
-        case "equal":val="equal temperament"; break;
-        case "werkmeister3":val="Werckmeister 3"; break;
-        case "meantone4":val="1/4 comma meantone"; break;
-        case "meantone6":val="1/6 comma meantone"; break;
-        case "valotti":val="Vallotti"; break;
-        }
-        tuner_tuning.appendChild(document.createTextNode(val));
-    }
+    tuner_tuning.appendChild( document.createTextNode( val ) );
+  }
 } );
 window.addEventListener( 'resize', function( event ) {
   objmix_draw();
