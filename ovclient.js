@@ -1132,7 +1132,7 @@ socket.on( 'tuner_getvar', function( path, val ) {
             tuner_tuning.removeChild( tuner_tuning.firstChild );
         switch( val ){
         case "equal":val="equal temperament"; break;
-        case "werkmeister":val="Werckmeister 3"; break;
+        case "werkmeister3":val="Werckmeister 3"; break;
         case "meantone4":val="1/4 comma meantone"; break;
         case "meantone6":val="1/6 comma meantone"; break;
         case "valotti":val="Vallotti"; break;
