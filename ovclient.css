@@ -110,7 +110,16 @@ button {
 .tuner_freqdisplay {
     font-size: 200%;
     color: #eee;
-    text-align: center;
+    text-align: left;
+    display: inline;
+    margin-left: 0.5em;
+}
+.tuner_deltadisplay {
+    font-size: 200%;
+    color: #eee;
+    text-align: right;
+    width: 50%;
+    display: inline-block;
 }
 .tuner_tuningdisplay {
     font-size: 180%;

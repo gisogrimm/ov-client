@@ -1098,6 +1098,7 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   tuner_delta_pos = document.getElementById( 'tuner_delta_pos' );
   tuner_note = document.getElementById( 'tuner_notedisplay' );
   tuner_freq = document.getElementById( 'tuner_freqdisplay' );
+  tuner_delta = document.getElementById( 'tuner_deltadisplay' );
   tuner_delta_neg.value = -v_delta;
   tuner_delta_pos.value = v_delta;
   tuner_delta_neg.style.opacity = v_confidence;
@@ -1108,12 +1109,21 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   tuner_freq.style.opacity = Math.sqrt( v_confidence );
   while ( tuner_freq.firstChild )
     tuner_freq.removeChild( tuner_freq.firstChild );
+  tuner_delta.style.opacity = Math.sqrt( v_confidence );
+  while ( tuner_delta.firstChild )
+    tuner_delta.removeChild( tuner_delta.firstChild );
   v_labels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb',
     'B'
   ];
   tuner_note.appendChild( document.createTextNode( v_labels[ v_note ] ) );
-  tuner_freq.appendChild( document.createTextNode( v_freq.toFixed( 1 ) +
-    " Hz " + v_delta.toFixed( 1 ) + " Cent (oct. " + v_octave.toFixed(
+  dsign = '+';
+  if ( v_delta < 0 )
+    dsign = '';
+  tuner_delta.appendChild( document.createTextNode( dsign + v_delta.toFixed(
+    0 ) + " Cent " ) );
+  tuner_freq.appendChild( document.createTextNode( " " + v_freq.toFixed(
+    1 ) +
+    " Hz " + "(oct. " + v_octave.toFixed(
       0 ) + ")" ) );
 } );
 socket.on( 'tuner_getvar', function( path, val ) {
@@ -1129,6 +1139,9 @@ socket.on( 'tuner_getvar', function( path, val ) {
       tuner_freq.style.opacity = 1.0;
       while ( tuner_freq.firstChild )
         tuner_freq.removeChild( tuner_freq.firstChild );
+      tuner_delta.style.opacity = 1.0;
+      while ( tuner_delta.firstChild )
+        tuner_delta.removeChild( tuner_delta.firstChild );
       tuner_note.appendChild( document.createTextNode( "--" ) );
       tuner_freq.appendChild( document.createTextNode( "--" ) );
     }
