@@ -1,4 +1,5 @@
 // Global variables
+const strobelen = 120;
 var deviceid = ''; // Unique device identifier
 var inchannelpos = {}; // Stores positions of audio channels
 var objmix_sel = -1; // Selected object for dragging
@@ -11,6 +12,7 @@ var recpos = { // Receiver position and rotation
   'ry': 0,
   'rx': 0
 };
+var strobebuffer = Array( strobelen );
 
 /**
  * Converts HSV color space to RGB
@@ -457,13 +459,20 @@ function tuner_draw() {
   canvas.width = canvas.parentElement.clientWidth - 2;
   canvas.height = 0.1 * canvas.width;
   const ctx = canvas.getContext( "2d" );
-  ctx.fillStyle = '#153d17';
-  ctx.fillRect( 0, 0, canvas.width, canvas.height );
-  ctx.save();
+  for ( let x = 0; x < strobelen; x++ ) {
+    let w = 0.5 * strobebuffer[ strobelen-x-1 ] + 0.5;
+    ctx.fillStyle = `rgb(
+${Math.floor(255*w)}
+${Math.floor(255*w)}
+${Math.floor(255*w)}
+)`;
+    ctx.fillRect( x*canvas.width / strobelen, 0, canvas.width / strobelen, canvas.height );
+  }
+  //ctx.save();
   // Draw background elements
-  ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+  //ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
   // Draw delta scale
-  ctx.restore();
+  //ctx.restore();
 }
 
 function tuner_set_isactive() {
@@ -1122,10 +1131,15 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   tuner_delta.appendChild( document.createTextNode( dsign + v_delta.toFixed(
     0 ) + " Cent " ) );
   tuner_freq.appendChild( document.createTextNode( " " + v_freq.toFixed(
-    1 ) +
+      1 ) +
     " Hz " + "(oct. " + v_octave.toFixed(
       0 ) + ")" ) );
 } );
+socket.on('tuner_strobe', function( strobe ){
+    for(let k=0;k<Math.min(strobe.length, strobebuffer.length);k++)
+	strobebuffer[k] = strobe[k];
+    tuner_draw();
+});
 socket.on( 'tuner_getvar', function( path, val ) {
   if ( path == '/tuner/isactive' ) {
     tuner_active = document.getElementById( 'tuner_active' );
@@ -1133,6 +1147,7 @@ socket.on( 'tuner_getvar', function( path, val ) {
     if ( !tuner_active.checked ) {
       tuner_note = document.getElementById( 'tuner_notedisplay' );
       tuner_freq = document.getElementById( 'tuner_freqdisplay' );
+	tuner_delta = document.getElementById( 'tuner_deltadisplay' );
       tuner_note.style.opacity = 1.0;
       while ( tuner_note.firstChild )
         tuner_note.removeChild( tuner_note.firstChild );
