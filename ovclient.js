@@ -1,5 +1,4 @@
 // Global variables
-const strobelen = 120;
 var deviceid = ''; // Unique device identifier
 var inchannelpos = {}; // Stores positions of audio channels
 var objmix_sel = -1; // Selected object for dragging
@@ -12,7 +11,7 @@ var recpos = { // Receiver position and rotation
   'ry': 0,
   'rx': 0
 };
-var strobebuffer = Array( strobelen );
+var strobebuffer = Array( 10 );
 
 /**
  * Converts HSV color space to RGB
@@ -459,15 +458,28 @@ function tuner_draw() {
   canvas.width = canvas.parentElement.clientWidth - 2;
   canvas.height = 0.1 * canvas.width;
   const ctx = canvas.getContext( "2d" );
-  for ( let x = 0; x < strobelen; x++ ) {
-    let w = 0.5 * strobebuffer[ strobelen-x-1 ] + 0.5;
-    ctx.fillStyle = `rgb(
-${Math.floor(255*w)}
-${Math.floor(255*w)}
-${Math.floor(255*w)}
-)`;
-    ctx.fillRect( x*canvas.width / strobelen, 0, canvas.width / strobelen, canvas.height );
+  var gradient = ctx.createLinearGradient( 0, 0, canvas.width, 0 );
+  var prev_color = 'rgb(0,0,0)';
+  gradient.addColorStop( 0, prev_color );
+  r_back = 20;
+  g_back = 44;
+  b_back = 27;
+  r_front = 241;
+  g_front = 236;
+  b_front = 208;
+  for ( let x = 0; x < strobebuffer.length; x++ ) {
+    let w = 0.5 * strobebuffer[ strobebuffer.length - x - 1 ] + 0.5;
+    if ( !isNaN( w ) ) {
+      let r = Math.min( 255, Math.max( 0, w * r_front + ( 1 - w ) * r_back ) );
+      let g = Math.min( 255, Math.max( 0, w * g_front + ( 1 - w ) * g_back ) );
+      let b = Math.min( 255, Math.max( 0, w * b_front + ( 1 - w ) * b_back ) );
+      var next_color = `rgb(${r} ${g} ${b})`;
+      gradient.addColorStop( x / strobebuffer.length, next_color );
+    }
+    prev_color = next_color;
   }
+  ctx.fillStyle = gradient;
+  ctx.fillRect( 0, 0, canvas.width, canvas.height );
   //ctx.save();
   // Draw background elements
   //ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
@@ -1135,11 +1147,14 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
     " Hz " + "(oct. " + v_octave.toFixed(
       0 ) + ")" ) );
 } );
-socket.on('tuner_strobe', function( strobe ){
-    for(let k=0;k<Math.min(strobe.length, strobebuffer.length);k++)
-	strobebuffer[k] = strobe[k];
-    tuner_draw();
-});
+socket.on( 'tuner_strobe', function( strobe ) {
+  if ( strobebuffer.length != strobe.length ) {
+    strobebuffer = Array( strobe.length );
+  }
+  for ( let k = 0; k < Math.min( strobe.length, strobebuffer.length ); k++ )
+    strobebuffer[ k ] = strobe[ k ];
+  tuner_draw();
+} );
 socket.on( 'tuner_getvar', function( path, val ) {
   if ( path == '/tuner/isactive' ) {
     tuner_active = document.getElementById( 'tuner_active' );
@@ -1147,7 +1162,7 @@ socket.on( 'tuner_getvar', function( path, val ) {
     if ( !tuner_active.checked ) {
       tuner_note = document.getElementById( 'tuner_notedisplay' );
       tuner_freq = document.getElementById( 'tuner_freqdisplay' );
-	tuner_delta = document.getElementById( 'tuner_deltadisplay' );
+      tuner_delta = document.getElementById( 'tuner_deltadisplay' );
       tuner_note.style.opacity = 1.0;
       while ( tuner_note.firstChild )
         tuner_note.removeChild( tuner_note.firstChild );

@@ -7,7 +7,7 @@ var osc = require( 'node-osc' );
 var path = require( 'path' );
 const homedir = require( 'os' ).homedir();
 var vertexgain = {};
-var strobebuffer = Array(50);
+var strobebuffer = Array(10);
 var deviceid = ''; {
   var devname = 'localhost';
   try {
@@ -124,7 +124,9 @@ io.on( 'connection', function( socket ) {
           4 ], msg[ 5 ] );
       }
 	if ( msg[ 0 ] == '/tuner/strobe' ) {
-	    for(let k=0;k<Math.min(50,msg.length-1);k++)
+            if( strobebuffer.length != msg.length-1 )
+                strobebuffer = Array(msg.length-1);
+	    for(let k=0;k<Math.min(strobebuffer.length,msg.length-1);k++)
 		strobebuffer[k] = msg[k+1];
 	    socket.emit('tuner_strobe', strobebuffer );
 	}

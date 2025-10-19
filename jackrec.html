@@ -38,14 +38,20 @@
   </div>
   <div id="tuner" class="tuner tabhide">
     <input type="checkbox" id="tuner_active" onclick="tuner_set_isactive();" checked="false">
-    <div id="tuner_notedisplay" class="tuner_notedisplay">--</div>
-    <div id="tuner_deltadisplay" class="tuner_deltadisplay">--</div>
-    <div id="tuner_freqdisplay" class="tuner_freqdisplay">--</div>
+    <div class="tuner_textcontainer">
+      <div id="tuner_notedisplay" class="tuner_notedisplay">--</div>
+      <div class="tuner_df_freq">
+        <div id="tuner_deltadisplay" class="tuner_deltadisplay">--</div>
+        <div id="tuner_freqdisplay" class="tuner_freqdisplay">--</div>
+      </div>
+    </div>
     <meter id="tuner_delta_neg" min="0" max="50" low="10" optimum="5" value="0" class="tunerscale" style="float:left;direction:rtl;"></meter>
     <meter id="tuner_delta_pos" min="0" max="50" low="10" optimum="5" value="0" class="tunerscale" style="float:right;"></meter>
     &nbsp;<br/>
-    <div class="tuner_tuningdisplay"><span id="tuner_pitcha"></span> / <span id="tuner_tuning"></span></div>
-    <canvas id="tunercanvas">tuner</canvas>
+    <canvas id="tunercanvas" class="tunercanvas">tuner</canvas>
+    <div class="tuner_tuningdisplay">
+      <span id="tuner_pitcha"></span> <span id="tuner_tuning"></span>
+    </div>
     <br/>
   </div>
 </div>
