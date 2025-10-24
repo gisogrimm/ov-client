@@ -12,6 +12,11 @@ var recpos = { // Receiver position and rotation
   'rx': 0
 };
 var strobebuffer = Array( 10 );
+var tuner_notelabels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A',
+  'Bb',
+  'B'
+];
+
 
 /**
  * Converts HSV color space to RGB
@@ -1133,10 +1138,8 @@ socket.on( 'tuner', function( v_freq, v_note, v_octave, v_delta,
   tuner_delta.style.opacity = Math.sqrt( v_confidence );
   while ( tuner_delta.firstChild )
     tuner_delta.removeChild( tuner_delta.firstChild );
-  v_labels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb',
-    'B'
-  ];
-  tuner_note.appendChild( document.createTextNode( v_labels[ v_note ] ) );
+  tuner_note.appendChild( document.createTextNode( tuner_notelabels[
+    v_note ] ) );
   dsign = '+';
   if ( v_delta < 0 )
     dsign = '';
@@ -1193,15 +1196,39 @@ socket.on( 'tuner_getvar', function( path, val ) {
         break;
       case "werkmeister3":
         val = "Werckmeister 3";
+        tuner_notelabels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G',
+          'G#', 'A', 'Bb',
+          'B'
+        ];
+        break;
+      case "werckmeister3":
+        val = "Werckmeister 3";
+        tuner_notelabels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G',
+          'G#', 'A', 'Bb',
+          'B'
+        ];
         break;
       case "meantone4":
         val = "1/4 comma meantone";
+        tuner_notelabels = [ 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G',
+          'G#', 'A', 'Bb',
+          'B'
+        ];
         break;
       case "meantone6":
         val = "1/6 comma meantone";
         break;
       case "valotti":
         val = "Vallotti";
+        break;
+      case "vallotti":
+        val = "Vallotti";
+        break;
+      case "Bach-Kellner1977":
+        val = "Bach-Kellner (1977)";
+        break;
+      case "Neidhardt-1724-GrosseStadt":
+        val = "Neidhardt (1724) Grosse Stadt";
         break;
     }
     tuner_tuning.appendChild( document.createTextNode( val ) );
