@@ -1215,6 +1215,20 @@ socket.on( 'tuner_getvar', function( path, val ) {
           'B'
         ];
         break;
+      case "meantone4#":
+        val = "1/4 comma meantone, sharps";
+        tuner_notelabels = [ 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G',
+          'G#', 'A', 'A#',
+          'B'
+        ];
+        break;
+      case "meantone4b":
+        val = "1/4 comma meantone, flats";
+        tuner_notelabels = [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G',
+          'Ab', 'A', 'Bb',
+          'B'
+        ];
+        break;
       case "meantone6":
         val = "1/6 comma meantone";
         break;
