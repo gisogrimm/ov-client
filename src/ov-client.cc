@@ -25,21 +25,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-enum frontend_t { FRONTEND_OV, FRONTEND_DS };
-
 static bool quit_app(false);
 
 static void sighandler(int sig)
 {
   quit_app = true;
-}
-
-std::string get_file_contents(const std::string& fname)
-{
-  std::ifstream t(fname);
-  std::string str((std::istreambuf_iterator<char>(t)),
-                  std::istreambuf_iterator<char>());
-  return str;
 }
 
 void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
@@ -103,8 +93,7 @@ int main(int argc, char** argv)
       // directory
       config = get_file_contents("ov-client.cfg");
     nlohmann::json js_cfg({{"deviceid", getmacaddr()},
-                           {"url", "https://oldbox.orlandoviols.com/"},
-                           {"protocol", "ov"}});
+                           {"url", "https://oldbox.orlandoviols.com/"}});
     if(!config.empty()) {
       try {
         js_cfg = nlohmann::json::parse(config);
@@ -117,21 +106,23 @@ int main(int argc, char** argv)
     std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
     std::string lobby(ovstrrep(
         js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
-    std::string protocol(js_cfg.value("protocol", "ov"));
-    // std::string deviceid(js_cfg["deviceid"].as<std::string>(getmacaddr()));
     bool showdevname(false);
     int pinglogport(0);
     bool allowsystemmods(false);
     bool secondary(false);
     std::string zitapath("");
-    const char* options = "s:hqvd:p:nf:z:a2";
-    struct option long_options[] = {
-        {"server", 1, 0, 's'},    {"help", 0, 0, 'h'},
-        {"quiet", 0, 0, 'q'},     {"deviceid", 1, 0, 'd'},
-        {"verbose", 0, 0, 'v'},   {"pinglogport", 1, 0, 'p'},
-        {"devname", 0, 0, 'n'},   {"frontend", 1, 0, 'f'},
-        {"zitapath", 1, 0, 'z'},  {"allowsystemmods", 0, 0, 'a'},
-        {"secondary", 0, 0, '2'}, {0, 0, 0, 0}};
+    const char* options = "s:hqvd:p:nz:a2";
+    struct option long_options[] = {{"server", 1, 0, 's'},
+                                    {"help", 0, 0, 'h'},
+                                    {"quiet", 0, 0, 'q'},
+                                    {"deviceid", 1, 0, 'd'},
+                                    {"verbose", 0, 0, 'v'},
+                                    {"pinglogport", 1, 0, 'p'},
+                                    {"devname", 0, 0, 'n'},
+                                    {"zitapath", 1, 0, 'z'},
+                                    {"allowsystemmods", 0, 0, 'a'},
+                                    {"secondary", 0, 0, '2'},
+                                    {0, 0, 0, 0}};
     int opt(0);
     int option_index(0);
     while((opt = getopt_long(argc, argv, options, long_options,
@@ -161,9 +152,6 @@ int main(int argc, char** argv)
       case 'n':
         showdevname = true;
         break;
-      case 'f':
-        protocol = optarg;
-        break;
       case 'z':
         zitapath = optarg;
         break;
@@ -174,13 +162,6 @@ int main(int argc, char** argv)
     }
     if(secondary)
       deviceid += "_2";
-    frontend_t frontend(FRONTEND_OV);
-    if(protocol == "ov")
-      frontend = FRONTEND_OV;
-    else if(protocol == "ds")
-      frontend = FRONTEND_DS;
-    else
-      throw ErrMsg("Invalid front end protocol \"" + protocol + "\".");
     if(showdevname) {
       std::string devname(getmacaddr());
       if(devname.size() > 6)
@@ -200,21 +181,14 @@ int main(int argc, char** argv)
     if(verbose)
       render.set_seqerr_callback(log_seq_error, nullptr);
     if(verbose)
-      std::cout << "creating frontend interface for " << lobby
-                << " using protocol \"" << protocol << "\"." << std::endl;
+      std::cout << "creating frontend interface for " << lobby << "."
+                << std::endl;
     if(zitapath.size())
       render.set_zita_path(zitapath);
     if(allowsystemmods)
       render.set_allow_systemmods(true);
     ov_client_base_t* ovclient(NULL);
-    switch(frontend) {
-    case FRONTEND_OV:
-      ovclient = new ov_client_orlandoviols_t(render, lobby);
-      break;
-    case FRONTEND_DS:
-      throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
-      break;
-    }
+    ovclient = new ov_client_orlandoviols_t(render, lobby);
     try {
       if(verbose)
         std::cout << "starting services\n";

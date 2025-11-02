@@ -44,8 +44,6 @@
   throw TASCAR::ErrMsg(std::string("No widget \"") + #x +                      \
                        std::string("\" in builder."))
 
-enum frontend_t { FRONTEND_OV, FRONTEND_DS };
-
 static bool quit_app(false);
 
 static std::string bindir;
@@ -53,14 +51,6 @@ static std::string bindir;
 static void sighandler(int sig)
 {
   quit_app = true;
-}
-
-std::string get_file_contents(const std::string& fname)
-{
-  std::ifstream t(fname);
-  std::string str((std::istreambuf_iterator<char>(t)),
-                  std::istreambuf_iterator<char>());
-  return str;
 }
 
 void log_seq_error(stage_device_id_t cid, sequence_t seq_ex, sequence_t seq_rec,
@@ -203,8 +193,7 @@ void ovboxgui_t::runclient()
         // directory
         config = get_file_contents("ov-client.cfg");
       nlohmann::json js_cfg({{"deviceid", getmacaddr()},
-                             {"url", "https://oldbox.orlandoviols.com/"},
-                             {"protocol", "ov"}});
+                             {"url", "https://oldbox.orlandoviols.com/"}});
       if(!config.empty()) {
         try {
           js_cfg = nlohmann::json::parse(config);
@@ -219,14 +208,6 @@ void ovboxgui_t::runclient()
           js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
       ui_url =
           ovstrrep(js_cfg.value("ui", "http://login.ovbox.de/"), "\\/", "/");
-      std::string protocol(js_cfg.value("protocol", "ov"));
-      frontend_t frontend(FRONTEND_OV);
-      if(protocol == "ov")
-        frontend = FRONTEND_OV;
-      else if(protocol == "ds")
-        frontend = FRONTEND_DS;
-      else
-        throw ErrMsg("Invalid front end protocol \"" + protocol + "\".");
       if(!cli_deviceid.empty())
         deviceid = cli_deviceid;
       if(deviceid.empty()) {
@@ -244,22 +225,15 @@ void ovboxgui_t::runclient()
       if(verbose)
         render.set_seqerr_callback(log_seq_error, nullptr);
       if(verbose)
-        std::cout << "creating frontend interface for " << lobby
-                  << " using protocol \"" << protocol << "\"." << std::endl;
+        std::cout << "creating frontend interface for " << lobby << "."
+                  << std::endl;
       if(zitapath.size())
         render.set_zita_path(zitapath);
       if(allowsystemmods)
         render.set_allow_systemmods(true);
-      switch(frontend) {
-      case FRONTEND_OV:
-        mcl.lock();
-        ovclient = new ov_client_orlandoviols_t(render, lobby);
-        mcl.unlock();
-        break;
-      case FRONTEND_DS:
-        throw ErrMsg("frontend protocol \"ds\" is not yet implemented");
-        break;
-      }
+      mcl.lock();
+      ovclient = new ov_client_orlandoviols_t(render, lobby);
+      mcl.unlock();
       if(verbose)
         std::cout << "starting services\n";
       ovclient->start_service();

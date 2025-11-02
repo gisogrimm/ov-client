@@ -39,14 +39,6 @@ std::string lobby = "https://oldbox.orlandoviols.com/";
 
 CURL* curl;
 
-std::string get_file_contents(const std::string& fname)
-{
-  std::ifstream t(fname);
-  std::string str((std::istreambuf_iterator<char>(t)),
-                  std::istreambuf_iterator<char>());
-  return str;
-}
-
 void update_config(std::string& deviceid, std::string& lobby)
 {
   // test for config file on raspi:

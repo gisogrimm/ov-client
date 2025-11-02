@@ -82,6 +82,10 @@ while true; do
         sudo mv ~ov/ov-client.cfg /boot/
         sync
     fi
+    if test -e ~ov/ovboxcfg.json; then
+        sudo cp ~ov/ovboxcfg.json /boot/
+        sync
+    fi
     # test for firmware update:
     if test -e ~ov/ov-client.firmwareupdate; then
         # firmware update requested: disable overlayfs and restart
