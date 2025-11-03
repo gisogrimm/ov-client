@@ -914,10 +914,12 @@ socket.on( "newfader", function( faderno, val ) {
     [ -40, -30, -20, -10, 0, 5, 10 ].forEach( function( item, index ) {
       let opt = datalist.appendChild( document.createElement(
         "div" ) );
-      opt.setAttribute( "style", "left: " + 100 * gain_to_gui( item ) +
-        "%;" );
+      opt.setAttribute( "style", "left: calc(" + 100 * gain_to_gui( item ) +
+        "% - 15px);" );
       opt.setAttribute( "class", "fadertick" );
       opt.appendChild( document.createTextNode( item ) );
+      opt.appendChild( document.createElement( 'br' ) );
+      opt.appendChild( document.createTextNode( '|' ) );
     } );
     el_row1.appendChild( datalist );
     let el_lab = el_row1.appendChild( document.createElement( "label" ) );

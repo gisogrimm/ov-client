@@ -7,7 +7,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     padding: 0;
-    width: 93%;
+    width: 100%;
     background-position:center top;
     background-repeat: no-repeat;
 }
@@ -34,15 +34,15 @@ body {
 .gaintxtfader {
     -webkit-appearance: none;
     width: 9%;
-    height: 25px;
-    border-radius: 5px;
+    height: 20px;
+    border-radius: 0px;
     font-size: 80%;
     float: right;
 }
 .fader {
     -webkit-appearance: none;
     width: calc(88% - 5px);
-    height: 25px;
+    height: 20px;
     margin-bottom: 0px;
     border-radius: 5px;  
     background: #d3d3d3;
@@ -60,18 +60,17 @@ body {
 .fader::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%; 
-    background: #4CAF50;
+    width: 40px;
+    height: 25px;
+    border-radius: 10px; 
+    background: #729673;
     cursor: pointer;
 }
-
 .fader::-moz-range-thumb {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: #4CAF50;
+    width: 40px;
+    height: 25px;
+    border-radius: 10px;
+    background: #729673;
     cursor: pointer;
 }
 button {
@@ -86,11 +85,11 @@ button {
 }
 .level {
     width: 88%;
-    height: 25px;
-    border-radius: 5px;  
-    background: #d3d3d3;
-    outline: none;
-    opacity: 0.7;
+    height: 15px;
+    border-radius: 0px;  
+    background: #14260c;
+    #outline: none;
+    #opacity: 0.7;
 }
 .tunerscale {
     width: 50%;
@@ -303,11 +302,13 @@ h1 {
     padding: 0;
     position: absolute;
     display: block;
-    top: 0px;
-    width: 20px;
+    top: 15px;
+    width: 30px;
+    font-size: 50%;
+    text-align: center;
 }
 .fadertickbox {
-    width: calc(88% - 5px);
+    width: calc(88% - 40px);
     height: 1px;
     margin-bottom: 0px;
     border-radius: 5px;
@@ -315,5 +316,5 @@ h1 {
     opacity: 0.7;
     display: block;
     position: relative;
-    left: -10px;
+    left: 20px;
 }
