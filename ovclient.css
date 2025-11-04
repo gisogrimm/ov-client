@@ -17,7 +17,15 @@ body {
     margin-top: 5px;
     margin-bottom: 5px;
     padding: 6px;
-    border-radius: 15px;
+    border-radius: 5px;
+}
+.mixercolbuttons{
+    width: 40px;
+    display: inline-block;
+}
+.mixercolfader{
+    width: calc(100% - 40px);
+    display: inline-block;
 }
 .mixerego {
     background-color: #ffa0a040;
@@ -31,6 +39,50 @@ body {
     padding-bottom: 6px;
     overflow: visible;
 }
+.togglebutton{
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    line-height:31px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.togglebutton input[type="checkbox"] {
+    display: none;
+}
+.mutebutton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 5px;
+    background-color: #885;
+    transition: background-color 0.2s ease-in-out;
+    color:#000;
+    text-align: center;
+}
+.togglebutton input:checked + .mutebutton {
+    background-color: #ff0;
+}
+.recordtoggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 5px;
+    background-color: #855;
+    transition: background-color 0.2s ease-in-out;
+    color:#000;
+    text-align: center;
+}
+.togglebutton input:checked + .recordtoggle {
+    background-color: #bf1818;
+    color:#fff;
+}
+
 .gaintxtfader {
     -webkit-appearance: none;
     width: 9%;

@@ -874,6 +874,8 @@ socket.on( "vertexposrot", function( vertexid, name, x, y, z, rz, ry, rx,
   //update_objmix_sounds();
 } );
 socket.on( "newfader", function( faderno, val ) {
+  // this function adds a new mixer strip to the mixer panel.
+
   // remove effect bus from mixer:
   if ( val.startsWith( 'bus.' ) )
     return;
@@ -882,9 +884,11 @@ socket.on( "newfader", function( faderno, val ) {
   fader = "/touchosc/fader" + faderno;
   levelid = "/touchosc/level" + faderno;
   muteid = "/touchosc/mute" + faderno;
+  recordtoggleid = "/recordtoggle" + faderno;
   let el_mixer = document.getElementById( "mixer" );
   if ( el_mixer ) {
     orig_val = val;
+    // set class based on name:
     let classname = "mixerstrip";
     val = val.replace( '.' + deviceid, '' );
     val = val.replace( deviceid + '.', '' );
@@ -900,13 +904,20 @@ socket.on( "newfader", function( faderno, val ) {
       "div" ) );
     el_mixerstrip.setAttribute( "class", classname );
     el_mixerstrip.setAttribute( "id", "mixerstrip_" + orig_val );
-    let el_row1 = el_mixerstrip.appendChild( document.createElement(
+    // now insert two columns, one for mute/rec buttons, the other for fader/level:
+    let el_col1 = el_mixerstrip.appendChild( document.createElement(
+      "div" ) );
+    el_col1.setAttribute( "class", "mixercolbuttons" );
+    let el_col2 = el_mixerstrip.appendChild( document.createElement(
+      "div" ) );
+    el_col2.setAttribute( "class", "mixercolfader" );
+    let el_row1 = el_col2.appendChild( document.createElement(
       "div" ) );
     el_row1.setAttribute( "class", "mixerrow" );
-    let el_row2 = el_mixerstrip.appendChild( document.createElement(
+    let el_row2 = el_col2.appendChild( document.createElement(
       "div" ) );
     el_row2.setAttribute( "class", "mixerrow" );
-    let el_row3 = el_mixerstrip.appendChild( document.createElement(
+    let el_row3 = el_col2.appendChild( document.createElement(
       "div" ) );
     el_row3.setAttribute( "class", "mixerrow" );
     let datalist = document.createElement( "tickbox" );
@@ -914,7 +925,8 @@ socket.on( "newfader", function( faderno, val ) {
     [ -40, -30, -20, -10, 0, 5, 10 ].forEach( function( item, index ) {
       let opt = datalist.appendChild( document.createElement(
         "div" ) );
-      opt.setAttribute( "style", "left: calc(" + 100 * gain_to_gui( item ) +
+      opt.setAttribute( "style", "left: calc(" + 100 * gain_to_gui(
+          item ) +
         "% - 15px);" );
       opt.setAttribute( "class", "fadertick" );
       opt.appendChild( document.createTextNode( item ) );
@@ -926,19 +938,31 @@ socket.on( "newfader", function( faderno, val ) {
     el_lab.setAttribute( "for", fader );
     el_lab.setAttribute( "class", "mixerlabel" );
     el_lab.append( val );
-    let el_mutebuttondiv = el_row1.appendChild( document.createElement(
-      "div" ) );
-    el_mutebuttondiv.setAttribute( "class", "mutebuttondiv" );
-    let el_span = el_mutebuttondiv.appendChild( document.createElement(
-      "span" ) );
-    el_span.setAttribute( "class", "mutebuttonlabel" );
-    el_span.appendChild( document.createTextNode( "mute " ) );
+    // mute button:
+    let el_mutebuttondiv = el_col1.appendChild( document.createElement(
+      "label" ) );
+    el_mutebuttondiv.setAttribute( "class", "togglebutton" );
     let el_mutebutton = el_mutebuttondiv.appendChild( document
       .createElement( "input" ) );
-    el_mutebutton.setAttribute( "class", "mutebutton" );
     el_mutebutton.setAttribute( "type", "checkbox" );
     el_mutebutton.setAttribute( "id", muteid );
-    //el_mutebutton.onchange = upload_session_gains;
+    let mb = el_mutebuttondiv.appendChild( document
+      .createElement( "span" ) );
+    mb.setAttribute( "class", "mutebutton" );
+    mb.appendChild( document.createTextNode( 'M' ) );
+    // // record enable:
+    // let el_recordtogglediv = el_col1.appendChild( document.createElement(
+    //     "label" ) );
+    // el_recordtogglediv.setAttribute( "class", "togglebutton" );
+    // let el_recordtoggle = el_recordtogglediv.appendChild( document
+    //                                                       .createElement( "input" ) );
+    // el_recordtoggle.setAttribute( "type", "checkbox" );
+    // el_recordtoggle.setAttribute( "id", recordtoggleid );
+    // let rb = el_recordtogglediv.appendChild( document
+    //                                          .createElement( "span" ) );
+    // rb.setAttribute( "class", "recordtoggle" );
+    // rb.appendChild(document.createTextNode('R'));
+    // fader:
     let el_fader = el_row2.appendChild( document.createElement( "input" ) );
     el_fader.setAttribute( "class", "fader" );
     el_fader.setAttribute( "type", "range" );
@@ -971,12 +995,6 @@ socket.on( "newfader", function( faderno, val ) {
     el_metertext.setAttribute( "readonly", "true" );
     el_metertext.setAttribute( "class", "gaintxtfader" );
     el_metertext.setAttribute( "id", "txt" + levelid );
-    //el_mixerstrip.appendChild(el_lab);
-    //el_mixerstrip.appendChild(el_mutebuttondiv);
-    //el_mixerstrip.appendChild(document.createElement("br"));
-    //el_mixerstrip.appendChild(document.createElement("br"));
-    //el_mixerstrip.appendChild(el_meter);
-    //el_mixerstrip.appendChild(el_metertext);
   }
 } );
 socket.on( "updatefader", function( fader, val ) {
@@ -1253,6 +1271,9 @@ socket.on( 'tuner_getvar', function( path, val ) {
 window.addEventListener( 'resize', function( event ) {
   objmix_draw();
 }, true );
+
+
+
 /*
  * Local Variables:
  * c-basic-offset: 2
