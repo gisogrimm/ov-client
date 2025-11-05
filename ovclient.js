@@ -556,7 +556,7 @@ socket.on( 'jackrecaddport', function( p ) {
   var classes = 'mixerstrip jackrecsrcport';
   var helps = '';
   if ( p.startsWith( 'n2j_' ) ) return;
-  if ( p.startsWith( 'levelanalysis.' ) ) return;
+  if ( p == deviceid + '.levelanalysis:out.0' ) return;
   if ( p.startsWith( 'system:capture' ) ) {
     classes += ' mixerego';
     helps = 'Hardware input';
@@ -574,10 +574,10 @@ socket.on( 'jackrecaddport', function( p ) {
     helps = 'Metronome';
     labs = 'metronome';
   }
-  if ( p.startsWith( 'render.' + deviceid ) ) {
+  if ( p.startsWith( deviceid + '.main:' ) ) {
     classes += ' mixerother';
     helps = 'My headphone output';
-    labs = labs.replace( 'render.' + deviceid + ':', '' );
+    labs = labs.replace( deviceid + '.main:', '' );
   }
   labs = labs.replace( '.' + deviceid + ':out', '' );
   let el = document.getElementById( "portlist" );
@@ -879,8 +879,8 @@ socket.on( "newfader", function( faderno, val ) {
   // remove effect bus from mixer:
   if ( val.startsWith( 'bus.' ) )
     return;
-  if ( val.startsWith( 'levelanalysis.' ) )
-    return;
+    if( val == deviceid+'.levelanalysis' )
+        return;
   fader = "/touchosc/fader" + faderno;
   levelid = "/touchosc/level" + faderno;
   muteid = "/touchosc/mute" + faderno;
