@@ -7,7 +7,7 @@ var osc = require( 'node-osc' );
 var path = require( 'path' );
 const homedir = require( 'os' ).homedir();
 var vertexgain = {};
-var strobebuffer = Array(10);
+var strobebuffer = Array( 10 );
 var deviceid = ''; {
   var devname = 'localhost';
   try {
@@ -123,16 +123,19 @@ io.on( 'connection', function( socket ) {
         socket.emit( 'tuner', msg[ 1 ], msg[ 2 ], msg[ 3 ], msg[
           4 ], msg[ 5 ] );
       }
-	if ( msg[ 0 ] == '/tuner/strobe' ) {
-            if( strobebuffer.length != msg.length-1 )
-                strobebuffer = Array(msg.length-1);
-	    for(let k=0;k<Math.min(strobebuffer.length,msg.length-1);k++)
-		strobebuffer[k] = msg[k+1];
-	    socket.emit('tuner_strobe', strobebuffer );
-	}
+      if ( msg[ 0 ] == '/tuner/strobe' ) {
+        if ( strobebuffer.length != msg.length - 1 )
+          strobebuffer = Array( msg.length - 1 );
+        for ( let k = 0; k < Math.min( strobebuffer.length, msg
+            .length - 1 ); k++ ) strobebuffer[ k ] = msg[ k + 1 ];
+        socket.emit( 'tuner_strobe', strobebuffer );
+      }
+      if ( msg[ 0 ] == '/micangle' ) {
+        socket.emit( 'micangle', msg[ 2 ] );
+      }
       if ( msg[ 0 ] == '/tuner_getvar' ) {
         // update tuner GUI (frequency, note, octave, delta, confidence):
-          socket.emit( 'tuner_getvar', msg[ 1 ], msg[ 2 ] );
+        socket.emit( 'tuner_getvar', msg[ 1 ], msg[ 2 ] );
       }
       // OSC gain control and level meter:
       if ( msg[ 0 ] == '/touchosc/scene' ) {
@@ -314,10 +317,15 @@ io.on( 'connection', function( socket ) {
       '/varlist', '/bus.' );
     //oscClient.send('/*/ego/*/pos/get', 'osc.udp://localhost:9000/', '/vertexpos');
     oscClient.send( '/*/globalpos/get', 'osc.udp://localhost:9000/',
-                    '/vertexpos' );
-      oscClient.send('/tuner/isactive/get','osc.udp://localhost:9000/', '/tuner_getvar');
-      oscClient.send('/tuner/f0/get','osc.udp://localhost:9000/', '/tuner_getvar');
-      oscClient.send('/tuner/tuning/get','osc.udp://localhost:9000/', '/tuner_getvar');
+      '/vertexpos' );
+    oscClient.send( '/tuner/isactive/get', 'osc.udp://localhost:9000/',
+      '/tuner_getvar' );
+    oscClient.send( '/tuner/f0/get', 'osc.udp://localhost:9000/',
+      '/tuner_getvar' );
+    oscClient.send( '/tuner/tuning/get', 'osc.udp://localhost:9000/',
+      '/tuner_getvar' );
+    oscClient.send( '/*/main/ortf/angle/get',
+      'osc.udp://localhost:9000/', '/micangle' );
   } );
   socket.on( 'message', function( obj ) {
     oscClient.send( obj );

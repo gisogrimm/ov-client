@@ -3,6 +3,7 @@ var deviceid = ''; // Unique device identifier
 var inchannelpos = {}; // Stores positions of audio channels
 var objmix_sel = -1; // Selected object for dragging
 var objmix_drag = false; // Dragging state flag
+var objmix_micangle = 90; // opening angle for additional lines
 var recpos = { // Receiver position and rotation
   'x': 0,
   'y': 0,
@@ -363,17 +364,32 @@ function objmix_draw() {
   ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
   // Draw crosshair
   const center = pos2scr( [ 0, 0, 0 ] );
-  const up = pos2scr( [ 0, 4, 0 ] );
-  const down = pos2scr( [ 0, -4, 0 ] );
-  const right = pos2scr( [ 4, 0, 0 ] );
+  const left = pos2scr( [ 0, 4, 0 ] );
+  const right = pos2scr( [ 0, -4, 0 ] );
+  const front = pos2scr( [ 4, 0, 0 ] );
+  const back = pos2scr( [ -4, 0, 0 ] );
   ctx.beginPath();
-  ctx.moveTo( up.x, up.y );
-  ctx.lineTo( down.x, down.y );
-  ctx.moveTo( center.x, center.y );
+  ctx.moveTo( left.x, left.y );
   ctx.lineTo( right.x, right.y );
+  ctx.moveTo( back.x, back.y );
+  ctx.lineTo( front.x, front.y );
+  // now draw opening angle lines:
+  const micleft = pos2scr( euler_rotz( {
+    x: 4,
+    y: 0,
+    z: 0
+  }, 0.0087266 * objmix_micangle ) );
+  const micright = pos2scr( euler_rotz( {
+    x: 4,
+    y: 0,
+    z: 0
+  }, -0.0087266 * objmix_micangle ) );
+  ctx.moveTo( micleft.x, micleft.y );
+  ctx.lineTo( center.x, center.y );
+  ctx.lineTo( micright.x, micright.y );
   ctx.stroke();
   // Draw circle
-  const radius = Math.abs( up.x - center.x );
+  const radius = Math.abs( left.x - center.x );
   ctx.beginPath();
   ctx.arc( center.x, center.y, radius, 0, 2 * Math.PI );
   ctx.stroke();
@@ -879,8 +895,8 @@ socket.on( "newfader", function( faderno, val ) {
   // remove effect bus from mixer:
   if ( val.startsWith( 'bus.' ) )
     return;
-    if( val == deviceid+'.levelanalysis' )
-        return;
+  if ( val == deviceid + '.levelanalysis' )
+    return;
   fader = "/touchosc/fader" + faderno;
   levelid = "/touchosc/level" + faderno;
   muteid = "/touchosc/mute" + faderno;
@@ -1177,6 +1193,9 @@ socket.on( 'tuner_strobe', function( strobe ) {
   for ( let k = 0; k < Math.min( strobe.length, strobebuffer.length ); k++ )
     strobebuffer[ k ] = strobe[ k ];
   tuner_draw();
+} );
+socket.on( 'micangle', function( val ) {
+  objmix_micangle = 57.296 * val;
 } );
 socket.on( 'tuner_getvar', function( path, val ) {
   if ( path == '/tuner/isactive' ) {
