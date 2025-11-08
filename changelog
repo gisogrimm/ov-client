@@ -1,3 +1,7 @@
+2025-11-08, version 0.31.27
+ - addition of instrument tuner to local web mixer
+ - preparation of improved mixer interface
+
 2025-08-25, version 0.31.1
  - correct display of orientation in object mixer
 
