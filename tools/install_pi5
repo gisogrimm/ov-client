@@ -55,7 +55,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     cnt=10
     while test $cnt -gt 0; do
         echo counter: $cnt
-	sudo -E apt upgrade --assume-yes && cnt=-1 || sleep 7; let cnt=$cnt-1
+	sudo -E apt upgrade --assume-yes --autoremove && cnt=-1 || sleep 7; let cnt=$cnt-1
 	sync
     done
 
@@ -154,7 +154,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 	fi
 	cnt=10
 	while test $cnt -gt 0; do
-	    sudo -E apt upgrade --assume-yes && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+	    sudo -E apt upgrade --assume-yes --autoremove && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
 	    sync
 	done
 
@@ -191,7 +191,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
 	done
 	cnt=10
 	while test $cnt -gt 0; do
-	    sudo -E apt upgrade --assume-yes && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
+	    sudo -E apt upgrade --assume-yes --autoremove && cnt=0 || ( sleep 20; let cnt=$cnt-1 )
 	    sync
 	done
 	cnt=10
