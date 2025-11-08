@@ -572,7 +572,7 @@ socket.on( 'jackrecaddport', function( p ) {
   var classes = 'mixerstrip jackrecsrcport';
   var helps = '';
   if ( p.startsWith( 'n2j_' ) ) return;
-  if ( p == deviceid + '.levelanalysis:out.0' ) return;
+  if ( p.startsWith( deviceid + '.levelanalysis:out' ) ) return;
   if ( p.startsWith( 'system:capture' ) ) {
     classes += ' mixerego';
     helps = 'Hardware input';
