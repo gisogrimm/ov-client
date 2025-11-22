@@ -75,6 +75,7 @@ public:
   bool allowsystemmods = false;
   std::string cli_deviceid = "";
   bool secondary = false;
+  std::string deviceid;
 
 protected:
   bool on_timeout();
@@ -119,6 +120,7 @@ ovboxgui_t::ovboxgui_t(BaseObjectType* cobject,
       sigc::mem_fun(*this, &ovboxgui_t::on_mixer_clicked));
   signal_hide().connect(sigc::mem_fun(*this, &ovboxgui_t::on_hide));
   show_all();
+  deviceid = getmacaddr();
 }
 
 void ovboxgui_t::on_hide()
@@ -129,12 +131,15 @@ void ovboxgui_t::on_hide()
 void ovboxgui_t::on_uiurl_clicked()
 {
 #ifdef _WIN32
-  ShellExecute(NULL, "open", ui_url.c_str(), NULL, NULL, 0);
+  ShellExecute(NULL, "open", (ui_url + "login.php?udid=" + deviceid).c_str(), NULL, NULL, 0);
 #else
 #ifdef __APPLE__
-  TASCAR::system(std::string("open " + ui_url).c_str(), false);
+  TASCAR::system(
+      std::string("open " + ui_url + "login.php?udid=" + deviceid).c_str(),
+      false);
 #else
-  gtk_show_uri(NULL, ui_url.c_str(), GDK_CURRENT_TIME, NULL);
+  gtk_show_uri(NULL, (ui_url + "login.php?udid=" + deviceid).c_str(),
+               GDK_CURRENT_TIME, NULL);
 #endif
 #endif
 }
@@ -203,7 +208,7 @@ void ovboxgui_t::runclient()
           DEBUG(err.what());
         }
       }
-      std::string deviceid(js_cfg.value("deviceid", getmacaddr()));
+      deviceid = js_cfg.value("deviceid", getmacaddr());
       std::string lobby(ovstrrep(
           js_cfg.value("url", "http://oldbox.orlandoviols.com/"), "\\/", "/"));
       ui_url =
