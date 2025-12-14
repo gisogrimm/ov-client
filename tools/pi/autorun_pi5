@@ -53,6 +53,12 @@ sudo service ntp start || true
     ## Stop all wifi/bluetooth devices
     rfkill block all
 
+    echo "reload USB driver"
+    ## reload USB driver
+    sudo rmmod snd_usb_audio
+    sleep 1
+    sudo modprobe snd_usb_audio
+
     ntpq -p
 
     # activate WiFi if required:

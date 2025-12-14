@@ -32,7 +32,7 @@ if test -e "$2"/firmware/cmdline.txt; then
     USEFIRMW="/firmware"
     SEDFIRMW="\/firmware"
 fi
-cat "$2"/"${USEFIRMW}"/cmdline.txt | grep -e 'init=.*/init_resize.sh' -e 'init=.*/firstboot' || (echo "The image was booted already."; ls "/$2";cat "$2"/"${USEFIRMW}"/cmdline.txt;exit 1;)
+cat "$2"/"${USEFIRMW}"/cmdline.txt | grep -e 'init=.*/init_resize.sh' -e 'init=.*/firstboot' -e "resize" || (echo "The image was booted already."; ls "/$2";cat "$2"/"${USEFIRMW}"/cmdline.txt;exit 1;)
 
 # set password:
 echo 'pi:$6$BfzNyd/.tlSynCad$HX/TpdQ35vqP2ahCHIrQbUXxzc8ld3CSW.Nb6pwIqP5/vSIxtO3IunfIiI/mmgzSulbbDwIO9jORU6n/wdbsB0' | sudo tee "$2"/userconf.txt

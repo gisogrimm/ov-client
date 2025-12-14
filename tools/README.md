@@ -76,7 +76,7 @@ Now list partitions:
 ```
 sudo fdisk -l $DEVNAME
 ```
-Identify the end sector, and follow (this)[https://softwarebakery.com/shrinking-images-on-linux] to truncate (replace numbers by end sector):
+Identify the end sector, and follow [softwarebakery.com/shrinking-images-on-linux](https://softwarebakery.com/shrinking-images-on-linux) to truncate (replace numbers by end sector):
 
 ```
 truncate --size=$[(9181183+1)*512] myimage.img
