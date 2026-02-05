@@ -51,7 +51,7 @@ sudo service ntp start || true
     killall dbus-launch
 
     ## Stop all wifi/bluetooth devices
-    sudo rfkill block all
+    #sudo rfkill block all
 
     echo "reload USB driver"
     ## reload USB driver
@@ -71,15 +71,19 @@ sudo service ntp start || true
         COUNTRYCODE=DE
         test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
         if test -n "${SSID}"; then
+            echo "starting NetworkManager"
+            sudo service NetworkManager start
             echo "connecting to WiFi ${SSID}"
-            sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+            nmcli radio wifi on
             sleep 2
-            sudo rfkill unblock wifi
-            echo "Waiting 10 seconds for the Wifi device to start..."
-            sleep 10
-            sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
-            echo "Waiting 20 seconds for the Wifi device to connect..."
-            sleep 20
+            nmcli device wifi connect "${SSID}" password "${PW}"
+            #sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
+            #sudo rfkill unblock wifi
+            #echo "Waiting 10 seconds for the Wifi device to start..."
+            #sleep 10
+            #sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
+            #echo "Waiting 20 seconds for the Wifi device to connect..."
+            #sleep 20
         fi
     fi
 
@@ -163,12 +167,12 @@ while true; do
         test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
         echo "connecting to WiFi ${SSID}"
         if test -n "${SSID}"; then
-            sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
-            sleep 1
-            sudo rfkill unblock wifi
-            sleep 5
-            sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
-            sleep 20
+            echo "starting NetworkManager"
+            sudo service NetworkManager start
+            echo "connecting to WiFi ${SSID}"
+            nmcli radio wifi on
+            sleep 2
+            nmcli device wifi connect "${SSID}" password "${PW}"
         fi
     fi
     if test -e ~ov/ov-client.hifiberry; then
