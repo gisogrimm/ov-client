@@ -215,7 +215,7 @@ BOOTFS=`mount | grep /boot | sed -e 's/.*\/boot/\/boot/1' -e 's/ .*//1'`
     echo "@audio - memlock unlimited"|sudo tee -a /etc/security/limits.conf
 
     echo "install user to run the scripts - do not provide root priviledges:"
-    sudo useradd -m -G audio,dialout ov || echo "user ov already exists."
+    sudo useradd -m -G audio,dialout,netdev ov || echo "user ov already exists."
 
     echo "register autorun script in /etc/rc.local:"
     sudo sed -i -e '/exit 0/ d' -e '/.*autorun.*autorun/ d' -e '/.*home.pi.install.*home.pi.install/ d' -i /etc/rc.local

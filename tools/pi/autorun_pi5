@@ -51,7 +51,7 @@ sudo service ntp start || true
     killall dbus-launch
 
     ## Stop all wifi/bluetooth devices
-    rfkill block all
+    sudo rfkill block all
 
     echo "reload USB driver"
     ## reload USB driver
@@ -74,7 +74,7 @@ sudo service ntp start || true
             echo "connecting to WiFi ${SSID}"
             sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
             sleep 2
-            rfkill unblock wifi
+            sudo rfkill unblock wifi
             echo "Waiting 10 seconds for the Wifi device to start..."
             sleep 10
             sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
@@ -165,7 +165,7 @@ while true; do
         if test -n "${SSID}"; then
             sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
             sleep 1
-            rfkill unblock wifi
+            sudo rfkill unblock wifi
             sleep 5
             sudo raspi-config nonint do_wifi_ssid_passphrase "${SSID}" "${PW}"
             sleep 20
