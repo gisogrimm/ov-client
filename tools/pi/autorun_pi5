@@ -71,8 +71,10 @@ sudo service ntp start || true
         COUNTRYCODE=DE
         test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
         if test -n "${SSID}"; then
+            sleep 5
             echo "starting NetworkManager"
             sudo service NetworkManager start
+            sleep 2
             echo "connecting to WiFi ${SSID}"
             nmcli radio wifi on
             sleep 2
@@ -169,6 +171,7 @@ while true; do
         if test -n "${SSID}"; then
             echo "starting NetworkManager"
             sudo service NetworkManager start
+            sleep 2
             echo "connecting to WiFi ${SSID}"
             nmcli radio wifi on
             sleep 2
