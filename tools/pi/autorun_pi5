@@ -33,7 +33,7 @@ sudo service ntp start || true
     sudo service triggerhappy stop
 
     ## Stop the dbus service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-    sudo service dbus stop
+    #sudo service dbus stop
 
     ## Stop the console-kit-daemon service. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
     sudo killall console-kit-daemon
@@ -45,10 +45,10 @@ sudo service ntp start || true
     killall gvfsd
 
     ## Kill the userspace D-Bus daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-    killall dbus-daemon
+    #killall dbus-daemon
 
     ## Kill the userspace dbus-launch daemon. Warning: this can cause unpredictable behaviour when running a desktop environment on the RPi
-    killall dbus-launch
+    #killall dbus-launch
 
     ## Stop all wifi/bluetooth devices
     #sudo rfkill block all
@@ -71,14 +71,16 @@ sudo service ntp start || true
         COUNTRYCODE=DE
         test -e ${BOOTFS}/ovclient-country.txt && COUNTRYCODE=$(cat ${BOOTFS}/ovclient-country.txt)
         if test -n "${SSID}"; then
-            sleep 5
             echo "starting NetworkManager"
             sudo service NetworkManager start
             sleep 2
+            echo "Activating Wifi device"
+            sudo nmcli radio wifi on
+            sleep 8
+            echo "list wifis:"
+            nmcli device wifi list --rescan yes
             echo "connecting to WiFi ${SSID}"
-            nmcli radio wifi on
-            sleep 2
-            nmcli device wifi connect "${SSID}" password "${PW}"
+            sudo nmcli device wifi connect "${SSID}" password "${PW}"
             #sudo raspi-config nonint do_wifi_country "${COUNTRYCODE}"
             #sudo rfkill unblock wifi
             #echo "Waiting 10 seconds for the Wifi device to start..."
@@ -172,10 +174,13 @@ while true; do
             echo "starting NetworkManager"
             sudo service NetworkManager start
             sleep 2
+            echo "Activating Wifi device"
+            sudo nmcli radio wifi on
+            sleep 8
+            echo "list wifis:"
+            nmcli device wifi list --rescan yes
             echo "connecting to WiFi ${SSID}"
-            nmcli radio wifi on
-            sleep 2
-            nmcli device wifi connect "${SSID}" password "${PW}"
+            sudo nmcli device wifi connect "${SSID}" password "${PW}"
         fi
     fi
     if test -e ~ov/ov-client.hifiberry; then
