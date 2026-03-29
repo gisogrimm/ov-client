@@ -131,7 +131,8 @@ void ovboxgui_t::on_hide()
 void ovboxgui_t::on_uiurl_clicked()
 {
 #ifdef _WIN32
-  ShellExecute(NULL, "open", (ui_url + "login.php?udid=" + deviceid).c_str(), NULL, NULL, 0);
+  ShellExecute(NULL, "open", (ui_url + "login.php?udid=" + deviceid).c_str(),
+               NULL, NULL, 0);
 #else
 #ifdef __APPLE__
   TASCAR::system(
@@ -187,26 +188,22 @@ void ovboxgui_t::runclient()
       labdevice->get_style_context()->remove_class("actmember");
       session_ready = false;
       // test for config file on raspi:
-      std::string config(get_file_contents("/boot/ov-client.cfg"));
-      if(config.empty() && std::getenv("HOME"))
-        // we are not on a raspi, or no file was created, thus check in home
-        // directory
-        config = get_file_contents(std::string(std::getenv("HOME")) +
-                                   std::string("/.ov-client.cfg"));
-      if(config.empty())
-        // we are not on a raspi, or no file was created, thus check in local
-        // directory
-        config = get_file_contents("ov-client.cfg");
       nlohmann::json js_cfg({{"deviceid", getmacaddr()},
                              {"url", "https://oldbox.orlandoviols.com/"}});
-      if(!config.empty()) {
-        try {
-          js_cfg = nlohmann::json::parse(config);
-        }
-        catch(const std::exception& err) {
-          DEBUG(config);
-          DEBUG(err.what());
-        }
+      std::vector<std::string> v_cfg_candidates = {
+          "/boot/ov-client.cfg", "/boot/firmware/ov-client.cfg",
+          std::string(std::getenv("HOME")) + std::string("/.ov-client.cfg"),
+          "ov-client.cfg"};
+      for(const auto& cfgfile : v_cfg_candidates) {
+        auto config = get_file_contents(cfgfile);
+        if(!config.empty())
+          try {
+            js_cfg = json_merge(js_cfg, nlohmann::json::parse(config));
+          }
+          catch(const std::exception& err) {
+            TASCAR::console_log(std::string("Error parsing config file \"") +
+                                cfgfile + std::string("\": ") + err.what());
+          }
       }
       deviceid = js_cfg.value("deviceid", getmacaddr());
       std::string lobby(ovstrrep(
