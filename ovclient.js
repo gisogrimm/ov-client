@@ -573,6 +573,7 @@ socket.on( 'jackrecaddport', function( p ) {
   var helps = '';
   if ( p.startsWith( 'n2j_' ) ) return;
   if ( p.startsWith( deviceid + '.levelanalysis:out' ) ) return;
+  if ( p.startsWith( 'levelanalysis.' + deviceid + ':out' ) ) return;
   if ( p.startsWith( 'system:capture' ) ) {
     classes += ' mixerego';
     helps = 'Hardware input';
