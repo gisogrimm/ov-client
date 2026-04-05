@@ -65,10 +65,11 @@ sudo service ntp start || true
     for k in {0..20}; do
         if test -e /proc/asound/card${k}; then
             CARDID=$(cat /proc/asound/card${k}/id)
-            echo "--- card ${k}: ${CARDID}"
+            echo "----- card ${k}: ${CARDID}"
             amixer -c ${k}
         fi
     done
+    echo "----- end"
 
     # activate WiFi if required:
     if test -e ${BOOTFS}/ovclient-wifi.txt; then
