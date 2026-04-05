@@ -61,6 +61,15 @@ sudo service ntp start || true
 
     ntpq -p
 
+    # list sound card controls
+    for k in {0..20}; do
+        if test -e /proc/asound/card${k}; then
+            CARDID=$(cat /proc/asound/card${k}/id)
+            echo "--- card ${k}: ${CARDID}"
+            amixer -c ${k}
+        fi
+    done
+
     # activate WiFi if required:
     if test -e ${BOOTFS}/ovclient-wifi.txt; then
         # remove DOS line ends:  -e 's/\r//1'
