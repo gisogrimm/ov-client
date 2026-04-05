@@ -66,7 +66,7 @@ sudo service ntp start || true
         if test -e /proc/asound/card${k}; then
             CARDID=$(cat /proc/asound/card${k}/id)
             echo "----- card ${k}: ${CARDID}"
-            amixer -c ${k}
+            amixer -c ${k} contents
         fi
     done
     echo "----- end"
