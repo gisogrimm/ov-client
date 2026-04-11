@@ -34,7 +34,6 @@ zita-j2n
 # Executables
 *.exe
 *.out
-*.app
 *.deb
 
 # output directories:

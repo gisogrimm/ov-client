@@ -1,0 +1,2 @@
+#!/bin/zsh
+ln -sf $(find /opt/homebrew/Cellar/ovbox -name ovbox.app) ${HOME}/Applications/
