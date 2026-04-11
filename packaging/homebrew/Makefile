@@ -16,6 +16,7 @@ build:
 copyfiles: build
 	mkdir -p "$(DESTDIR)$(PREFIX)"
 	cp -r "homebrew-build-dir/$(PREFIX)/"* "$(DESTDIR)$(PREFIX)"
+	cp "$(REPO)/packaging/homebrew/ovbox_homebrew_postinstall" "$(DESTDIR)$(PREFIX)/bin/"
 
 clean:
 	@rm -rf homebrew-build-dir
