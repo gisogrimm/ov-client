@@ -1,1 +1,1 @@
-nodejs, jackd, hoertech-openmha-keyring, ${shlibsDepends}
+nodejs, jackd, ${shlibsDepends}
