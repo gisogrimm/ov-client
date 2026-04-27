@@ -4,6 +4,9 @@ BINDIR=$(PREFIX)/bin
 SHAREDIR=$(PREFIX)/share/ovclient
 DESTDIR=
 
+FULLVERSION:=$(shell cd libov && ./get_version.sh)
+
+
 # build all tools:
 all: build lib binaries
 
@@ -29,7 +32,7 @@ endif
 BIN_OLD_CLI = ov-client
 
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
-  ovrealpath ovbox_version ovbox_sendlog
+  ovrealpath ovbox_version ovbox_sendlog ov-server
 
 BIN_GUI = ovbox
 
@@ -229,6 +232,8 @@ build/ovbox: EXTERNALS += gtkmm-3.0
 build/ovbox: CXXFLAGS += -I./build
 build/ovbox: build/ovbox_glade.h
 build/ovbox: build/ovbox.res.c
+
+build/ov-server: CXXFLAGS += -DOVBOXVERSION="\"$(FULLVERSION)\""
 
 ifeq ($(UNAME_S),Darwin)
 zita: build/.directory
