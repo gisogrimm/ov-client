@@ -32,7 +32,11 @@ endif
 BIN_OLD_CLI = ov-client
 
 BIN_CLI = ovbox_cli ov-client_hostname ov-client_listsounddevs	\
-  ovrealpath ovbox_version ovbox_sendlog ov-server
+  ovrealpath ovbox_version ovbox_sendlog
+
+ifeq ($(UNAME_S),Linux)
+BIN_CLI += ov-server
+endif
 
 BIN_GUI = ovbox
 
