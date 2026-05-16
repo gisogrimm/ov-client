@@ -16,8 +16,18 @@
     </div>
     <div class="portlist">
       <p class="listhead">sources:</p>
-      <input class="ctlbutton" type="checkbox" onclick="jackrec_selectallports();" id="selectallports">
-      <label for="selectallports">select all</label>
+      <div class="recportselector">
+        <input class="ctlbutton" type="checkbox" onclick="jackrec_selectallports();" id="selectallports">
+        <label for="selectallports">select all</label>
+      </div>
+      <div class="recportselector">
+        <input class="ctlbutton" type="checkbox" onclick="jackrec_selectswports();" id="selectswports">
+        <label for="selectswports">select members</label>
+      </div>
+      <div class="recportselector">
+        <input class="ctlbutton" type="checkbox" onclick="jackrec_selecthwports();" id="selecthwports">
+        <label for="selecthwports">select hardware inputs</label>
+      </div>
       <div id="portlist"></div>
     </div>
     <div class="filelist">
@@ -40,7 +50,7 @@
     <input type="checkbox" id="tuner_active" onclick="tuner_set_isactive();" checked="false">
     <div class="tuner_textcontainer">
       <div id="tuner_notedisplay" class="tuner_notedisplay">--</div>
-      <div class="tuner_df_freq">
+      <div class="tuner_df_freq>"
         <div id="tuner_deltadisplay" class="tuner_deltadisplay">--</div>
         <div id="tuner_freqdisplay" class="tuner_freqdisplay">--</div>
       </div>

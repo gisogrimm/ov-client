@@ -570,6 +570,7 @@ socket.on( "jackrecportlist", function( t ) {
 socket.on( 'jackrecaddport', function( p ) {
   var labs = p;
   var classes = 'mixerstrip jackrecsrcport';
+  var porttype = 'porttype_sw';
   var helps = '';
   if ( p.startsWith( 'n2j_' ) ) return;
   if ( p.startsWith( deviceid + '.levelanalysis:out' ) ) return;
@@ -577,9 +578,10 @@ socket.on( 'jackrecaddport', function( p ) {
   if ( p.startsWith( 'system:capture' ) ) {
     classes += ' mixerego';
     helps = 'Hardware input';
+    porttype = 'porttype_hw';
   }
   if ( p.startsWith( 'bus.' ) ) {
-    classes += ' mixerego';
+    //classes += ' mixerego';
     helps = 'My input (with effects)';
     labs = labs.replace( 'bus.', '' ).replace( ':out.0', '' );
   }
@@ -590,8 +592,10 @@ socket.on( 'jackrecaddport', function( p ) {
     classes += ' mixerother';
     helps = 'Metronome';
     labs = 'metronome';
+    porttype = 'porttype_other';
   }
   if ( p.startsWith( deviceid + '.main:' ) ) {
+    porttype = 'porttype_other';
     classes += ' mixerother';
     helps = 'My headphone output';
     labs = labs.replace( deviceid + '.main:', '' );
@@ -606,7 +610,7 @@ socket.on( 'jackrecaddport', function( p ) {
     inp.setAttribute( 'type', 'checkbox' );
     inp.setAttribute( 'value', p );
     inp.setAttribute( 'id', p );
-    inp.setAttribute( 'class', 'jackport checkbox' );
+    inp.setAttribute( 'class', 'jackport checkbox ' + porttype );
     let lab = div.appendChild( document.createElement( 'label' ) );
     lab.setAttribute( 'for', p );
     lab.setAttribute( 'title', helps );
@@ -761,9 +765,35 @@ function jackrec_selectallfiles() {
 
 function jackrec_selectallports() {
   let ischecked = document.getElementById( "selectallports" ).checked;
+  document.getElementById( "selectswports" ).checked = false;
+  document.getElementById( "selecthwports" ).checked = false;
   let el = document.getElementById( "portlist" );
   if ( !el ) return;
   let ports = el.getElementsByClassName( 'jackport' );
+  for ( var k = 0; k < ports.length; k++ ) {
+    ports[ k ].checked = ischecked;
+  }
+}
+
+function jackrec_selectswports() {
+  let ischecked = document.getElementById( "selectswports" ).checked;
+  document.getElementById( "selectallports" ).checked = false;
+  document.getElementById( "selecthwports" ).checked = false;
+  let el = document.getElementById( "portlist" );
+  if ( !el ) return;
+  let ports = el.getElementsByClassName( 'porttype_sw' );
+  for ( var k = 0; k < ports.length; k++ ) {
+    ports[ k ].checked = ischecked;
+  }
+}
+
+function jackrec_selecthwports() {
+  let ischecked = document.getElementById( "selecthwports" ).checked;
+  document.getElementById( "selectallports" ).checked = false;
+  document.getElementById( "selectswports" ).checked = false;
+  let el = document.getElementById( "portlist" );
+  if ( !el ) return;
+  let ports = el.getElementsByClassName( 'porttype_hw' );
   for ( var k = 0; k < ports.length; k++ ) {
     ports[ k ].checked = ischecked;
   }
@@ -805,6 +835,8 @@ socket.on( "connect", function() {
     'rx': 0
   };
   socket.emit( "config", {} );
+  document.getElementById( "selectswports" ).checked = false;
+  document.getElementById( "selecthwports" ).checked = false;
 } );
 socket.on( 'deviceid', function( id ) {
   deviceid = id;
