@@ -378,3 +378,9 @@ h1 {
     background-color: #ffffff40;
     margin: 2px;
 }
+.stopbutton {
+    padding: 10px;
+}
+.recbutton {
+    padding: 10px;
+}
