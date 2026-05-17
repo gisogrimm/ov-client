@@ -210,8 +210,8 @@ void ov_server_t::announce_new_connection(stage_device_id_t cid,
   log(portno,
       "new connection for " + std::to_string(cid) + " from " + ep2str(ep.ep) +
           " in " + ((ep.mode & B_PEER2PEER) ? "peer-to-peer" : "server") +
-          "-mode" + ((ep.mode & B_RECEIVEDOWNMIX) ? " receivedownmix" : "") +
-          ((ep.mode & B_SENDDOWNMIX) ? " senddownmix" : "") +
+          "-mode" + ((ep.mode & B_RECEIVEDOWNMIX_deprecated) ? " receivedownmix" : "") +
+          ((ep.mode & B_SENDDOWNMIX_deprecated) ? " senddownmix" : "") +
           ((ep.mode & B_DONOTSEND) ? " donotsend" : "") + " v" + ep.version);
 }
 
@@ -425,8 +425,8 @@ void ov_server_t::srv()
           if((target_id != sender_id) && (dest.timeout > 0) &&
              (!(dest.mode & B_DONOTSEND)) &&
              ((!(dest.mode & B_PEER2PEER)) || (!(src.mode & B_PEER2PEER))) &&
-             ((bool)(dest.mode & B_RECEIVEDOWNMIX) ==
-              (bool)(src.mode & B_SENDDOWNMIX))) {
+             ((bool)(dest.mode & B_RECEIVEDOWNMIX_deprecated) ==
+              (bool)(src.mode & B_SENDDOWNMIX_deprecated))) {
             char* send_msg = buffer;
             size_t send_len = n;
             // now check for encryption:
