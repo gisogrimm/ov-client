@@ -6,6 +6,7 @@
 #include "errmsg.h"
 #include "ovtcpsocket.h"
 #include "udpsocket.h"
+#include <atomic>
 #include <condition_variable>
 #include <queue>
 #include <signal.h>
@@ -78,10 +79,10 @@ namespace webCURL {
 
 class latreport_t {
 public:
-  latreport_t() : src(0), dest(0), tmean(0), jitter(0){};
+  latreport_t() : src(0), dest(0), tmean(0), jitter(0) {};
   latreport_t(stage_device_id_t src_, stage_device_id_t dest_, double tmean_,
               double jitter_)
-      : src(src_), dest(dest_), tmean(tmean_), jitter(jitter_){};
+      : src(src_), dest(dest_), tmean(tmean_), jitter(jitter_) {};
   stage_device_id_t src;
   stage_device_id_t dest;
   double tmean;
@@ -99,7 +100,7 @@ public:
 
 #define ANNOUNCEMENTPERIOD_FAILURE_MS 50000
 
-static bool quit_app(false);
+static volatile std::atomic<bool> quit_app(false);
 
 class ov_server_t : public endpoint_list_t {
 public:
@@ -210,7 +211,8 @@ void ov_server_t::announce_new_connection(stage_device_id_t cid,
   log(portno,
       "new connection for " + std::to_string(cid) + " from " + ep2str(ep.ep) +
           " in " + ((ep.mode & B_PEER2PEER) ? "peer-to-peer" : "server") +
-          "-mode" + ((ep.mode & B_RECEIVEDOWNMIX_deprecated) ? " receivedownmix" : "") +
+          "-mode" +
+          ((ep.mode & B_RECEIVEDOWNMIX_deprecated) ? " receivedownmix" : "") +
           ((ep.mode & B_SENDDOWNMIX_deprecated) ? " senddownmix" : "") +
           ((ep.mode & B_DONOTSEND) ? " donotsend" : "") + " v" + ep.version);
 }
@@ -314,6 +316,7 @@ void ov_server_t::announce_service()
         url += httpGetRequest;
         {
           std::lock_guard<std::mutex> lk(curlmtx);
+          curl_easy_reset(curl);
           curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
           curl_easy_setopt(curl, CURLOPT_USERPWD, "room:room");
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
