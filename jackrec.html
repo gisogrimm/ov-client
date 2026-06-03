@@ -10,7 +10,7 @@
     <div class="jackrecctl">
       <input class="recbutton ctlbutton" type="button" value="rec" onclick="jackrec_start();">
       <input class="stopbutton ctlbutton" type="button" value="stop" onclick="jackrec_stop();">
-      <input class="rectime ctlbutton" type="label" id="rectime" value="00:00.0">
+      <input class="rectime ctlbutton" type="text" id="rectime" value="00:00.0">
       <span id="recindicator" class="recindicator"></span>
       <span id="recerr" class="jackrecerr"></span>
     </div>
@@ -47,10 +47,11 @@
     </div>
   </div>
   <div id="tuner" class="tuner tabhide">
-    <input type="checkbox" id="tuner_active" onclick="tuner_set_isactive();" checked="false">
+    <input type="checkbox" id="tuner_active" onclick="tuner_set_isactive();" checked="false"/>
+    <label for="tuner_active">enable tuner</label>
     <div class="tuner_textcontainer">
       <div id="tuner_notedisplay" class="tuner_notedisplay">--</div>
-      <div class="tuner_df_freq>"
+      <div class="tuner_df_freq">
         <div id="tuner_deltadisplay" class="tuner_deltadisplay">--</div>
         <div id="tuner_freqdisplay" class="tuner_freqdisplay">--</div>
       </div>

@@ -384,3 +384,14 @@ h1 {
 .recbutton {
     padding: 10px;
 }
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(1.8); /* IE */
+  -moz-transform: scale(1.8); /* FF */
+  -webkit-transform: scale(1.8); /* Safari and Chrome */
+  -o-transform: scale(1.8); /* Opera */
+  transform: scale(1.8);
+  padding: 10px;
+}
