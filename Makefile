@@ -84,7 +84,8 @@ LDLIBS += -ldl
 
 HEADER := $(wildcard src/*.h) $(wildcard libov/src/*.h) tscver
 
-CXXFLAGS += -Ilibov/tascar/libtascar/build
+# TASCAR headers:
+CXXFLAGS += -Ilibov/tascar/libtascar/include -Ilibov/tascar/libtascar/build
 
 OSFLAG :=
 UNAME_S :=
