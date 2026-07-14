@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: fetchtags
       run: git fetch --unshallow --tags
     - name: submods
@@ -28,7 +28,7 @@ jobs:
       run: dpkg-query -l ovbox-cli
     - name: test-run
       run: ovbox_cli --deviceid=000000000000 & sleep 20;killall ovbox_cli
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: ov-client-ubuntu-22.04
         path: packaging/deb/debian/*/*.deb
