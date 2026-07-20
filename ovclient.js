@@ -552,6 +552,20 @@ function objmix_upload_posandgains() {
     "value": null
   } );
 }
+
+function jackrec_toggle_portselection( e ) {
+  if ( e.target.checked )
+    socket.emit( "msg", {
+      'path': '/jackrec/addport',
+      'value': e.target.id
+    } );
+  else
+    socket.emit( "msg", {
+      'path': '/jackrec/delport',
+      'value': e.target.id
+    } );
+}
+
 socket.on( "jackrecerr", function( e ) {
   recerror( e )
 } );
@@ -566,6 +580,24 @@ socket.on( "jackrecportlist", function( t ) {
     while ( el.firstChild ) {
       el.removeChild( el.firstChild );
     }
+} );
+socket.on( "jackrecenabledports", function( t ) {
+  if ( t == 'start' ) {
+    let el = document.getElementById( "portlist" );
+    if ( el ) {
+      let ports = el.getElementsByClassName( 'jackport' );
+      for ( var k = 0; k < ports.length; k++ ) {
+        ports[ k ].checked = false;
+      }
+      console.log( 'jackrecenabledports/start' );
+    }
+  }
+} );
+socket.on( "jackrecenabledport", function( t ) {
+  let el = document.getElementById( t );
+  if ( el )
+    el.checked = true;
+  console.log( t );
 } );
 socket.on( 'jackrecaddport', function( p ) {
   var labs = p;
@@ -611,6 +643,7 @@ socket.on( 'jackrecaddport', function( p ) {
     inp.setAttribute( 'value', p );
     inp.setAttribute( 'id', p );
     inp.setAttribute( 'class', 'jackport checkbox ' + porttype );
+    inp.setAttribute( 'onchange', 'jackrec_toggle_portselection(event);' );
     let lab = div.appendChild( document.createElement( 'label' ) );
     lab.setAttribute( 'for', p );
     lab.setAttribute( 'title', helps );
@@ -700,24 +733,32 @@ function handleChange( e ) {
 }
 
 function jackrec_start() {
-  socket.emit( "msg", {
-    path: '/jackrec/clear',
-    value: null
-  } );
-  let el = document.getElementById( "portlist" );
-  if ( !el ) return;
-  let ports = el.getElementsByClassName( 'jackport' );
-  for ( var k = 0; k < ports.length; k++ ) {
-    if ( ports[ k ].checked ) {
-      socket.emit( "msg", {
-        path: '/jackrec/addport',
-        value: ports[ k ].getAttribute( 'value' )
-      } );
-    }
-  }
+  jackrec_update_enabled_ports();
+  //socket.emit( "msg", {
+  //  path: '/jackrec/clear',
+  //  value: null
+  //} );
+  //let el = document.getElementById( "portlist" );
+  //if ( !el ) return;
+  //let ports = el.getElementsByClassName( 'jackport' );
+  //for ( var k = 0; k < ports.length; k++ ) {
+  //  if ( ports[ k ].checked ) {
+  //    socket.emit( "msg", {
+  //      path: '/jackrec/addport',
+  //      value: ports[ k ].getAttribute( 'value' )
+  //    } );
+  //  }
+  //}
   recerror( '' );
   socket.emit( "msg", {
     path: '/jackrec/start',
+    value: null
+  } );
+}
+
+function jackrec_update_enabled_ports() {
+  socket.emit( "msg", {
+    path: '/jackrec/listenabledports',
     value: null
   } );
 }
@@ -764,39 +805,68 @@ function jackrec_selectallfiles() {
 }
 
 function jackrec_selectallports() {
-  let ischecked = document.getElementById( "selectallports" ).checked;
-  document.getElementById( "selectswports" ).checked = false;
-  document.getElementById( "selecthwports" ).checked = false;
-  let el = document.getElementById( "portlist" );
-  if ( !el ) return;
-  let ports = el.getElementsByClassName( 'jackport' );
-  for ( var k = 0; k < ports.length; k++ ) {
-    ports[ k ].checked = ischecked;
-  }
+    let ischecked = document.getElementById( "selectallports" ).checked;
+    if( !ischecked){
+	socket.emit("msg",{'path':'/jackrec/clear','value':null});
+    }else{
+	document.getElementById( "selectswports" ).checked = false;
+	document.getElementById( "selecthwports" ).checked = false;
+	let el = document.getElementById( "portlist" );
+	if ( !el ) return;
+	let ports = el.getElementsByClassName( 'jackport' );
+	for ( var k = 0; k < ports.length; k++ ) {
+	    if ( ischecked )
+		socket.emit( "msg", {
+		    'path': '/jackrec/addport',
+		    'value': ports[ k ].id
+		} );
+	}
+    }
+    jackrec_update_enabled_ports();
 }
 
 function jackrec_selectswports() {
-  let ischecked = document.getElementById( "selectswports" ).checked;
-  document.getElementById( "selectallports" ).checked = false;
-  document.getElementById( "selecthwports" ).checked = false;
-  let el = document.getElementById( "portlist" );
-  if ( !el ) return;
-  let ports = el.getElementsByClassName( 'porttype_sw' );
-  for ( var k = 0; k < ports.length; k++ ) {
-    ports[ k ].checked = ischecked;
-  }
+    let ischecked = document.getElementById( "selectswports" ).checked;
+    document.getElementById( "selectallports" ).checked = false;
+    document.getElementById( "selecthwports" ).checked = false;
+    let el = document.getElementById( "portlist" );
+    if ( !el ) return;
+    let ports = el.getElementsByClassName( 'porttype_sw' );
+    for ( var k = 0; k < ports.length; k++ ) {
+	if ( ischecked )
+	    socket.emit( "msg", {
+		'path': '/jackrec/addport',
+		'value': ports[ k ].id
+	    } );
+	else
+	    socket.emit( "msg", {
+		'path': '/jackrec/delport',
+		'value': ports[ k ].id
+	    } );
+    }
+    jackrec_update_enabled_ports();
 }
 
 function jackrec_selecthwports() {
-  let ischecked = document.getElementById( "selecthwports" ).checked;
-  document.getElementById( "selectallports" ).checked = false;
-  document.getElementById( "selectswports" ).checked = false;
-  let el = document.getElementById( "portlist" );
-  if ( !el ) return;
-  let ports = el.getElementsByClassName( 'porttype_hw' );
-  for ( var k = 0; k < ports.length; k++ ) {
-    ports[ k ].checked = ischecked;
-  }
+    let ischecked = document.getElementById( "selecthwports" ).checked;
+    document.getElementById( "selectallports" ).checked = false;
+    document.getElementById( "selectswports" ).checked = false;
+    let el = document.getElementById( "portlist" );
+    if ( !el ) return;
+    let ports = el.getElementsByClassName( 'porttype_hw' );
+    for ( var k = 0; k < ports.length; k++ ) {
+	if ( ischecked )
+	    socket.emit( "msg", {
+		'path': '/jackrec/addport',
+		'value': ports[ k ].id
+	    } );
+	else
+	    socket.emit( "msg", {
+		'path': '/jackrec/delport',
+		'value': ports[ k ].id
+	    } );
+    }
+    jackrec_update_enabled_ports();
 }
 
 function showtab( name ) {
