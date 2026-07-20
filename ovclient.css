@@ -197,6 +197,10 @@ button {
     width: 30px;
 }
 
+.hiddencheckbox {
+    width: 0px;
+}
+
 .netctl {
     background-color: #383838;
     padding: 20px;
@@ -394,4 +398,30 @@ input[type=checkbox]
   -o-transform: scale(1.8); /* Opera */
   transform: scale(1.8);
   padding: 10px;
+}
+
+.portind {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+}
+
+.portind-norec {
+    background-color: #808080;
+}
+
+.portind-recording {
+    background-color: #fb0000;
+}
+
+.portind-recenable {
+    background-color: #8B0000;
+    animation: portind-blink-animation 1s infinite;
+}
+
+@keyframes portind-blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
 }
