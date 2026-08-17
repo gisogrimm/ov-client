@@ -269,6 +269,7 @@ install: all
 	$(CMD_INSTALL) -D build/ovbox_version -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovbox_sendlog -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovbox_cli -t $(DESTDIR)$(BINDIR)
+	$(CMD_INSTALL) -D build/ov-server -t $(DESTDIR)$(BINDIR)
 	$(CMD_INSTALL) -D build/ovzita* -t $(DESTDIR)$(BINDIR)
 	mkdir -p  $(DESTDIR)$(SHAREDIR) && cp -r node_modules $(DESTDIR)$(SHAREDIR)
 	$(CMD_INSTALL) -D ovclient.css -t $(DESTDIR)$(SHAREDIR)
