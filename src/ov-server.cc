@@ -79,10 +79,10 @@ namespace webCURL {
 
 class latreport_t {
 public:
-  latreport_t() : src(0), dest(0), tmean(0), jitter(0) {};
+  latreport_t() : src(0), dest(0), tmean(0), jitter(0){};
   latreport_t(stage_device_id_t src_, stage_device_id_t dest_, double tmean_,
               double jitter_)
-      : src(src_), dest(dest_), tmean(tmean_), jitter(jitter_) {};
+      : src(src_), dest(dest_), tmean(tmean_), jitter(jitter_){};
   stage_device_id_t src;
   stage_device_id_t dest;
   double tmean;
@@ -104,7 +104,7 @@ static volatile std::atomic<bool> quit_app(false);
 
 class ov_server_t : public endpoint_list_t {
 public:
-  ov_server_t(int portno, int prio, const std::string& group_);
+  ov_server_t(int portno, int prio, const std::string& group_, bool tcp);
   ~ov_server_t();
   int portno;
   void srv();
@@ -138,6 +138,7 @@ private:
 
   secret_t secret = 1234;
   ovbox_udpsocket_t socket;
+  ovtcpsocket_t tcp;
   std::atomic<bool> runsession{false};
   std::string roomname = "";
   std::string lobbyurl = "http://localhost";
@@ -149,18 +150,23 @@ private:
   double serverjitter = -1.0;
 
   std::string group;
+  bool use_tcp = false;
 };
 
-ov_server_t::ov_server_t(int portno_, int prio, const std::string& group_)
+ov_server_t::ov_server_t(int portno_, int prio, const std::string& group_,
+                         bool usetcp)
     : portno(portno_), prio(prio), socket(secret, STAGE_ID_SERVER),
       roomname(addr2str(getipaddr().sin_addr) + ":" + std::to_string(portno)),
-      group(group_)
+      group(group_), use_tcp(usetcp)
 {
   endpoints.resize(255, ep_desc_t());
   // for(auto& ep:endpoints)
   //  memset(&ep,0,sizeof(ep));
   socket.set_timeout_usec(100000);
   portno = socket.bind(portno);
+  if(usetcp) {
+    tcp.bind(portno);
+  }
 }
 
 ov_server_t::~ov_server_t()
@@ -260,10 +266,11 @@ void ov_server_t::announce_service()
         {
           std::lock_guard<std::mutex> lk(settings_mtx);
           // Register at the lobby:
-          sprintf(httpGetRequest,
-                  "?port=%d&name=%s&pin=%d&srvjit=%1.1f&grp=%s&version=%s",
-                  portno, roomname.c_str(), secret, serverjitter, group.c_str(),
-                  OVBOXVERSION);
+          sprintf(
+              httpGetRequest,
+              "?port=%d&name=%s&pin=%d&srvjit=%1.1f&grp=%s&version=%s&tcp=%d",
+              portno, roomname.c_str(), secret, serverjitter, group.c_str(),
+              OVBOXVERSION, use_tcp);
           serverjitter = 0;
           std::string url(lobbyurl);
           url += std::string(httpGetRequest);
@@ -569,7 +576,7 @@ int main(int argc, char** argv)
     std::string lobby("http://oldbox.orlandoviols.com");
     std::string group;
     bool usetcp = false;
-    const char* options = "p:qr:hvn:l:g:";
+    const char* options = "p:qr:hvn:l:g:t";
     struct option long_options[] = {{"rtprio", 1, 0, 'r'},
                                     {"quiet", 0, 0, 'q'},
                                     {"port", 1, 0, 'p'},
@@ -628,15 +635,11 @@ int main(int argc, char** argv)
     // initialize random generator:
     srandom(seed);
     {
-      ov_server_t rec(portno, prio, group);
+      ov_server_t rec(portno, prio, group, usetcp);
       if(!roomname.empty())
         rec.set_roomname(roomname);
       if(!lobby.empty())
         rec.set_lobbyurl(lobby);
-      ovtcpsocket_t tcp;
-      if(usetcp) {
-        tcp.bind(portno);
-      }
       rec.start_services();
       rec.srv();
       rec.stop_services();
